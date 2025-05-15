@@ -1,0 +1,19 @@
+{
+  "dependencies": {
+    "ol": "^10.5.0",
+    "playwright": "^1.52.0"
+  },
+  "name": "spring-security",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@playwright/mcp": "^0.0.15"
+  }
+}

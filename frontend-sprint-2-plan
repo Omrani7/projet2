@@ -1,0 +1,132 @@
+Okay, let's dive into the frontend implementation, keeping your described flow, the screenshots, and the choice of OpenLayers with OpenStreetMap tiles in mind.
+Core Frontend Components & Services (Angular):
+Based on your description, we'll likely need/refine the following:
+Services:
+InstituteService (e.g., institute.service.ts):
+searchInstitutes(nameFragment: string): Observable<Institute[]>: Calls GET /api/v1/institutes/search?name={nameFragment}. The Institute model on the frontend should match the data returned (id, name, latitude, longitude).
+PropertyListingService (e.g., property-listing.service.ts):
+searchProperties(criteria: PropertySearchCriteria, pageable: Pageable): Observable<Page<PropertyListingDTO>>: Calls GET /api/v1/properties/search.
+PropertySearchCriteria (frontend interface/class): Needs to match the backend DTO structure (instituteId?, propertyType?, minPrice?, maxPrice?, radiusKm?, bedrooms?, etc.).
+Pageable (frontend interface/class): For page, size, sort (e.g., sort=distance,asc).
+Page<PropertyListingDTO> (frontend interface/class): To represent the paginated response.
+PropertyListingDTO (frontend interface/class): Matches the backend DTO (id, title, price, lat, lon, ownerUsername, mainImageUrl, etc.).
+getPropertyById(id: number): Observable<PropertyListingDTO>: Calls GET /api/v1/properties/{id}.
+(Later for CRUD): createProperty(...), updateProperty(...), deleteProperty(...) methods.
+MapService (e.g., map.service.ts) (Optional but Recommended):
+A dedicated service to encapsulate OpenLayers map initialization, marker management (adding, removing, updating pins for institutes and properties), view manipulation (centering, zooming), and event handling (marker clicks). This keeps map-specific logic out of your components.
+Components:
+DiscoveryComponent (or LandingPageComponent if it serves this purpose):
+The main container for the search results page (map + list).
+Holds the current search state (filters, pagination, sorting).
+Orchestrates data fetching from PropertyListingService when filters/sort/page change.
+Passes data to child components (MapDisplayComponent, PropertyListComponent, FilterBarComponent).
+FilterBarComponent (or part of DiscoveryComponent):
+Contains the "Sort By" dropdown/options.
+Contains the main "Filter" button that opens the filter modal.
+Displays selected filter chips/tags (optional).
+Institute Autocomplete Input:
+Uses Angular forms (Reactive or Template-driven).
+Calls InstituteService.searchInstitutes() as the user types.
+Displays suggestions.
+When a user selects an institute, it stores the selected Institute object (with id, name, lat, lon).
+Emits filter/sort changes to the parent DiscoveryComponent.
+FilterModalComponent:
+Launched when the "Filter" button is clicked.
+Contains various filter controls:
+University Search/Select: (Could reuse the autocomplete logic or have a dedicated list).
+Locality/Region Filters: (If applicable, needs backend support if not derived from university).
+Budget Sliders/Inputs: For min/max price.
+Room Type Dropdowns/Checkboxes.
+Distance Slider/Input: For radiusKm (likely enabled when a university is selected).
+Other filters from your screenshot (Move in Month, Stay Duration, Guarantor, Availability, Dual Occupancy, Housing Type). These all need corresponding fields in PropertySearchCriteria and backend support in PropertyListingService if they are to be used as filters.
+On "Show X results", emits the complete set of selected filter criteria.
+PropertyListComponent:
+Input: properties: PropertyListingDTO[].
+Input: currentPage, totalPages, totalElements (for pagination).
+Displays a list of PropertyCardComponent.
+Handles pagination events (e.g., page change) and emits them.
+Emits events on card hover/click to interact with the map.
+PropertyCardComponent:
+Input: property: PropertyListingDTO.
+Displays individual property information (image, title, price, basic details).
+Navigation to the property detail page on click.
+MapDisplayComponent (OpenLayers):
+Input: properties: PropertyListingDTO[].
+Input: selectedInstitute?: Institute (or its coordinates).
+Uses MapService (or contains direct OpenLayers logic).
+Initializes an OpenLayers map with OpenStreetMap tiles.
+Institute Pin: If selectedInstitute is provided, displays a distinct marker for it and centers/zooms the map appropriately.
+Property Pins: Displays markers for each property in the properties list using their lat/lon.
+Marker styling (e.g., show price on marker as in screenshot €216).
+Interaction:
+Clicking a property pin: Shows a small popup/infowindow with basic details (image, title, price) and a "View Details" button. Could also highlight the corresponding card in the list.
+Updates view (pan/zoom) when the search criteria or selected institute changes.
+Highlights a map pin when the corresponding list item is hovered/clicked.
+PropertyDetailComponent:
+Routed component (e.g., /properties/:id).
+Fetches full property details using PropertyListingService.getPropertyById().
+Displays all information about the property.
+Flow Implementation - Step-by-Step Thinking:
+Initial Page Load / DiscoveryComponent Init:
+DiscoveryComponent initializes. It might fetch an initial set of properties (e.g., latest, or based on default filters) by calling PropertyListingService.searchProperties() with default criteria.
+MapDisplayComponent initializes, perhaps centered on Tunisia or a default location until a search is made.
+User Interacts with Institute Autocomplete (FilterBarComponent):
+User types "Faculté des..."
+Autocomplete input calls InstituteService.searchInstitutes("Faculté des").
+Service hits GET /api/v1/institutes/search?name=Faculté des.
+Backend queries the (ideally seeded) institutes table.
+List of matching Institute objects (id, name, lat, lon) is returned.
+Frontend displays these as suggestions.
+User selects "Faculté des Sciences Humaines et Sociales de Tunis".
+FilterBarComponent (or DiscoveryComponent) now holds the selected Institute object (including its ID and coordinates).
+User Clicks Main Search Icon (or "Show X results" from Filter Modal):
+DiscoveryComponent gathers all current filter criteria:
+Selected instituteId (if any).
+radiusKm (if institute selected and distance specified).
+Price range, property type, bedrooms, etc. from the filter modal or other inputs.
+Current sort selection (e.g., sort=distance,asc if "Nearest" is selected and an institute is chosen).
+Current page number.
+Calls PropertyListingService.searchProperties(criteria, pageable).
+Backend processes the request, performs geospatial query if instituteId and radiusKm are present, applies other filters, sorts, and paginates.
+Page<PropertyListingDTO> is returned.
+DiscoveryComponent updates its state with the new list of properties, pagination details.
+Map Update (MapDisplayComponent):
+Receives the new list of PropertyListingDTO[] and the selectedInstitute.
+Clears old property pins.
+If selectedInstitute exists, places/updates its pin and potentially re-centers/zooms the map around it, considering the radiusKm.
+Adds new pins for each property in the results.
+List Update (PropertyListComponent):
+Receives the new list of PropertyListingDTO[] and pagination data.
+Re-renders the list of property cards.
+User Changes Sort Option:
+FilterBarComponent emits the new sort preference (e.g., sort=price,asc).
+DiscoveryComponent updates its pageable.sort state and re-fetches data by calling PropertyListingService.searchProperties() with the same filters but new sort order.
+Map and List update as in step 3.
+User Clicks on a Property Pin/Card:
+Pin Click: MapDisplayComponent shows an OpenLayers popup with info. A "View Details" button in the popup navigates to /properties/:id.
+Card Click: PropertyCardComponent navigates to /properties/:id.
+Considerations for OpenLayers & OpenStreetMap:
+Installation: npm install ol
+Styling: You'll need to import OpenLayers CSS or manage styling yourself.
+Map Initialization: Typically in ngAfterViewInit of your MapDisplayComponent.
+Apply to GeocodingSer...
+Markers (Features): You'll create Feature objects with Point geometries for each institute and property.
+Marker Styling: Use ol/style/Style, ol/style/Icon (for custom pin images), ol/style/Text (to show price on marker).
+Popups (Overlays): OpenLayers uses Overlay to display HTML content (like info windows) on the map.
+Projection: OpenStreetMap tiles (and OpenLayers by default) use EPSG:3857 (Web Mercator). Your backend coordinates are in EPSG:4326 (Latitude/Longitude). You MUST use fromLonLat() from ol/proj to convert your coordinates before using them with OpenLayers.
+Immediate Frontend Tasks:
+Setup Basic Services:
+Create/stub InstituteService with searchInstitutes().
+Create/stub PropertyListingService with searchProperties() and getPropertyById(). Define the necessary frontend interfaces (PropertySearchCriteria, Pageable, PropertyListingDTO, Institute).
+Setup DiscoveryComponent (or equivalent):
+Basic layout (placeholder for map, list, filters).
+State management for filters, sort, pagination.
+Implement FilterBarComponent with Institute Autocomplete:
+Input field.
+Call InstituteService.searchInstitutes().
+Display suggestions.
+Store selected institute.
+Basic MapDisplayComponent Setup:
+Install ol.
+Initialize a basic OpenLayers map with OSM tiles, centered on Tunisia.
+This is a substantial amount of frontend work. I recommend tackling it piece by piece, starting with the services and the institute autocomplete, then moving to the main search and map display.
