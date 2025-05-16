@@ -1,0 +1,54 @@
+@startuml "Updated Authentication Use Case Diagram"
+
+left to right direction
+skinparam actorStyle awesome
+skinparam packageStyle rectangle
+skinparam usecaseBackgroundColor #F0F8FF
+skinparam usecaseBorderColor #4169E1
+
+actor "User" as User
+actor "Registered User" as RegUser
+actor "System" as System
+
+rectangle "Authentication System" {
+  usecase "UC1: Register new account" as UC1
+  usecase "UC2: Verify email address" as UC2
+  usecase "UC3: Login with email/password" as UC3
+  usecase "UC4: Login with Google OAuth2" as UC4
+  usecase "UC5: Logout" as UC5
+  usecase "UC6: Request password reset" as UC6
+  usecase "UC7: Reset password" as UC7
+  usecase "UC8: View authentication status" as UC8
+  usecase "UC9: Process OAuth2 callback" as UC9
+  usecase "UC10: Manage authentication state" as UC10
+  usecase "UC11: Clean expired tokens" as UC11
+}
+
+User --> UC1
+User --> UC3
+User --> UC4
+User --> UC6
+User --> UC8
+
+RegUser --> UC2
+RegUser --> UC5
+RegUser --> UC7
+
+System --> UC11
+
+UC1 ..> UC2 : <<include>>
+UC6 ..> UC7 : <<include>>
+UC4 ..> UC9 : <<include>>
+UC3 ..> UC10 : <<include>>
+UC4 ..> UC10 : <<include>>
+UC5 ..> UC10 : <<include>>
+UC9 ..> UC10 : <<include>>
+UC8 ..> UC10 : <<extend>>
+
+note right of UC3: Standard email/password authentication
+note right of UC4: Alternative OAuth2 authentication
+note bottom of UC8: New feature to visualize auth state
+note right of UC9: Handles the redirect from OAuth provider
+note top of UC10: Reactive state management
+
+@enduml 

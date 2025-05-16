@@ -1,0 +1,127 @@
+| Établissement                                                                                              | Latitude        | Longitude      |
+|------------------------------------------------------------------------------------------------------------|-----------------|-----------------|
+| Faculté des Sciences Humaines et Sociales de Tunis                                                        | 36.795229716196 | 10.162663951823 |
+| École Supérieure des Sciences Économiques et Commerciales de Tunis (ESSEC)                                | 36.787050342642 | 10.174531567164 |
+| École Normale Supérieure de Tunis                                                                         | 36.791094222055 | 10.168644795999 |
+| École Supérieure des Sciences et Techniques de Tunis (ESSTT)                                              | 36.784968838163 | 10.179632273559 |
+| Institut Préparatoire aux Études d’Ingénieurs de Tunis (IPEIT)                                            | 36.786007069690 | 10.170873421137 |
+| Institut Préparatoire aux Études Littéraires et de Sciences Humaines de Tunis (IPELSH)                    | 36.792722       | 10.164167       |
+| Institut Supérieur de Gestion de Tunis (ISG)                                                              | 36.804564457156 | 10.150593709494 |
+| Institut Supérieur de l’Éducation et de la Formation Continue (ISEFC)                                     | 36.805096727509 | 10.150857921138 |
+| Institut Supérieur des Beaux-Arts de Tunis (ISBAT)                                                        | 36.806965       | 10.159248       |
+| Institut Supérieur de Musique de Tunis (ISMT)                                                             | 36.806389       | 10.181667       |
+| Institut Supérieur d’Art Dramatique                                                                       | 36.814773721949 | 10.166864796001 |
+| Institut Supérieur des Sciences Culturelles et Métiers du Patrimoine de Tunis                            | 36.786536283187 | 10.172577095999 |
+| Institut Supérieur des Études Appliquées en Humanités de Tunis                                            | 35.247744954121 | 9.107653013522  |
+| Institut Supérieur de l’Animation pour la Jeunesse et la Culture                                          | 36.806389       | 10.181667       |
+| Institut Supérieur des Études Appliquées en Humanités de Zaghouan                                         | 36.434273476032 | 10.090244480639 |
+| Institut National du Patrimoine                                                                           | 36.795602712132 | 10.170556711342 |
+| Tunis Business School                                                                                     | 36.720975367681 | 10.235384582502 |
+| Faculté des Sciences Juridiques, Politiques et Sociales de Tunis                                          | 36.845485       | 10.186745       |
+| Faculté des Sciences de Bizerte                                                                           | 37.266794       | 9.880720        |
+| Faculté des Sciences Économiques et de Gestion de Nabeul                                                  | 36.434788       | 10.689684       |
+| École Nationale d’Architecture et d’Urbanisme de Tunis                                                   | 36.872750       | 10.338369       |
+| École Polytechnique de Tunisie                                                                           | 36.880000       | 10.340000       |
+| École Supérieure de Technologie et d’Informatique (ENICarthage)                                          | 36.850000       | 10.210000       |
+| École Supérieure de la Statistique et de l’Analyse de l’Information (ESSAI)                              | 36.862798       | 10.195914       |
+| École Supérieure de l’Audiovisuel et du Cinéma de Gammarth                                               | 36.909721       | 10.286667       |
+| Institut Préparatoire aux Études d’Ingénieur de Bizerte                                                  | 37.264247       | 9.873201        |
+| Institut des Hautes Études Commerciales de Carthage (IHEC Carthage)                                      | 36.826139       | 10.177833       |
+| Institut National des Sciences Appliquées et de Technologie (INSAT)                                      | 36.840000       | 10.197000       |
+| Institut Supérieur des Sciences Appliquées et de Technologie de Mateur (ISSATM)                          | 37.040000       | 9.665000        |
+| Institut Préparatoire aux Études d’Ingénieur de Nabeul                                                   | 36.454170       | 10.734720       |
+| Institut Préparatoire aux Études Scientifiques et Techniques de la Marsa                                 | 36.866667       | 10.316667       |
+| Institut Supérieur des Beaux-Arts de Nabeul                                                              | 36.454170       | 10.734720       |
+| Institut Supérieur des Technologies de l’Environnement, de l’Urbanisme et du Bâtiment                    | 36.454170       | 10.734720       |
+| Institut Supérieur des Langues de Tunis                                                                  | 36.845485       | 10.186745       |
+| Institut Supérieur des Langues Appliquées et d’Informatique de Nabeul                                    | 36.454170       | 10.734720       |
+| Institut Supérieur des Sciences et Technologies de l’Environnement de Borj Cédria                        | 36.771389       | 10.224444       |
+| Institut Supérieur de Commerce et de Comptabilité de Bizerte                                             | 37.266794       | 9.880720        |
+| Institut Préparatoire aux Études Biologiques et Géologiques à la Soukra                                  | 36.880000       | 10.280000       |
+| Sup’Com (École nationale supérieure des Télécommunications de Tunis)                                     | 36.851000       | 10.211000       |
+| École Supérieure d’Agriculture de Mograne                                                                | 36.687000       | 9.490000        |
+| École Supérieure d’Agriculture de Mateur                                                                 | 37.040000       | 9.665000        |
+| École Supérieure des Industries Alimentaires de Tunis                                                    | 36.800000       | 10.160000       |
+| Institut Supérieur de Pêche et d’Aquaculture de Bizerte                                                  | 37.266794       | 9.880720        |
+| Institut National du Travail et des Études Sociales de Tunis                                             | 36.818000       | 10.118000       |
+| Institut Supérieur des Cadres de l’Enfance                                                               | 36.818000       | 10.118000       |
+| Institut National Agronomique de Tunisie                                                                 | 36.838000       | 10.165000       |
+| Institut des Études Touristiques Supérieures de Sidi Dhrif                                               | 36.818000       | 10.118000       |
+| Institut National de Recherche en Génie Rural, Eau et Forêt (INRGREF)                                    | 36.818000       | 10.118000       |
+| Institut National de Recherche Agronomique de Tunisie (INRAT)                                            | 36.818000       | 10.118000       |
+| Faculté de Droit et des Sciences Économiques et Politiques de Sousse                                     | 35.814330       | 10.633920       |
+| Faculté de Médecine de Sousse                                                                            | 35.830000       | 10.630000       |
+| Faculté des Lettres et des Sciences Humaines de Sousse                                                   | 35.800050       | 10.616110       |
+| Institut Supérieur de Finances et de Fiscalité de Sousse                                                 | 35.820000       | 10.635833       |
+| Institut Supérieur d’Informatique et des Technologies de Communication de Hammam Sousse                  | 35.858889       | 10.593889       |
+| Institut Supérieur du Transport et de la Logistique de Sousse                                            | 35.798333       | 10.615833       |
+| Institut Supérieur des Beaux Arts de Sousse                                                              | 35.831240       | 10.639080       |
+| École Supérieure des Sciences et Techniques de la Santé de Sousse                                        | 35.821430       | 10.634422       |
+| Institut Supérieur de Gestion de Sousse                                                                  | 35.821430       | 10.634422       |
+| Institut des Hautes Études Commerciales de Sousse                                                        | 35.831794652046 | 10.590482365267 |
+| Institut Supérieur de Musique de Sousse                                                                  | 35.820227865965 | 10.635174751773 |
+| Institut Supérieur des Sciences Appliquées et de Technologie de Sousse                                   | 35.821430       | 10.634422       |
+| École Nationale d’Ingénieurs de Sousse (ENISo)                                                          | 35.820327       | 10.593240       |
+| Institut Supérieur Agronomique de Chott Mériem                                                           | 35.915156563953 | 10.560210967120 |
+| Institut Supérieur des Sciences Infirmières de Sousse                                                    | 35.829320306816 | 10.624114805352 |
+| École Supérieure des Sciences et de la Technologie de Hammam Sousse (ESSTHS)                             | 35.850146       | 10.597748       |
+| Faculté des Sciences Économiques et de Gestion de Sfax                                                   | 34.740560       | 10.756670       |
+| Faculté de Médecine de Sfax                                                                              | 34.740560       | 10.756670       |
+| Faculté de droit de Sfax                                                                                 | 34.740560       | 10.756670       |
+| Institut Supérieur des Arts et Métiers de Sfax                                                           | 34.747470       | 10.762050       |
+| Institut Supérieur d’Electronique et de Communication de Sfax (ENET’com)                                 | 34.839620       | 10.756660       |
+| Institut Supérieur de Gestion Industrielle de Sfax (ISGI)                                                | 34.740560       | 10.756670       |
+| Institut des Hautes Études Commerciales de Sfax (IHEC)                                                   | 34.793820       | 10.837440       |
+| Faculté des Sciences de Sfax                                                                             | 34.740560       | 10.756670       |
+| École Nationale d’Ingénieurs de Sfax (ENISo)                                                            | 34.839620       | 10.756660       |
+| École Supérieure de Commerce de Sfax (ESC)                                                               | 34.740560       | 10.756670       |
+| Institut Supérieur d’Administration des Affaires de Sfax (ISAAS)                                         | 34.740560       | 10.756670       |
+| Institut Supérieur d’Informatique et de Multimédia de Sfax (ISIMS)                                       | 34.839620       | 10.756660       |
+| Institut Supérieur de Musique de Sfax                                                                    | 34.839620       | 10.756660       |
+| Institut Préparatoire aux Études d’Ingénieurs de Sfax (IPEIS)                                            | 34.740560       | 10.756670       |
+| Institut Supérieur du Sport et de l’Éducation Physique de Sfax (ISSEPS)                                  | 34.740560       | 10.756670       |
+| Institut Supérieur de Biotechnologies de Sfax                                                            | 34.740560       | 10.756670       |
+| Faculté des Lettres et Sciences Humaines de Sfax                                                         | 34.740560       | 10.756670       |
+| Institut Zitouna de Sfax                                                                                 | 34.742854454419 | 10.760978904256 |
+| École Supérieure des Sciences et Techniques de la Santé de Sfax (ESSTHS)                                 | 34.740560       | 10.756670       |
+| Institut Supérieur des Sciences Infirmières de Sfax (ISSI)                                               | 34.740560       | 10.756670       |
+| Institut Supérieur de Théologie de Tunis (ISTH)                                                          | 36.792700       | 10.165200       |
+| Institut Supérieur de Civilisation Islamique de Tunis (ISCI)                                             | 36.789433       | 10.164867       |
+| Centre des Études Islamiques de Kairouan                                                                 | 35.650750       | 10.084160       |
+| Faculté des Lettres, des Arts et des Humanités de la Manouba                                             | 36.812220       | 10.066110       |
+| École Supérieure des Sciences et Technologies du Design                                                  | 36.802500       | 10.116940       |
+| École Supérieure de Commerce de Tunis (ESCT)                                                             | 36.814210       | 10.062130       |
+| École Supérieure de Commerce Électronique de la Manouba (ESCE)                                           | 36.816030       | 10.059360       |
+| École Nationale des Sciences de l’Informatique (ENSI)                                                    | 36.813560       | 10.063910       |
+| Institut Supérieur des Arts du Multimédia de la Manouba (ISAMM)                                          | 36.816030       | 10.059360       |
+| Institut Supérieur de Comptabilité et d’Administration des Entreprises (ISCAE)                           | 36.816030       | 10.059360       |
+| Institut Supérieur de Biotechnologie de Sidi Thabet (ISBST)                                              | 36.908640       | 10.042470       |
+| Institut Supérieur de Documentation de Tunis (ISDT)                                                      | 36.816030       | 10.059360       |
+| Institut de Presse et des Sciences de l’Information (IPSI)                                               | 36.816030       | 10.059360       |
+| École Nationale de Médecine Vétérinaire de Sidi Thabet (ENMV)                                            | 36.907160       | 10.047960       |
+| Institut Supérieur du Sport et de l’Éducation Physique de Ksar Saïd (ISSEP)                              | 36.826600       | 10.104740       |
+| Institut Supérieur de Promotion des Handicapés de Ksar Saïd (IPH)                                        | 36.826600       | 10.104740       |
+| Institut Supérieur de l’Histoire de la Tunisie Contemporaine (ISHTC)                                     | 36.816030       | 10.059360       |
+| Faculté des Sciences de Monastir                                                                         | 35.764191       | 10.805056       |
+| Faculté de Médecine de Monastir                                                                          | 35.767139       | 10.832723       |
+| Institut Supérieur d’Informatique et de Mathématiques de Monastir (ISIMM)                                | 35.764825       | 10.840726       |
+| Faculté de Médecine Dentaire de Monastir                                                                 | 35.764681       | 10.828703       |
+| Faculté de Pharmacie de Monastir                                                                         | 35.764681       | 10.828703       |
+| Faculté des Sciences Économiques et de Gestion de Mahdia                                                 | 35.520830       | 11.028060       |
+| École Nationale d’Ingénieurs de Monastir (ENIM)                                                          | 35.760000       | 10.810000       |
+| Institut Supérieur de Biotechnologie de Monastir (ISBM)                                                  | 35.764681       | 10.828703       |
+| Institut Préparatoire aux Études d’Ingénieurs de Monastir (IPEIM)                                        | 35.766223904084 | 10.803717422935 |
+| École Supérieure des Sciences & Techniques de la Santé de Monastir (ESSTSM)                             | 35.767220485322 | 10.834245922935 |
+| Institut Supérieur des Études Appliquées en Humanités de Mahdia (ISEAHM)                                 | 35.478828272278 | 11.052238382441 |
+| Institut Supérieur des Métiers de la Mode de Monastir (ISMMM)                                            | 35.767096090999 | 10.841139053642 |
+| Institut Supérieur d’Informatique de Mahdia (ISIMa)                                                      | 35.524071187334 | 11.030587251759 |
+| Institut Supérieur des Arts et Métiers de Mahdia (ISAMMH)                                                 | 35.502571160236 | 11.065329782442 |
+| Institut Supérieur des Sciences Appliquées & Tech. de Mahdia (ISSATMH)                                   | 36.821082017757 | 10.179888182507 |
+| Institut Supérieur des Langues Appliquées aux Affaires & Tourisme de Moknine                              | 35.633000       | 10.900000       |
+| Faculté des Sciences de Gafsa                                                                             | 34.422270       | 8.746980        |
+| Institut Supérieur des Études Appliquées en Humanités de Gafsa                                           | 34.422270       | 8.746980        |
+| Institut Supérieur d’Administration des Entreprises de Gafsa                                             | 34.422270       | 8.746980        |
+| Institut Supérieur des Sciences Appliquées et de Technologie de Gafsa (ISET‑Gafsa)                        | 34.429768       | 8.762546        |
+| Institut Supérieur d’Arts et Métiers de Gafsa (ISAMG‑Gafsa)                                              | 34.423490       | 8.758090        |
+| Institut Supérieur des Sciences et des Technologies de l’Énergie de Gafsa                                | 34.422270       | 8.746980        |
+| Institut Supérieur des Études Appliquées en Humanités de Tozeur
