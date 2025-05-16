@@ -1,0 +1,95 @@
+<!-- Navigation Bar -->
+<nav class="bg-white shadow-md py-4">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+    <div class="flex items-center">
+      <span class="text-xl font-bold text-primary">TuniToit</span>
+      <div class="hidden md:flex ml-10 space-x-8">
+        <a href="#" class="text-gray-600 hover:text-primary">Download App</a>
+        <a href="#" class="text-gray-600 hover:text-primary">Support</a>
+        <a href="#" class="text-gray-600 hover:text-primary">Shortlist</a>
+      </div>
+    </div>
+
+    <div class="flex items-center">
+      <!-- Auth Status Indicator -->
+      <app-auth-status class="mr-4 hidden md:block"></app-auth-status>
+
+      <div class="mr-2 text-sm text-gray-600">
+        <span *ngIf="logoutInProgress" class="flex items-center">
+          <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Processing...
+        </span>
+      </div>
+
+      <!-- Show login button when user is not logged in -->
+      <button
+        *ngIf="!isLoggedIn()"
+        (click)="login()"
+        class="ml-4 px-6 py-2 border border-primary text-primary hover:bg-primary hover:text-white rounded-md transition flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+        </svg>
+        Login
+      </button>
+
+      <!-- Show logout button when user is logged in -->
+      <button
+        *ngIf="isLoggedIn()"
+        (click)="logout()"
+        [disabled]="logoutInProgress"
+        class="ml-4 px-6 py-2 border border-primary text-primary hover:bg-primary hover:text-white rounded-md transition flex items-center"
+        [class.opacity-50]="logoutInProgress"
+        [class.cursor-not-allowed]="logoutInProgress">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+        </svg>
+        {{ logoutInProgress ? 'Logging out...' : 'Logout' }}
+      </button>
+
+      <button class="ml-4 p-2 text-gray-600 md:hidden">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero Section -->
+<div class="bg-gray-100 min-h-screen flex items-center">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="text-center">
+      <h1 class="text-4xl font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
+        <span class="block">Your home away</span>
+        <span class="block text-primary">from home</span>
+      </h1>
+      <p class="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
+        Find accommodation across universities and cities around the globe
+      </p>
+
+      <!-- Add auth status here for better visibility -->
+      <div class="mt-4 flex justify-center">
+        <app-auth-status></app-auth-status>
+      </div>
+
+      <div class="mt-10 flex justify-center">
+        <div class="inline-flex rounded-md shadow">
+          <a href="#" class="px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary hover:bg-primary/90">
+            Get Started
+          </a>
+        </div>
+        <div class="ml-3 inline-flex">
+          <a href="#" class="px-5 py-3 border border-transparent text-base font-medium rounded-md text-primary bg-white hover:bg-gray-50">
+            Learn more
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- If isLoginModalOpen is true, show the login modal component -->
+<app-login *ngIf="isLoginModalOpen" (closeModalEvent)="closeLoginModal()"></app-login>

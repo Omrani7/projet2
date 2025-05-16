@@ -1,0 +1,28 @@
+.discovery-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.filter-bar-area {
+  flex: 0 0 auto;
+  padding: 10px 0;
+}
+
+.main-content-area {
+  display: flex;
+  flex: 1;
+  height: calc(100vh - 180px); /* Adjust based on header/navbar/etc. heights */
+}
+
+.property-list-area {
+  flex: 0 0 50%;
+  overflow-y: auto;
+  padding-right: 15px;
+}
+
+.map-area {
+  flex: 0 0 50%;
+  height: 100%; /* Important for map container */
+  position: relative;
+}

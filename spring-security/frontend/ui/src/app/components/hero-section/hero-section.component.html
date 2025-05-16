@@ -1,0 +1,56 @@
+<div class="relative bg-cover bg-center h-[70vh] md:h-[80vh] flex flex-col items-center justify-center text-white" style="background-image: url('/ui/src/assets/room-background.png');">  <!-- Overlay for better text readability -->
+  <div class="absolute inset-0 bg-black opacity-50"></div>
+
+  <!-- Content -->
+  <div class="relative z-10 flex flex-col items-center justify-center text-center p-4">
+    <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold mb-3">Home away from home</h1>
+    <p class="text-lg sm:text-xl md:text-2xl mb-6 max-w-3xl">
+      Book student accommodations near top universities and cities across the globe
+    </p>
+
+    <!-- Guarantee Badges -->
+    <div class="flex flex-wrap justify-center items-center space-x-2 sm:space-x-4 mb-8">
+      <span class="bg-gray-700 bg-opacity-70 py-2 px-3 rounded-md text-xs sm:text-sm flex items-center">
+        <!-- Icon placeholder --> <span class="mr-1">✔</span> Verified Properties
+      </span>
+      <span class="bg-gray-700 bg-opacity-70 py-2 px-3 rounded-md text-xs sm:text-sm flex items-center">
+        <!-- Icon placeholder --> <span class="mr-1">🎧</span> 24x7 Assistance
+      </span>
+      <span class="bg-gray-700 bg-opacity-70 py-2 px-3 rounded-md text-xs sm:text-sm flex items-center">
+        <!-- Icon placeholder --> <span class="mr-1">💰</span> Lowest Price Guarantee
+      </span>
+    </div>
+
+    <!-- Search Bar -->
+    <form [formGroup]="heroSearchForm" (ngSubmit)="onHeroSearch()" class="w-full max-w-xl lg:max-w-2xl mb-4">
+      <div class="relative flex items-center">
+        <input
+          type="text"
+          formControlName="query"
+          placeholder="Search by City, University or Property"
+          class="w-full py-3 sm:py-4 px-5 pr-12 rounded-full text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-500 placeholder-gray-500 text-sm sm:text-base"
+        />
+        <button
+          type="submit"
+          class="absolute right-1 sm:right-2 top-1/2 transform -translate-y-1/2 bg-red-500 hover:bg-red-600 text-white rounded-full p-2 sm:p-2.5 focus:outline-none"
+          aria-label="Search"
+        >
+          <!-- SVG Search Icon (Heroicons) -->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 sm:w-6 sm:h-6">
+            <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.452 4.391l3.328 3.329a.75.75 0 1 1-1.06 1.06l-3.329-3.328A7 7 0 0 1 2 9Z" clip-rule="evenodd" />
+          </svg>
+        </button>
+      </div>
+    </form>
+
+    <!-- Recent Searches -->
+    <div class="flex flex-wrap justify-center items-center gap-2 text-xs sm:text-sm">
+      <span class="font-medium">Recent Searches:</span>
+      <a href="#" class="bg-gray-700 bg-opacity-60 hover:bg-opacity-80 py-1 px-3 rounded-full transition-colors">London <span class="text-gray-400"></span></a>
+      <a href="#" class="bg-gray-700 bg-opacity-60 hover:bg-opacity-80 py-1 px-3 rounded-full transition-colors">University Colleg... <span class="text-gray-400"></span></a>
+      <a href="#" class="bg-gray-700 bg-opacity-60 hover:bg-opacity-80 py-1 px-3 rounded-full transition-colors">Bath <span class="text-gray-400"></span></a>
+      <a href="#" class="bg-gray-700 bg-opacity-60 hover:bg-opacity-80 py-1 px-3 rounded-full transition-colors">Berlitz Manchester <span class="text-gray-400"></span></a>
+      <a href="#" class="bg-gray-700 bg-opacity-60 hover:bg-opacity-80 py-1 px-3 rounded-full transition-colors">Manchester <span class="text-gray-400"></span></a>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,65 @@
+/* State Navigation Tabs */
+.state-navigation {
+  margin-bottom: 30px;
+  overflow-x: auto; /* Allow horizontal scrolling on small screens */
+  white-space: nowrap;
+  padding-bottom: 10px; /* Space for scrollbar */
+  border-bottom: 1px solid #eee;
+}
+
+.state-tabs {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: inline-block; /* Keep items in one line */
+}
+
+.state-tabs li {
+  display: inline-block;
+  padding: 10px 20px;
+  margin-right: 10px;
+  cursor: pointer;
+  border-radius: 20px; /* Pill shape */
+  border: 1px solid #ddd;
+  background-color: #f8f9fa;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.state-tabs li:hover {
+  background-color: #e9ecef;
+  border-color: #bbb;
+}
+
+.state-tabs li.active {
+  background-color: #007bff; /* Example primary color */
+  color: white;
+  border-color: #007bff;
+  font-weight: bold;
+}
+
+/* Property List Area */
+.state-property-list h3 {
+  margin-bottom: 20px;
+}
+
+.properties-grid {
+  display: grid;
+  /* Adjust columns based on screen size / design */
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+/* States for Loading/Empty */
+.loading-indicator,
+.empty-state,
+.initial-prompt {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+  font-style: italic;
+}
+
+/* Common padding */
+.section-padding {
+    padding: 40px 20px;
+}

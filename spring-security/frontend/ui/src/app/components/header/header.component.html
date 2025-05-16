@@ -1,0 +1,94 @@
+<!-- Header: Use ngClass to switch between absolute/transparent and fixed/white -->
+<nav [ngClass]="{
+  'absolute text-white': !isScrolled,
+  'fixed bg-white text-gray-800 shadow-md': isScrolled
+}"
+class="top-0 left-0 right-0 z-20 p-4 md:px-8 lg:px-16 transition-colors duration-300 ease-in-out">
+  <div class="container mx-auto flex justify-between items-center">
+    <!-- Brand/Logo -->
+    <a routerLink="/" class="text-2xl md:text-3xl font-bold">
+      TuniToit <!-- Logo color will inherit from text-white or text-gray-800 -->
+    </a>
+
+    <!-- Right-side Links & Auth -->
+    <div class="flex items-center space-x-4 md:space-x-6 lg:space-x-8">
+      <!-- Links: Adjust hover color based on scroll state -->
+      <a href="#" [ngClass]="isScrolled ? 'hover:text-gray-600' : 'hover:text-gray-300'" class="hidden md:inline-flex items-center">
+        <span class="mr-1">&#x1F4F1;</span> <!-- Icon color might need adjustment -->
+        Download App
+      </a>
+      <a href="#" [ngClass]="isScrolled ? 'hover:text-gray-600' : 'hover:text-gray-300'" class="inline-flex items-center">
+         <span class="mr-1">&#x2753;</span> <!-- Icon color might need adjustment -->
+        Support
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 ml-1">
+          <path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+        </svg>
+      </a>
+      <a href="#" [ngClass]="isScrolled ? 'hover:text-gray-600' : 'hover:text-gray-300'" class="inline-flex items-center">
+        <span class="mr-1">&#x2661;</span> <!-- Icon color might need adjustment -->
+        Shortlist
+      </a>
+
+      <!-- Auth Section -->
+      <div class="auth-section ml-4">
+        <!-- Logged Out State: Adjust button styles for scrolled state -->
+        <ng-container *ngIf="!(isAuthenticated$ | async)">
+          <a routerLink="/auth/login"
+             [ngClass]="isScrolled ? 'hover:text-gray-600 border border-gray-300 rounded px-3 py-1 text-sm' : 'hover:text-gray-300 mr-3 md:mr-4'"
+             class="text-sm md:text-base transition-colors">
+            Login
+          </a>
+          <a routerLink="/auth/register"
+             [ngClass]="isScrolled ? 'bg-purple-600 hover:bg-purple-700 text-white' : 'bg-purple-600 hover:bg-purple-700 text-white'"
+             class="text-sm md:text-base font-semibold py-2 px-4 rounded-md transition-colors ml-2">
+            Register
+          </a>
+        </ng-container>
+
+        <!-- Logged In State (Button style remains the same) -->
+        <ng-container *ngIf="isAuthenticated$ | async">
+           <!-- Dropdown Container -->
+          <div class="relative">
+            <!-- Avatar Button -->
+            <button (click)="toggleDropdown()"
+                    class="bg-purple-600 hover:bg-purple-700 text-white rounded-full w-8 h-8 md:w-10 md:h-10 flex items-center justify-center focus:outline-none">
+              <span class="font-semibold">M</span>
+               <span class="ml-1"> &#x2261;</span>
+            </button>
+
+            <!-- Dropdown Menu (Style remains the same) -->
+            <div *ngIf="isDropdownOpen"
+                 class="absolute right-0 mt-2 w-60 bg-white rounded-md shadow-lg py-2 text-gray-800 text-sm z-30">
+               <!-- Dropdown Items -->
+              <a routerLink="/profile" class="flex items-center px-4 py-2 hover:bg-gray-100">
+                 <span class="mr-2">👤</span> Profile
+              </a>
+              <a routerLink="/bookings" class="flex items-center px-4 py-2 hover:bg-gray-100">
+                <!-- Bookings Icon Placeholder --> <span class="mr-2">📅</span> Bookings
+              </a>
+              <hr class="my-1 border-gray-200">
+              <a href="#" class="flex items-center justify-between px-4 py-2 hover:bg-gray-100">
+                <span class="flex items-center"><span class="mr-2">👥</span> Group Booking</span>
+                <span class="bg-green-100 text-green-700 text-xs font-semibold px-2 py-0.5 rounded-full">New</span>
+              </a>
+               <a href="#" class="flex items-center justify-between px-4 py-2 hover:bg-gray-100">
+                 <span class="flex items-center"><span class="mr-2">🗣️</span> Refer a Friend</span>
+                <span class="bg-green-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full">Get 50 GBP</span>
+              </a>
+              <a href="#" class="flex items-center px-4 py-2 hover:bg-gray-100">
+                 <span class="mr-2">🤝</span> Partner with Us
+              </a>
+              <a href="#" class="flex items-center px-4 py-2 hover:bg-gray-100">
+                 <span class="mr-2">📄</span> List with Us
+              </a>
+              <hr class="my-1 border-gray-200">
+              <button (click)="logout()" class="w-full text-left flex items-center px-4 py-2 hover:bg-gray-100">
+                 <span class="mr-2">➔</span> Logout
+              </button>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</nav>

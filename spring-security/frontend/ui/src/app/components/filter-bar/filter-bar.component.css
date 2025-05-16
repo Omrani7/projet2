@@ -1,0 +1,190 @@
+.filter-bar-container {
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  margin-bottom: 1rem; /* Add some space below the filter bar */
+}
+
+.search-form {
+  display: flex;
+  gap: 1rem; /* Consistent spacing between form elements */
+  align-items: center;
+}
+
+/* Common styling for form groups if needed */
+.form-group {
+  position: relative; /* For dropdown positioning */
+  display: flex;
+  flex-direction: column; /* Stack label and input if labels were visible */
+}
+
+.institute-search-wrapper {
+  flex-grow: 1; /* Allow institute search to take more space */
+  max-width: 450px; /* Adjust as needed */
+  position: relative; /* For clear button */
+}
+
+.institute-input {
+  /* Using Bootstrap's form-control for base styling */
+  padding-right: 2.5rem; /* Space for the clear button */
+}
+
+.btn-clear {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  font-size: 1.25rem; /* Make it a bit larger */
+  line-height: 1;
+  padding: 0.25rem 0.5rem;
+  color: #6c757d;
+  cursor: pointer;
+  z-index: 4; /* Ensure it's above the input */
+}
+
+.btn-clear:hover {
+  color: #212529;
+}
+
+.institutes-dropdown {
+  position: absolute;
+  top: 100%; /* Position below the input */
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  border: 1px solid #ced4da;
+  border-top: none;
+  border-radius: 0 0 0.25rem 0.25rem;
+  z-index: 1050; /* High z-index for visibility (Bootstrap dropdowns are ~1000) */
+  max-height: 250px;
+  overflow-y: auto;
+  /* Using Bootstrap's shadow-sm for subtle shadow */
+}
+
+/* Styling for items within the dropdown, using Bootstrap's dropdown-item for consistency */
+.institutes-dropdown .dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  clear: both;
+  font-weight: 400;
+  color: #212529;
+  text-align: inherit;
+  white-space: nowrap;
+  background-color: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.institutes-dropdown .dropdown-item:hover {
+  background-color: #e9ecef;
+  color: #1e2125;
+}
+
+.institutes-dropdown .dropdown-item.text-muted {
+  color: #6c757d !important; /* Ensure text-muted color is applied */
+  cursor: default;
+}
+
+.sort-select {
+  min-width: 180px; /* Give sort select some base width */
+  /* Using Bootstrap's form-select for base styling */
+}
+
+.filter-button {
+  /* Using Bootstrap's btn and btn-primary for base styling */
+}
+
+/* Visually hidden class for accessible labels */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* Filter Modal Styles */
+.filter-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1060;
+}
+
+.filter-modal-content {
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.filter-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.filter-modal-header h5 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.filter-modal-header .btn-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0;
+  color: #6c757d;
+}
+
+.filter-modal-body {
+  padding: 20px;
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.filter-modal-footer {
+  padding: 15px 20px;
+  border-top: 1px solid #dee2e6;
+  display: flex;
+  justify-content: space-between;
+}
+
+.filter-modal-footer .btn {
+  padding: 6px 16px;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -0.5rem;
+  margin-left: -0.5rem;
+}
+
+.col {
+  flex: 1 0 0%;
+  padding-right: 0.5rem;
+  padding-left: 0.5rem;
+}

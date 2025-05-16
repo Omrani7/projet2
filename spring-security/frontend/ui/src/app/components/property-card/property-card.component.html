@@ -1,0 +1,54 @@
+<!--
+  NOTE: For the CurrencyPipe to work, ensure CommonModule (which provides it) is imported
+  in the Angular module that declares this component (e.g., AppModule or a SharedModule).
+-->
+<div *ngIf="property" class="bg-white rounded-lg shadow-md overflow-hidden group cursor-pointer transition-shadow hover:shadow-lg">
+  <!-- Image with Hover Effect & Wishlist Button -->
+  <div class="relative">
+    <img [src]="property!.imageUrl || 'assets/placeholder-image.png'"
+         alt="{{ property!.title }} Image"
+         class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105">
+    <!-- Wishlist Button Placeholder -->
+    <button class="absolute top-2 right-2 bg-white bg-opacity-80 rounded-full p-1.5 focus:outline-none hover:bg-opacity-100">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-700">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+      </svg>
+    </button>
+    <!-- Add image pagination dots if needed -->
+  </div>
+
+  <!-- Card Body -->
+  <div class="p-4">
+    <!-- Title -->
+    <h3 class="text-lg font-semibold text-gray-800 truncate mb-1" title="{{ property!.title }}">
+      {{ property!.title }}
+    </h3>
+    <!-- Address -->
+    <p class="text-sm text-gray-600 truncate mb-3" title="{{ property!.address }}">
+      {{ property!.address }}
+    </p>
+    <!-- Price -->
+    <div class="flex justify-between items-center mb-3">
+       <p class="text-base font-bold text-gray-900">
+          From {{ property!.price | currency:property!.currency:'symbol':'1.0-0' }}/week
+        </p>
+        <!-- Rating Placeholder -->
+        <span class="text-sm text-gray-600 flex items-center">
+          <!-- Star icon -->
+           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 text-yellow-500 mr-1">
+            <path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z" clip-rule="evenodd" />
+          </svg>
+          5.0 (3) <!-- Placeholder rating -->
+        </span>
+    </div>
+    <!-- Details (Beds/Baths/Area) - Can uncomment if needed, not prominent in screenshot -->
+    <!--
+    <div class="flex items-center space-x-4 text-sm text-gray-600 border-t pt-2 mt-2">
+        <span *ngIf="property!.beds" class="flex items-center"><span class="mr-1">🛏️</span> {{property!.beds}} Beds</span>
+        <span *ngIf="property!.baths" class="flex items-center"><span class="mr-1">🛁</span> {{property!.baths}} Baths</span>
+        <span *ngIf="property!.area" class="flex items-center"><span class="mr-1">📐</span> {{property!.area}} sqm</span>
+    </div>
+    -->
+     <!-- View Details Button (Removed - card is clickable) -->
+  </div>
+</div>

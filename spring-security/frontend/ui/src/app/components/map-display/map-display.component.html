@@ -1,0 +1,9 @@
+<div [id]="mapId" class="map-container"></div>
+
+<!-- Popup Overlay -->
+<div #popupContainer class="ol-popup" [style.display]="isPopupVisible ? 'block' : 'none'">
+  <a href="#" #popupCloser class="ol-popup-closer" (click)="closePopup($event)">&times;</a>
+  <div #popupContent class="popup-content-wrapper">
+    <!-- Content will be dynamically set here -->
+  </div>
+</div>

@@ -1,0 +1,173 @@
+<div class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-lg shadow-xl w-full max-w-lg p-6 md:p-8 relative animate-fade-in-up">
+    <!-- Close button -->
+    <button (click)="closeModal()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition-colors">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+
+    <!-- Register header -->
+    <h2 class="text-2xl font-semibold mb-6 text-center text-gray-800">Create Your TuniToit Account</h2>
+
+    <!-- Registration form -->
+    <form (ngSubmit)="register()" #registerForm="ngForm">
+      <div class="space-y-4">
+        <div>
+          <label for="email" class="block text-gray-700 text-sm font-medium mb-2">Email Address</label>
+          <input
+            id="email"
+            type="email"
+            class="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
+            placeholder="Enter your email"
+            [(ngModel)]="email"
+            name="email"
+            required
+            email #emailInput="ngModel">
+          <p *ngIf="emailInput.invalid && (emailInput.dirty || emailInput.touched) && emailInput.errors?.['required']" class="text-red-500 text-xs mt-1">Email is required.</p>
+          <p *ngIf="emailInput.invalid && (emailInput.dirty || emailInput.touched) && emailInput.errors?.['email']" class="text-red-500 text-xs mt-1">Please enter a valid email address.</p>
+        </div>
+
+        <div>
+          <label for="username" class="block text-gray-700 text-sm font-medium mb-2">Username</label>
+          <input
+            id="username"
+            type="text"
+            class="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
+            placeholder="Choose a username"
+            [(ngModel)]="username"
+            name="username"
+            required #usernameInput="ngModel">
+          <p *ngIf="usernameInput.invalid && (usernameInput.dirty || usernameInput.touched)" class="text-red-500 text-xs mt-1">Username is required.</p>
+        </div>
+
+        <div>
+          <label for="password" class="block text-gray-700 text-sm font-medium mb-2">Password</label>
+          <input
+            id="password"
+            type="password"
+            class="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
+            [class.border-red-500]="passwordInput.invalid && (passwordInput.dirty || passwordInput.touched)"
+            placeholder="Create a password"
+            [(ngModel)]="password"
+            name="password"
+            required
+            minlength="8"
+            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$"
+            #passwordInput="ngModel">
+          <div *ngIf="passwordInput.invalid && (passwordInput.dirty || passwordInput.touched)" class="mt-1 text-red-500 text-xs space-y-0.5">
+            <p *ngIf="passwordInput.errors?.['required']">
+              Password is required.
+            </p>
+            <p *ngIf="passwordInput.errors?.['minlength']">
+              Password must be at least 8 characters long.
+            </p>
+            <p *ngIf="passwordInput.errors?.['pattern']">
+              Must contain uppercase, lowercase, and numbers.
+            </p>
+          </div>
+        </div>
+
+        <!-- Role Selection Styling -->
+        <div>
+          <label class="block text-gray-700 text-sm font-medium mb-2">I am a...</label>
+          <div class="flex space-x-3">
+            <div
+              class="flex-1 p-3 border rounded-md cursor-pointer text-center transition-all duration-200 ease-in-out hover:shadow-md"
+              [ngClass]="{'border-purple-500 bg-purple-50 ring-2 ring-purple-300 shadow-md': selectedRole === 'STUDENT', 'border-gray-300 hover:border-gray-400': selectedRole !== 'STUDENT'}"
+              (click)="selectedRole = 'STUDENT'">
+              <h3 class="font-semibold text-sm text-gray-800">Student</h3>
+              <p class="text-xs text-gray-500 mt-1">Looking for rentals</p>
+            </div>
+            <div
+              class="flex-1 p-3 border rounded-md cursor-pointer text-center transition-all duration-200 ease-in-out hover:shadow-md"
+              [ngClass]="{'border-purple-500 bg-purple-50 ring-2 ring-purple-300 shadow-md': selectedRole === 'OWNER', 'border-gray-300 hover:border-gray-400': selectedRole !== 'OWNER'}"
+              (click)="selectedRole = 'OWNER'">
+              <h3 class="font-semibold text-sm text-gray-800">Owner</h3>
+              <p class="text-xs text-gray-500 mt-1">Listing properties</p>
+            </div>
+          </div>
+        </div>
+        <!-- End Role Selection Styling -->
+
+        <div>
+          <label for="phoneNumber" class="block text-gray-700 text-sm font-medium mb-2">Phone Number <span class="text-gray-500 text-xs">(Optional)</span></label>
+          <input
+            id="phoneNumber"
+            type="tel"
+            class="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
+            placeholder="e.g., +216 12 345 678"
+            [(ngModel)]="phoneNumber"
+            name="phoneNumber">
+        </div>
+      </div>
+
+      <!-- General Error message from Backend / Client -->
+      <div *ngIf="errorMessage" class="mt-4 mb-4 text-red-600 text-sm p-3 bg-red-50 rounded-md border border-red-200">
+        {{ errorMessage }}
+      </div>
+
+      <!-- Loading Indicator -->
+      <div *ngIf="isRegistering" class="w-full py-3 flex justify-center items-center mb-6 text-purple-700">
+        <svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Creating account...
+      </div>
+
+      <!-- Register button -->
+      <button *ngIf="!isRegistering"
+        type="submit"
+        [disabled]="registerForm.invalid || !selectedRole"
+        class="w-full bg-purple-600 text-white py-3 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-1 transition mt-6 mb-6 disabled:opacity-50 disabled:cursor-not-allowed">
+        Create Account
+      </button>
+    </form>
+
+    <!-- Divider -->
+    <div class="flex items-center justify-center mb-6">
+      <div class="border-t border-gray-200 flex-grow"></div>
+      <div class="mx-4 text-xs text-gray-500 uppercase">or</div>
+      <div class="border-t border-gray-200 flex-grow"></div>
+    </div>
+
+    <!-- Alternative registration methods -->
+    <div class="space-y-3">
+      <!-- Google signup -->
+      <button
+        (click)="registerWithGoogle()"
+        [disabled]="isGoogleLoginInProgress"
+        class="w-full border border-gray-300 py-2.5 px-4 rounded-md flex items-center justify-center text-gray-700 hover:bg-gray-50 transition-colors relative disabled:opacity-60 disabled:cursor-wait">
+
+        <!-- Loading overlay for Google button -->
+        <div *ngIf="isGoogleLoginInProgress" class="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 rounded-md">
+           <svg class="animate-spin h-5 w-5 text-purple-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+        </div>
+
+        <!-- Google icon SVG -->
+        <svg class="w-5 h-5 mr-3" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+           <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"/>
+         </svg>
+        <span class="text-sm font-medium">Sign up with Google</span>
+      </button>
+      <!-- Add other social signups if needed -->
+    </div>
+
+    <!-- Login link -->
+    <div class="mt-6 text-center text-sm">
+      <span class="text-gray-600">Already have an account?</span>
+      <a (click)="goToLogin()" class="text-purple-600 hover:text-purple-800 font-medium ml-1 transition-colors cursor-pointer">Sign in</a>
+    </div>
+
+    <!-- Terms and conditions -->
+    <div class="mt-4 text-center text-xs text-gray-400">
+      By signing up you agree to our
+      <a href="#" class="text-purple-600 hover:underline">Privacy Policy</a> and
+      <a href="#" class="text-purple-600 hover:underline">Terms & Conditions</a>.
+    </div>
+  </div>
+</div>

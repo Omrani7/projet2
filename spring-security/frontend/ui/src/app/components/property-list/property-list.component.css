@@ -1,0 +1,131 @@
+.property-list-container {
+  width: 100%;
+}
+
+.loading-indicator-wrapper,
+.error-message-wrapper,
+.empty-state-wrapper {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.1rem;
+  color: #6c757d; /* Bootstrap text-muted like color */
+}
+
+.error-message-wrapper .text-danger {
+  color: #dc3545; /* Bootstrap text-danger color */
+}
+
+.property-items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Responsive grid */
+  gap: 1.5rem; /* Space between cards */
+  padding: 0; /* Remove default ul padding */
+}
+
+.property-item-card .card {
+  height: 100%; /* Make cards in a row equal height if container enforces it */
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Subtle shadow */
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.property-item-card .card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.property-item-card .card-img-top {
+  width: 100%;
+  height: 200px; /* Fixed height for images */
+  object-fit: cover; /* Scale image nicely */
+}
+
+.property-item-card .card-body {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; /* Allow body to take remaining space */
+  padding: 1rem;
+}
+
+.property-item-card .card-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.property-item-card .price {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #007bff; /* Primary color for price */
+  margin-bottom: 0.25rem;
+}
+
+.property-item-card .type-location {
+  font-size: 0.85rem;
+  color: #6c757d;
+  margin-bottom: 0.75rem;
+  flex-grow: 1; /* Push footer down */
+}
+
+.property-item-card .card-footer {
+  background-color: #f8f9fa; /* Light footer background */
+  font-size: 0.8rem;
+  padding: 0.5rem 1rem;
+  border-top: 1px solid #e9ecef;
+}
+
+.pagination-wrapper {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+/* Basic styling for pagination to look decent without full Bootstrap */
+.pagination {
+  display: flex;
+  padding-left: 0;
+  list-style: none;
+}
+
+.justify-content-center {
+  justify-content: center !important;
+}
+
+.page-item {
+  margin: 0 2px;
+}
+
+.page-item.disabled .page-link {
+  color: #6c757d;
+  pointer-events: none;
+  background-color: #fff;
+  border-color: #dee2e6;
+}
+
+.page-item.active .page-link {
+  z-index: 3;
+  color: #fff;
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.page-link {
+  position: relative;
+  display: block;
+  padding: 0.5rem 0.75rem;
+  margin-left: -1px;
+  line-height: 1.25;
+  color: #007bff;
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.page-link:hover {
+  z-index: 2;
+  color: #0056b3;
+  background-color: #e9ecef;
+  border-color: #dee2e6;
+}

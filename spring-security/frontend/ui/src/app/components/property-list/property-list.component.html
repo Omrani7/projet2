@@ -1,0 +1,60 @@
+<div class="property-list-container">
+  <div *ngIf="isLoading" class="loading-indicator-wrapper">
+    <p>Loading properties...</p> <!-- Replace with a spinner component later -->
+  </div>
+
+  <div *ngIf="!isLoading && errorMessage" class="error-message-wrapper">
+    <p class="text-danger">{{ errorMessage }}</p>
+  </div>
+
+  <div *ngIf="!isLoading && !errorMessage && (!propertiesPage || propertiesPage.empty)" class="empty-state-wrapper">
+    <p>No properties found matching your criteria.</p>
+    <!-- Optionally, suggest broadening search or checking filters -->
+  </div>
+
+  <div *ngIf="propertiesPage && !propertiesPage.empty">
+    <ul class="list-unstyled property-items-grid">
+      <li *ngFor="let prop of propertiesPage.content" class="property-item-card">
+        <div class="card">
+          <img
+            [src]="getImageAsDataUrl(prop.mainImageUrl)"
+            class="card-img-top"
+            alt="Property image for {{ prop.title }}"
+            (error)="handleImageError($event, prop)">
+          <div class="card-body">
+            <h5 class="card-title">{{ prop.title }}</h5>
+            <p class="card-text price">{{ prop.price | currency:'TND':'symbol':'1.0-0' }} / month</p>
+            <p class="card-text type-location">
+              <small>{{ prop.propertyType }} - {{ prop.location || 'Location not specified'}}</small>
+            </p>
+            <!-- Add more details like bedrooms, area, etc. as needed -->
+            <!-- <a href="#" class="btn btn-primary">View Details</a> -->
+          </div>
+          <div class="card-footer text-muted">
+            <small>Posted on: {{ prop.listingDate | date:'mediumDate' }}</small>
+          </div>
+        </div>
+      </li>
+    </ul>
+
+    <nav *ngIf="propertiesPage.totalPages > 1" aria-label="Properties pagination" class="pagination-wrapper">
+      <ul class="pagination justify-content-center">
+        <li class="page-item" [class.disabled]="propertiesPage.first">
+          <a class="page-link" href="javascript:void(0)" (click)="onPageChange(propertiesPage.number - 1)" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+        <li class="page-item" *ngFor="let pageNum of pageNumbers" [class.active]="pageNum === propertiesPage.number">
+          <a class="page-link" href="javascript:void(0)" (click)="onPageChange(pageNum)">
+            {{ pageNum + 1 }}
+          </a>
+        </li>
+        <li class="page-item" [class.disabled]="propertiesPage.last">
+          <a class="page-link" href="javascript:void(0)" (click)="onPageChange(propertiesPage.number + 1)" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>

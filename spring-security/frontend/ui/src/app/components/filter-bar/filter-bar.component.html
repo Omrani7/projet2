@@ -1,0 +1,110 @@
+<div class="filter-bar-container">
+  <form [formGroup]="searchForm" class="search-form">
+    <div class="institute-search-wrapper form-group">
+      <label for="instituteQueryInput" class="visually-hidden">Search University/Institute</label>
+      <input
+        id="instituteQueryInput"
+        type="text"
+        placeholder="Search University or Institute..."
+        formControlName="instituteQuery"
+        (focus)="onFocusInstitute()"
+        (blur)="onBlurInstitute()"
+        class="form-control institute-input"
+        aria-autocomplete="list"
+        aria-expanded="showInstitutesDropdown"
+        aria-controls="institutesDropdownList"
+      />
+      <button type="button" *ngIf="searchForm.get('instituteQuery')?.value" (click)="clearInstituteSearch()" class="btn-clear" aria-label="Clear institute search">
+        &times;
+      </button>
+
+      <div *ngIf="showInstitutesDropdown" class="institutes-dropdown shadow-sm" id="institutesDropdownList">
+        <div *ngIf="isLoadingInstitutes" class="dropdown-item text-muted">Loading...</div>
+        <ng-container *ngIf="(filteredInstitutes$ | async) as institutes">
+          <ul *ngIf="!isLoadingInstitutes && institutes.length > 0" class="list-unstyled mb-0">
+            <li *ngFor="let institute of institutes"
+                (mousedown)="selectInstitute(institute)"
+                class="dropdown-item"
+                role="option"
+                [attr.aria-selected]="false"> <!-- Basic ARIA, can be enhanced -->
+              {{ institute.name }}
+            </li>
+          </ul>
+          <div *ngIf="!isLoadingInstitutes && institutes.length === 0 && searchForm.get('instituteQuery')?.value?.trim().length > 1" class="dropdown-item text-muted">
+            No institutes found for "{{ searchForm.get('instituteQuery')?.value }}".
+          </div>
+        </ng-container>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="sortBySelect" class="visually-hidden">Sort by</label>
+      <select id="sortBySelect" formControlName="sortBy" class="form-select sort-select">
+        <option *ngFor="let option of sortOptions" [value]="option.value">
+          {{ option.label }}
+        </option>
+      </select>
+    </div>
+
+    <button type="button" class="btn btn-primary filter-button" (click)="toggleFilterModal()">Filters</button>
+  </form>
+
+  <!-- Filter Modal -->
+  <div *ngIf="showFilterModal" class="filter-modal">
+    <div class="filter-modal-content">
+      <div class="filter-modal-header">
+        <h5>Filters</h5>
+        <button type="button" class="btn-close" (click)="toggleFilterModal()">&times;</button>
+      </div>
+      <div class="filter-modal-body">
+        <form [formGroup]="filterForm">
+          <div class="form-group mb-3">
+            <label for="propertyType">Property Type</label>
+            <select id="propertyType" formControlName="propertyType" class="form-select">
+              <option value="">Any Type</option>
+              <option *ngFor="let type of propertyTypes" [value]="type">{{ type }}</option>
+            </select>
+          </div>
+
+          <div class="form-group mb-3">
+            <label>Price Range (TND)</label>
+            <div class="row">
+              <div class="col">
+                <input type="number" formControlName="minPrice" class="form-control" placeholder="Min" min="0">
+              </div>
+              <div class="col">
+                <input type="number" formControlName="maxPrice" class="form-control" placeholder="Max" min="0">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group mb-3">
+            <label for="bedrooms">Bedrooms</label>
+            <select id="bedrooms" formControlName="bedrooms" class="form-select">
+              <option value="">Any</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4+</option>
+            </select>
+          </div>
+
+          <div class="form-group mb-3" *ngIf="currentSelectedInstitute">
+            <label for="radiusKm">Distance from {{ currentSelectedInstitute.name }}</label>
+            <select id="radiusKm" formControlName="radiusKm" class="form-select">
+              <option value="1">1 km</option>
+              <option value="2">2 km</option>
+              <option value="3">3 km</option>
+              <option value="5">5 km</option>
+              <option value="10">10 km</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="filter-modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="clearFilters()">Clear All</button>
+        <button type="button" class="btn btn-primary" (click)="applyFilters()">Apply Filters</button>
+      </div>
+    </div>
+  </div>
+</div>

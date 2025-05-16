@@ -1,0 +1,41 @@
+<div class="discovery-page">
+  <app-filter-bar
+    [currentSelectedInstitute]="selectedInstitute"
+    (instituteSelected)="onInstituteSelected($event)"
+    (sortChanged)="onSortChanged($event)"
+    (filtersChanged)="onFiltersChanged($event)"
+  ></app-filter-bar>
+
+  <header class="filter-bar-area">
+    <!-- Placeholder for FilterBarComponent -->
+    <p>[FilterBarComponent Placeholder]</p>
+    <div *ngIf="selectedInstitute">
+      Searching near: {{ selectedInstitute.name }}
+    </div>
+  </header>
+
+  <div class="main-content-area">
+    <aside class="property-list-area">
+      <p *ngIf="selectedInstitute && !isLoading">
+        <!-- Displaying selected institute info if needed, or it can be part of filter bar itself -->
+        <!-- Results for institute: <strong>{{ selectedInstitute.name }}</strong> -->
+      </p>
+      <!-- <hr *ngIf="selectedInstitute && !isLoading"> -->
+
+      <app-property-list
+        [propertiesPage]="(propertyPage$ | async)"
+        [isLoading]="isLoading"
+        [errorMessage]="errorMessage"
+        (pageChanged)="onPageChanged($event)"
+      ></app-property-list>
+
+    </aside>
+
+    <main class="map-area">
+      <app-map-display
+        [properties]="(propertyPage$ | async)?.content || []"
+        [selectedInstitute]="selectedInstitute"
+      ></app-map-display>
+    </main>
+  </div>
+</div>
