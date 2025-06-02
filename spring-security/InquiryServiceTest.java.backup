@@ -1,0 +1,480 @@
+package com.example.spring_security.service;
+
+import com.example.spring_security.dao.InquiryRepository;
+import com.example.spring_security.dao.PropertyListingRepository;
+import com.example.spring_security.dao.UserRepo;
+import com.example.spring_security.dto.*;
+import com.example.spring_security.exception.ResourceNotFoundException;
+import com.example.spring_security.model.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class InquiryServiceTest {
+
+    @Mock
+    private InquiryRepository inquiryRepository;
+
+    @Mock
+    private PropertyListingRepository propertyListingRepository;
+
+    @Mock
+    private UserRepo userRepository;
+
+    @Mock
+    private EmailService emailService;
+    
+    @Spy // Use Spy for ModelMapper to test its actual mapping logic if needed, or mock its methods
+    private ModelMapper modelMapper = new ModelMapper();
+
+    @Mock
+    private WebSocketNotificationService webSocketNotificationService;
+
+    @InjectMocks
+    private InquiryService inquiryService;
+
+    private User studentUser;
+    private User ownerUser;
+    private PropertyListing propertyListingOwner;
+    private PropertyListing propertyListingScraped;
+    private Inquiry inquiry;
+    private UserPrincipal studentPrincipal;
+    private UserPrincipal ownerPrincipal;
+    private InquiryCreateDTO inquiryCreateDTO;
+    private InquiryReplyDTO inquiryReplyDTO;
+
+    @BeforeEach
+    void setUp() {
+        // Re-initialize mocks if not using @ExtendWith or ensure clean state
+        // MockitoAnnotations.openMocks(this); 
+        // This is done by @ExtendWith(MockitoExtension.class)
+
+        studentUser = new User();
+        studentUser.setId(1);
+        studentUser.setUsername("student");
+        studentUser.setEmail("student@example.com");
+        studentUser.setRole(User.Role.STUDENT);
+
+        ownerUser = new User();
+        ownerUser.setId(2);
+        ownerUser.setUsername("owner");
+        ownerUser.setEmail("owner@example.com");
+        ownerUser.setRole(User.Role.OWNER);
+
+        propertyListingOwner = PropertyListing.builder()
+                .id(1L)
+                .title("Owner Property")
+                .user(ownerUser)
+                .sourceType(PropertyListing.SourceType.OWNER)
+                .price(BigDecimal.valueOf(1000))
+                .location("Test Location")
+                .city("Test City")
+                .build();
+
+        propertyListingScraped = PropertyListing.builder()
+                .id(2L)
+                .title("Scraped Property")
+                .user(ownerUser) // Scraped property might still have an associated user (e.g., admin who added it)
+                .sourceType(PropertyListing.SourceType.SCRAPED)
+                .build();
+
+        inquiry = Inquiry.builder()
+                .id(1L)
+                .student(studentUser)
+                .owner(ownerUser)
+                .property(propertyListingOwner)
+                .message("Test message")
+                .status(InquiryStatus.PENDING_REPLY)
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        studentPrincipal = new UserPrincipal(studentUser.getId(), studentUser.getEmail(), "password", Collections.emptyList(), studentUser.getRole());
+        ownerPrincipal = new UserPrincipal(ownerUser.getId(), ownerUser.getEmail(), "password", Collections.emptyList(), ownerUser.getRole());
+
+        inquiryCreateDTO = new InquiryCreateDTO();
+        inquiryCreateDTO.setPropertyId(propertyListingOwner.getId());
+        inquiryCreateDTO.setMessage("New inquiry message");
+        
+        inquiryReplyDTO = new InquiryReplyDTO();
+        inquiryReplyDTO.setReply("Owner reply");
+    }
+    
+    private InquiryDTO convertToDTOManual(Inquiry inquiryEntity) {
+        UserBasicDTO studentDTO = modelMapper.map(inquiryEntity.getStudent(), UserBasicDTO.class);
+        UserBasicDTO ownerDTO = modelMapper.map(inquiryEntity.getOwner(), UserBasicDTO.class);
+        PropertyListingBasicDTO propertyDTO = modelMapper.map(inquiryEntity.getProperty(), PropertyListingBasicDTO.class);
+        return InquiryDTO.builder()
+                .id(inquiryEntity.getId())
+                .student(studentDTO)
+                .owner(ownerDTO)
+                .property(propertyDTO)
+                .message(inquiryEntity.getMessage())
+                .timestamp(inquiryEntity.getTimestamp())
+                .reply(inquiryEntity.getReply())
+                .replyTimestamp(inquiryEntity.getReplyTimestamp())
+                .status(inquiryEntity.getStatus().name())
+                .build();
+    }
+
+    @Test
+    void createInquiry_Success() {
+        when(userRepository.findById(studentPrincipal.getId())).thenReturn(Optional.of(studentUser));
+        when(propertyListingRepository.findById(inquiryCreateDTO.getPropertyId())).thenReturn(Optional.of(propertyListingOwner));
+        when(inquiryRepository.save(any(Inquiry.class))).thenAnswer(invocation -> {
+            Inquiry savedInquiry = invocation.getArgument(0);
+            savedInquiry.setId(2L); // Simulate saving and getting an ID
+            savedInquiry.setTimestamp(LocalDateTime.now()); // Simulate @CreationTimestamp
+            return savedInquiry;
+        });
+
+        InquiryDTO result = inquiryService.createInquiry(inquiryCreateDTO, studentPrincipal);
+
+        assertNotNull(result);
+        assertEquals(inquiryCreateDTO.getMessage(), result.getMessage());
+        assertEquals(studentUser.getId(), result.getStudent().getId());
+        assertEquals(ownerUser.getId(), result.getOwner().getId());
+        assertEquals(InquiryStatus.PENDING_REPLY.name(), result.getStatus());
+
+        verify(inquiryRepository).save(any(Inquiry.class));
+        verify(emailService).sendEmail(eq(ownerUser.getEmail()), anyString(), anyString());
+        verify(webSocketNotificationService).notifyOwnerOfNewInquiry(eq(Long.valueOf(ownerUser.getId())), any(InquiryDTO.class));
+    }
+
+    @Test
+    void createInquiry_Failure_UserNotFound() {
+        when(userRepository.findById(studentPrincipal.getId())).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> {
+            inquiryService.createInquiry(inquiryCreateDTO, studentPrincipal);
+        });
+        verify(inquiryRepository, never()).save(any(Inquiry.class));
+    }
+
+    @Test
+    void createInquiry_Failure_PropertyNotFound() {
+        when(userRepository.findById(studentPrincipal.getId())).thenReturn(Optional.of(studentUser));
+        when(propertyListingRepository.findById(inquiryCreateDTO.getPropertyId())).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> {
+            inquiryService.createInquiry(inquiryCreateDTO, studentPrincipal);
+        });
+        verify(inquiryRepository, never()).save(any(Inquiry.class));
+    }
+    
+    @Test
+    void createInquiry_Failure_PropertyNotOwnerListed() {
+        inquiryCreateDTO.setPropertyId(propertyListingScraped.getId());
+        when(userRepository.findById(studentPrincipal.getId())).thenReturn(Optional.of(studentUser));
+        when(propertyListingRepository.findById(propertyListingScraped.getId())).thenReturn(Optional.of(propertyListingScraped));
+
+        assertThrows(IllegalStateException.class, () -> {
+            inquiryService.createInquiry(inquiryCreateDTO, studentPrincipal);
+        });
+        verify(inquiryRepository, never()).save(any(Inquiry.class));
+    }
+
+    @Test
+    void createInquiry_Failure_PropertyHasNoOwner() {
+        propertyListingOwner.setUser(null); // Simulate no owner
+        when(userRepository.findById(studentPrincipal.getId())).thenReturn(Optional.of(studentUser));
+        when(propertyListingRepository.findById(inquiryCreateDTO.getPropertyId())).thenReturn(Optional.of(propertyListingOwner));
+
+        assertThrows(IllegalStateException.class, () -> {
+            inquiryService.createInquiry(inquiryCreateDTO, studentPrincipal);
+        });
+        verify(inquiryRepository, never()).save(any(Inquiry.class));
+    }
+
+    @Test
+    void getInquiriesForOwner_Success() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Inquiry> inquiryPage = new PageImpl<>(List.of(inquiry), pageable, 1);
+        
+        when(userRepository.findById(ownerUser.getId())).thenReturn(Optional.of(ownerUser));
+        when(inquiryRepository.findByOwnerIdOrderByTimestampDesc(ownerUser.getId().longValue(), pageable)).thenReturn(inquiryPage);
+
+        Page<InquiryDTO> result = inquiryService.getInquiriesForOwner(ownerUser.getId().longValue(), ownerPrincipal, pageable);
+
+        assertNotNull(result);
+        assertEquals(1, result.getTotalElements());
+        assertEquals(inquiry.getMessage(), result.getContent().get(0).getMessage());
+        verify(inquiryRepository).findByOwnerIdOrderByTimestampDesc(ownerUser.getId().longValue(), pageable);
+    }
+    
+    @Test
+    void getInquiriesForOwner_Failure_UserMismatch() {
+        Pageable pageable = PageRequest.of(0, 10);
+        UserPrincipal otherOwnerPrincipal = new UserPrincipal(99, "other@owner.com", "pass", Collections.emptyList(), User.Role.OWNER);
+        assertThrows(AccessDeniedException.class, () -> {
+            inquiryService.getInquiriesForOwner(ownerUser.getId().longValue(), otherOwnerPrincipal, pageable);
+        });
+    }
+
+    @Test
+    void getInquiriesForOwner_Failure_NotOwnerRole() {
+        Pageable pageable = PageRequest.of(0, 10);
+        studentUser.setRole(User.Role.STUDENT); // Change role to simulate error
+        when(userRepository.findById(studentUser.getId())).thenReturn(Optional.of(studentUser));
+
+        assertThrows(AccessDeniedException.class, () -> {
+            inquiryService.getInquiriesForOwner(studentUser.getId().longValue(), studentPrincipal, pageable);
+        });
+    }
+    
+    @Test
+    void getInquiriesForStudent_Success() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Inquiry> inquiryPage = new PageImpl<>(List.of(inquiry), pageable, 1);
+        
+        when(inquiryRepository.findByStudentIdOrderByTimestampDesc(studentUser.getId().longValue(), pageable)).thenReturn(inquiryPage);
+
+        Page<InquiryDTO> result = inquiryService.getInquiriesForStudent(studentUser.getId().longValue(), studentPrincipal, pageable);
+
+        assertNotNull(result);
+        assertEquals(1, result.getTotalElements());
+        assertEquals(inquiry.getMessage(), result.getContent().get(0).getMessage());
+        verify(inquiryRepository).findByStudentIdOrderByTimestampDesc(studentUser.getId().longValue(), pageable);
+    }
+    
+    @Test
+    void getInquiriesForStudent_Failure_UserMismatch() {
+        Pageable pageable = PageRequest.of(0, 10);
+        UserPrincipal otherStudentPrincipal = new UserPrincipal(99, "other@student.com", "pass", Collections.emptyList(), User.Role.STUDENT);
+        assertThrows(AccessDeniedException.class, () -> {
+            inquiryService.getInquiriesForStudent(studentUser.getId().longValue(), otherStudentPrincipal, pageable);
+        });
+    }
+
+    @Test
+    void replyToInquiry_Success() {
+        when(inquiryRepository.findByIdWithDetails(inquiry.getId())).thenReturn(Optional.of(inquiry));
+        when(inquiryRepository.save(any(Inquiry.class))).thenReturn(inquiry); // Return the modified inquiry
+        
+        // Mock the ModelMapper behavior specifically for this test case if needed, or rely on @Spy
+        // If using @Spy, ensure the actual mapping logic in InquiryService.convertToDTO is correct
+        // For more robust testing, you might mock modelMapper.map calls within convertToDTO calls
+        InquiryDTO expectedDto = convertToDTOManual(inquiry);
+        expectedDto.setReply(inquiryReplyDTO.getReply());
+        expectedDto.setStatus(InquiryStatus.REPLIED.name());
+        // replyTimestamp will be set to now(), hard to assert exact match, so check for not null
+
+        InquiryDTO result = inquiryService.replyToInquiry(inquiry.getId(), inquiryReplyDTO, ownerPrincipal);
+
+        assertNotNull(result);
+        assertEquals(inquiryReplyDTO.getReply(), result.getReply());
+        assertEquals(InquiryStatus.REPLIED.name(), result.getStatus());
+        assertNotNull(result.getReplyTimestamp());
+
+        verify(inquiryRepository).save(any(Inquiry.class));
+        verify(emailService).sendEmail(eq(studentUser.getEmail()), anyString(), anyString());
+        verify(webSocketNotificationService).notifyStudentOfReply(eq(Long.valueOf(studentUser.getId())), any(InquiryDTO.class));
+    }
+    
+    @Test
+    void replyToInquiry_Failure_InquiryNotFound() {
+        when(inquiryRepository.findByIdWithDetails(inquiry.getId())).thenReturn(Optional.empty());
+        assertThrows(ResourceNotFoundException.class, () -> {
+            inquiryService.replyToInquiry(inquiry.getId(), inquiryReplyDTO, ownerPrincipal);
+        });
+        verify(inquiryRepository, never()).save(any(Inquiry.class));
+    }
+
+    @Test
+    void replyToInquiry_Failure_NotOwner() {
+        when(inquiryRepository.findByIdWithDetails(inquiry.getId())).thenReturn(Optional.of(inquiry));
+        UserPrincipal notOwnerPrincipal = studentPrincipal; // Student tries to reply as owner
+
+        assertThrows(AccessDeniedException.class, () -> {
+            inquiryService.replyToInquiry(inquiry.getId(), inquiryReplyDTO, notOwnerPrincipal);
+        });
+        verify(inquiryRepository, never()).save(any(Inquiry.class));
+    }
+    
+    @Test
+    void getUnreadInquiryCount_Success() {
+        when(inquiryRepository.countUnreadInquiriesForOwner(ownerUser.getId().longValue())).thenReturn(5L);
+        
+        long count = inquiryService.getUnreadInquiryCount(ownerUser.getId().longValue(), ownerPrincipal);
+        
+        assertEquals(5L, count);
+        verify(inquiryRepository).countUnreadInquiriesForOwner(ownerUser.getId().longValue());
+    }
+    
+    @Test
+    void getUnreadInquiryCount_Failure_UserMismatch() {
+        UserPrincipal otherOwnerPrincipal = new UserPrincipal(99, "other@owner.com", "pass", Collections.emptyList(), User.Role.OWNER);
+        assertThrows(AccessDeniedException.class, () -> {
+            inquiryService.getUnreadInquiryCount(ownerUser.getId().longValue(), otherOwnerPrincipal);
+        });
+    }
+    
+    @Test
+    void markInquiryStatus_Success() {
+        when(inquiryRepository.findById(inquiry.getId())).thenReturn(Optional.of(inquiry));
+        when(inquiryRepository.save(any(Inquiry.class))).thenReturn(inquiry);
+        
+        InquiryDTO result = inquiryService.markInquiryStatus(inquiry.getId(), InquiryStatus.CLOSED, ownerPrincipal);
+        
+        assertNotNull(result);
+        assertEquals(InquiryStatus.CLOSED.name(), result.getStatus());
+        verify(inquiryRepository).save(any(Inquiry.class));
+    }
+    
+    @Test
+    void markInquiryStatus_Failure_NotOwner() {
+        when(inquiryRepository.findById(inquiry.getId())).thenReturn(Optional.of(inquiry));
+        UserPrincipal notOwnerPrincipal = studentPrincipal;
+        
+        assertThrows(AccessDeniedException.class, () -> {
+            inquiryService.markInquiryStatus(inquiry.getId(), InquiryStatus.CLOSED, notOwnerPrincipal);
+        });
+        verify(inquiryRepository, never()).save(any(Inquiry.class));
+    }
+
+    @Test
+    void closeDealWithStudent_Success() {
+        // Setup: Create additional inquiries for the same property
+        User student2 = new User();
+        student2.setId(3);
+        student2.setUsername("student2");
+        student2.setEmail("student2@example.com");
+        student2.setRole(User.Role.STUDENT);
+
+        User student3 = new User();
+        student3.setId(4);
+        student3.setUsername("student3");
+        student3.setEmail("student3@example.com");
+        student3.setRole(User.Role.STUDENT);
+
+        Inquiry inquiry2 = Inquiry.builder()
+                .id(2L)
+                .student(student2)
+                .owner(ownerUser)
+                .property(propertyListingOwner)
+                .message("Second inquiry")
+                .status(InquiryStatus.PENDING_REPLY)
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        Inquiry inquiry3 = Inquiry.builder()
+                .id(3L)
+                .student(student3)
+                .owner(ownerUser)
+                .property(propertyListingOwner)
+                .message("Third inquiry")
+                .status(InquiryStatus.REPLIED)
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        List<Inquiry> activeInquiries = List.of(inquiry, inquiry2, inquiry3);
+        List<Long> otherInquiryIds = List.of(2L, 3L);
+
+        // Mock repository calls
+        when(inquiryRepository.findByIdWithDetails(inquiry.getId())).thenReturn(Optional.of(inquiry));
+        when(inquiryRepository.findActiveInquiriesByPropertyId(propertyListingOwner.getId())).thenReturn(activeInquiries);
+        when(inquiryRepository.save(any(Inquiry.class))).thenReturn(inquiry);
+        when(inquiryRepository.updateInquiryStatusByIds(otherInquiryIds, InquiryStatus.PROPERTY_NO_LONGER_AVAILABLE)).thenReturn(2);
+        when(propertyListingRepository.save(any(PropertyListing.class))).thenReturn(propertyListingOwner);
+
+        // Execute the method
+        InquiryDTO result = inquiryService.closeDealWithStudent(inquiry.getId(), ownerPrincipal);
+
+        // Verify results
+        assertNotNull(result);
+        assertEquals(InquiryStatus.CLOSED.name(), result.getStatus());
+
+        // Verify repository interactions
+        verify(inquiryRepository).findByIdWithDetails(inquiry.getId());
+        verify(inquiryRepository).findActiveInquiriesByPropertyId(propertyListingOwner.getId());
+        verify(inquiryRepository).save(any(Inquiry.class));
+        verify(inquiryRepository).updateInquiryStatusByIds(otherInquiryIds, InquiryStatus.PROPERTY_NO_LONGER_AVAILABLE);
+        verify(propertyListingRepository).save(any(PropertyListing.class));
+
+        // Verify notifications (3 emails: winner + owner + 2 affected students)
+        verify(emailService, times(4)).sendEmail(anyString(), anyString(), anyString());
+        verify(webSocketNotificationService, times(2)).notifyStudentOfPropertyUnavailable(anyLong(), any(InquiryDTO.class));
+    }
+
+    @Test
+    void closeDealWithStudent_Failure_InquiryNotFound() {
+        when(inquiryRepository.findByIdWithDetails(inquiry.getId())).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> {
+            inquiryService.closeDealWithStudent(inquiry.getId(), ownerPrincipal);
+        });
+
+        verify(inquiryRepository, never()).save(any(Inquiry.class));
+        verify(propertyListingRepository, never()).save(any(PropertyListing.class));
+    }
+
+    @Test
+    void closeDealWithStudent_Failure_NotOwner() {
+        when(inquiryRepository.findByIdWithDetails(inquiry.getId())).thenReturn(Optional.of(inquiry));
+
+        assertThrows(AccessDeniedException.class, () -> {
+            inquiryService.closeDealWithStudent(inquiry.getId(), studentPrincipal);
+        });
+
+        verify(inquiryRepository, never()).save(any(Inquiry.class));
+        verify(propertyListingRepository, never()).save(any(PropertyListing.class));
+    }
+
+    @Test
+    void closeDealWithStudent_Failure_InvalidStatus() {
+        inquiry.setStatus(InquiryStatus.CLOSED); // Already closed
+        when(inquiryRepository.findByIdWithDetails(inquiry.getId())).thenReturn(Optional.of(inquiry));
+
+        assertThrows(IllegalStateException.class, () -> {
+            inquiryService.closeDealWithStudent(inquiry.getId(), ownerPrincipal);
+        });
+
+        verify(inquiryRepository, never()).save(any(Inquiry.class));
+        verify(propertyListingRepository, never()).save(any(PropertyListing.class));
+    }
+
+    @Test
+    void closeDealWithStudent_Success_NoOtherInquiries() {
+        // Test case where there are no other inquiries for the property
+        List<Inquiry> activeInquiries = List.of(inquiry); // Only the winning inquiry
+
+        when(inquiryRepository.findByIdWithDetails(inquiry.getId())).thenReturn(Optional.of(inquiry));
+        when(inquiryRepository.findActiveInquiriesByPropertyId(propertyListingOwner.getId())).thenReturn(activeInquiries);
+        when(inquiryRepository.save(any(Inquiry.class))).thenReturn(inquiry);
+        when(propertyListingRepository.save(any(PropertyListing.class))).thenReturn(propertyListingOwner);
+
+        InquiryDTO result = inquiryService.closeDealWithStudent(inquiry.getId(), ownerPrincipal);
+
+        assertNotNull(result);
+        assertEquals(InquiryStatus.CLOSED.name(), result.getStatus());
+
+        // Verify no bulk updates were called since there are no other inquiries
+        verify(inquiryRepository, never()).updateInquiryStatusByIds(anyList(), any(InquiryStatus.class));
+        verify(webSocketNotificationService, never()).notifyStudentOfPropertyUnavailable(anyLong(), any(InquiryDTO.class));
+
+        // But still verify property was deactivated and winner was notified
+        verify(propertyListingRepository).save(any(PropertyListing.class));
+        verify(emailService, times(2)).sendEmail(anyString(), anyString(), anyString()); // Winner + owner emails
+    }
+} 

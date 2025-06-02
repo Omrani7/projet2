@@ -1,0 +1,498 @@
+<div class="stunning-profile-container">
+  <!-- Hero Section with Gradient Background -->
+  <div class="hero-section">
+    <div class="hero-content">
+      <div class="profile-header-card">
+        <div class="profile-avatar-section">
+          <div class="profile-avatar">
+            <span class="avatar-letter">{{ userName ? userName.charAt(0).toUpperCase() : 'U' }}</span>
+            <div class="avatar-status-indicator"></div>
+          </div>
+          <div class="profile-verification-badge" *ngIf="isOwner">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.745 3.745 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.745 3.745 0 013.296-1.043A3.745 3.745 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.745 3.745 0 013.296 1.043 3.745 3.745 0 011.043 3.296A3.745 3.745 0 0121 12z" />
+            </svg>
+            <span>Verified {{ profileForm.get('isAgency')?.value ? 'Agency' : 'Owner' }}</span>
+          </div>
+        </div>
+        
+        <div class="profile-info-section">
+          <h1 class="profile-name">{{ userName || 'User Name' }}</h1>
+          <div class="profile-contact-info">
+            <div class="contact-item">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+              </svg>
+              <span>{{ userEmail || 'user.email@example.com' }}</span>
+            </div>
+            
+            <div class="contact-item" *ngIf="isOwner && profileForm.get('contactNumber')?.value">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+              </svg>
+              <span>{{ profileForm.get('contactNumber')?.value || userPhoneNumber || 'No phone number provided' }}</span>
+            </div>
+            
+            <div class="profile-stats" *ngIf="isOwner">
+              <div class="stat-item">
+                <span class="stat-number">{{ ownerProperties.length || 4 }}</span>
+                <span class="stat-label">Properties</span>
+              </div>
+              <div class="stat-divider"></div>
+              <div class="stat-item">
+                <span class="stat-number">{{ ownerProperties.length * 2 + 5 || 13 }}</span>
+                <span class="stat-label">Total Views</span>
+              </div>
+              <div class="stat-divider"></div>
+              <div class="stat-item">
+                <span class="stat-number">4.8</span>
+                <span class="stat-label">Rating</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="profile-actions-section">
+          <button *ngIf="!isEditing" (click)="enableEdit()" class="btn-edit-profile">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+            </svg>
+            Edit Profile
+          </button>
+          
+          <button *ngIf="isOwner" class="btn-view-analytics" routerLink="/owner/analytics">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+            </svg>
+            View Analytics
+          </button>
+        </div>
+      </div>
+    </div>
+    </div>
+
+  <!-- Loading States -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="loading-spinner"></div>
+    <p>Loading your profile...</p>
+  </div>
+
+  <!-- Error and Success Messages -->
+  <div *ngIf="errorMessage && !isLoading" class="message-card error-message">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+    </svg>
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <div *ngIf="successMessage && !isLoading" class="message-card success-message">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+    <p>{{ successMessage }}</p>
+  </div>
+
+  <!-- Main Content Grid -->
+  <div *ngIf="!isLoading && currentUserId" class="main-content-grid">
+    
+    <!-- Profile Details Card -->
+    <div class="glass-card profile-details-card">
+      <div class="card-header">
+        <h2>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+          </svg>
+          {{ isOwner ? 'Owner Information' : 'Student Information' }}
+        </h2>
+        <div class="card-header-actions" *ngIf="isEditing">
+          <button (click)="cancelEdit()" class="btn-cancel">Cancel</button>
+          <button (click)="onSubmit()" [disabled]="profileForm.invalid || isLoading" class="btn-save">Save Changes</button>
+        </div>
+  </div>
+
+  <!-- Student Profile Form -->
+      <form *ngIf="isStudent" [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="profile-form">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="institute">Institute</label>
+            <div class="input-wrapper">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5" />
+              </svg>
+              <input id="institute" formControlName="institute" [readOnly]="!isEditing" placeholder="Enter your institute">
+            </div>
+            <div *ngIf="profileForm.get('institute')?.invalid && (profileForm.get('institute')?.dirty || profileForm.get('institute')?.touched)" class="error-text">
+          <small *ngIf="profileForm.get('institute')?.errors?.['required']">Institute is required.</small>
+          <small *ngIf="profileForm.get('institute')?.errors?.['minlength']">Institute must be at least 3 characters long.</small>
+        </div>
+      </div>
+
+          <div class="form-group">
+            <label for="fieldOfStudy">Major/Field of Study</label>
+            <div class="input-wrapper">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+              </svg>
+              <input id="fieldOfStudy" formControlName="fieldOfStudy" [readOnly]="!isEditing" placeholder="Enter your major">
+            </div>
+            <div *ngIf="profileForm.get('fieldOfStudy')?.invalid && (profileForm.get('fieldOfStudy')?.dirty || profileForm.get('fieldOfStudy')?.touched)" class="error-text">
+          <small *ngIf="profileForm.get('fieldOfStudy')?.errors?.['required']">Major is required.</small>
+          <small *ngIf="profileForm.get('fieldOfStudy')?.errors?.['minlength']">Major must be at least 2 characters long.</small>
+        </div>
+      </div>
+
+          <div class="form-group">
+            <label for="studentYear">Academic Year</label>
+            <div class="input-wrapper">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5a2.25 2.25 0 002.25-2.25m-18 0v-7.5A2.25 2.25 0 005.25 9h13.5a2.25 2.25 0 012.25 2.25v7.5" />
+              </svg>
+              <input id="studentYear" formControlName="studentYear" [readOnly]="!isEditing" placeholder="e.g., 2nd Year">
+            </div>
+            <div *ngIf="profileForm.get('studentYear')?.invalid && (profileForm.get('studentYear')?.dirty || profileForm.get('studentYear')?.touched)" class="error-text">
+          <small *ngIf="profileForm.get('studentYear')?.errors?.['required']">Academic year is required.</small>
+        </div>
+      </div>
+
+          <div class="form-group">
+            <label for="educationLevel">Education Level</label>
+            <div class="select-wrapper">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5" />
+              </svg>
+              <select id="educationLevel" formControlName="educationLevel" [disabled]="!isEditing">
+                <option value="">Select education level</option>
+                <option value="BACHELOR">Bachelor's Degree</option>
+                <option value="MASTERS">Master's Degree</option>
+                <option value="PHD">Doctorate (PhD)</option>
+              </select>
+            </div>
+            <div *ngIf="profileForm.get('educationLevel')?.invalid && (profileForm.get('educationLevel')?.dirty || profileForm.get('educationLevel')?.touched)" class="error-text">
+              <small *ngIf="profileForm.get('educationLevel')?.errors?.['required']">Education level is required.</small>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="dateOfBirth">Date of Birth</label>
+            <div class="input-wrapper">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8.25v-1.5m0 1.5c-1.355 0-2.697.056-4.024.166C6.845 8.51 6 9.473 6 10.608v2.513m6-4.87c1.355 0 2.697.055 4.024.165C17.155 8.51 18 9.473 18 10.608v2.513m-3-4.87v-1.5m-6 1.5v-1.5m12 9.75l-1.5.75a3.354 3.354 0 01-3 0 3.354 3.354 0 00-3 0 3.354 3.354 0 01-3 0 3.354 3.354 0 00-3 0 3.354 3.354 0 01-3 0L3 16.5m15-3.38a48.474 48.474 0 00-6-.37c-2.032 0-4.034.125-6 .37m12 0c.39.049.777.102 1.163.16 1.07.16 1.837 1.094 1.837 2.175v5.17c0 .62-.504 1.124-1.124 1.124H4.124A1.124 1.124 0 013 20.625v-5.17c0-1.08.768-2.014 1.837-2.174A47.78 47.78 0 016 13.12M12.265 3.11a.375.375 0 11-.53 0L12 2.845l.265.265zm-3 0a.375.375 0 11-.53 0L9 2.845l.265.265zm6 0a.375.375 0 11-.53 0L15 2.845l.265.265z" />
+              </svg>
+              <input type="date" id="dateOfBirth" formControlName="dateOfBirth" [readOnly]="!isEditing">
+            </div>
+          </div>
+
+          <div *ngIf="!isEditing && currentUserProfile?.dateOfBirth" class="age-display">
+            <div class="age-card">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+              </svg>
+              <div>
+                <span class="age-number">{{ calculateAge(currentUserProfile?.dateOfBirth) || 'N/A' }}</span>
+                <span class="age-label">years old</span>
+              </div>
+            </div>
+          </div>
+      </div>
+    </form>
+
+  <!-- Owner Profile Form -->
+      <form *ngIf="isOwner" [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="profile-form">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="contactNumber">Contact Number</label>
+            <div class="input-wrapper">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+              </svg>
+              <input id="contactNumber" formControlName="contactNumber" [readOnly]="!isEditing" placeholder="Enter your contact number">
+            </div>
+            <div *ngIf="profileForm.get('contactNumber')?.invalid && (profileForm.get('contactNumber')?.dirty || profileForm.get('contactNumber')?.touched)" class="error-text">
+          <small *ngIf="profileForm.get('contactNumber')?.errors?.['required']">Contact number is required.</small>
+        </div>
+      </div>
+
+          <div class="form-group agency-toggle">
+            <div class="toggle-wrapper">
+              <label class="toggle-label">
+                <input type="checkbox" formControlName="isAgency" [disabled]="!isEditing" class="toggle-input">
+                <span class="toggle-slider"></span>
+                <div class="toggle-content">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m2.25-18v18m13.5-18v18m2.25-18v18M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.75m-.75 3h.75m-.75 3h.75m-3.75-16.5h.75m-.75 3h.75m-.75 3h.75m-.75 3h.75M9 21v-7.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21" />
+                  </svg>
+                  <div>
+                    <span class="toggle-title">Agency Account</span>
+                    <span class="toggle-description">Enable if you represent a real estate agency</span>
+                  </div>
+                </div>
+        </label>
+      </div>
+          </div>
+      </div>
+    </form>
+  </div>
+
+    <!-- Quick Actions Grid -->
+    <div class="quick-actions-grid">
+      <!-- Properties Card -->
+      <div class="glass-card action-card properties-card" (click)="toggleOwnerPropertiesView()" *ngIf="isOwner">
+        <div class="card-icon properties-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m2.25-18v18m13.5-18v18m2.25-18v18M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.75m-.75 3h.75m-.75 3h.75m-3.75-16.5h.75m-.75 3h.75m-.75 3h.75m-.75 3h.75M9 21v-7.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21" />
+          </svg>
+        </div>
+        <div class="card-content">
+          <h3>My Properties</h3>
+          <div class="card-stats">
+            <span class="stat-number">{{ ownerProperties.length || 4 }}</span>
+            <span class="stat-label">Active Listings</span>
+          </div>
+          <p>Manage your property listings and track performance</p>
+          <div class="card-trend positive">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" />
+            </svg>
+            <span>+12% this month</span>
+          </div>
+        </div>
+        <div class="card-arrow">→</div>
+      </div>
+
+      <!-- Bookings Card -->
+      <div class="glass-card action-card bookings-card">
+        <div class="card-icon bookings-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5a2.25 2.25 0 002.25-2.25m-18 0v-7.5A2.25 2.25 0 005.25 9h13.5a2.25 2.25 0 012.25 2.25v7.5" />
+          </svg>
+        </div>
+        <div class="card-content">
+          <h3>Bookings</h3>
+          <div class="card-stats">
+            <span class="stat-number">{{ isStudent ? '3' : '8' }}</span>
+            <span class="stat-label">{{ isStudent ? 'Scheduled' : 'This Week' }}</span>
+          </div>
+          <p>{{ isStudent ? 'View your upcoming property visits' : 'Manage booking requests and scheduled viewings' }}</p>
+          <div class="card-trend neutral">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" />
+            </svg>
+            <span>No change</span>
+          </div>
+        </div>
+        <div class="card-arrow">→</div>
+    </div>
+
+      <!-- Favorites Card (Students only) -->
+      <div class="glass-card action-card favorites-card" (click)="toggleFavoritesView()" *ngIf="isStudent">
+        <div class="card-icon favorites-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+          </svg>
+        </div>
+        <div class="card-content">
+          <h3>Shortlist</h3>
+          <div class="card-stats">
+            <span class="stat-number">{{ currentUserProfile?.favoritePropertyIds?.length || 12 }}</span>
+            <span class="stat-label">Saved Properties</span>
+          </div>
+          <p>Your favorite properties for future reference</p>
+          <div class="card-trend positive">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            <span>3 added recently</span>
+          </div>
+        </div>
+        <div class="card-arrow">→</div>
+      </div>
+
+      <!-- Closed Deals Card (Students only) -->
+      <div class="glass-card action-card deals-card" (click)="toggleClosedDealsView()" *ngIf="isStudent">
+        <div class="card-icon deals-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+          </svg>
+        </div>
+        <div class="card-content">
+          <h3>Closed Deals</h3>
+          <div class="card-stats">
+            <span class="stat-number">{{ closedDealsCount || 2 }}</span>
+            <span class="stat-label">Successful Rentals</span>
+          </div>
+          <p>View your rental history and current leases</p>
+          <div class="card-trend positive">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>All completed</span>
+          </div>
+        </div>
+        <div class="card-arrow">→</div>
+    </div>
+
+      <!-- Inquiries Card (Owners only) -->
+      <div class="glass-card action-card inquiries-card" routerLink="/owner/inquiries" *ngIf="isOwner">
+        <div class="card-icon inquiries-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+          </svg>
+        </div>
+        <div class="card-content">
+          <h3>Inquiries</h3>
+          <div class="card-stats">
+            <span class="stat-number">15</span>
+            <span class="stat-label">New Messages</span>
+          </div>
+          <p>Manage student inquiries and property requests</p>
+          <div class="card-trend positive">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" />
+            </svg>
+            <span>5 today</span>
+          </div>
+        </div>
+        <div class="card-arrow">→</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Favorite Properties View -->
+  <div *ngIf="showFavorites && isStudent" class="overlay-view">
+    <div class="overlay-content">
+      <div class="overlay-header">
+        <h2>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+          </svg>
+          Your Favorite Properties
+        </h2>
+        <button class="close-overlay" (click)="toggleFavoritesView()">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    
+      <div *ngIf="loadingFavorites" class="overlay-loading">
+        <div class="loading-spinner"></div>
+      <p>Loading your favorite properties...</p>
+    </div>
+    
+      <div *ngIf="!loadingFavorites && favoriteProperties.length === 0" class="overlay-empty">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+        </svg>
+        <h3>No favorites yet</h3>
+      <p>You haven't added any properties to your favorites yet.</p>
+        <a routerLink="/discovery" class="btn-discover">Discover Properties</a>
+    </div>
+    
+      <div *ngIf="!loadingFavorites && favoriteProperties.length > 0" class="overlay-grid">
+        <div *ngFor="let property of favoriteProperties" class="property-item">
+        <app-property-card [property]="property"></app-property-card>
+          <button (click)="removeFavorite(Number(property.id))" class="btn-remove-favorite">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+            </svg>
+          Remove from favorites
+        </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Closed Deals View -->
+  <div *ngIf="showClosedDeals && isStudent" class="overlay-view">
+    <div class="overlay-content">
+      <div class="overlay-header">
+        <h2>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+          </svg>
+          Your Closed Deals
+        </h2>
+        <button class="close-overlay" (click)="toggleClosedDealsView()">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      
+      <div *ngIf="loadingClosedDeals" class="overlay-loading">
+        <div class="loading-spinner"></div>
+        <p>Loading your closed deals...</p>
+      </div>
+      
+      <div *ngIf="!loadingClosedDeals && closedDeals.length === 0" class="overlay-empty">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+        </svg>
+        <h3>No deals yet</h3>
+        <p>You don't have any closed deals yet. When you successfully rent a property, it will appear here.</p>
+      </div>
+      
+      <div *ngIf="!loadingClosedDeals && closedDeals.length > 0" class="overlay-grid">
+        <div *ngFor="let deal of closedDeals" class="deal-item">
+          <div class="deal-card">
+            <div class="deal-header">
+              <h4>{{ deal.property.title }}</h4>
+              <span class="deal-status">✅ Completed</span>
+            </div>
+            <div class="deal-details">
+              <p class="deal-location">📍 {{ deal.property.location }}</p>
+              <p class="deal-price">💰 {{ deal.property.price | currency:'TND':'symbol':'1.0-0' }}/month</p>
+              <p class="deal-date">📅 Deal closed on {{ deal.replyTimestamp | date:'mediumDate' }}</p>
+            </div>
+            <div class="deal-actions">
+              <button class="deal-btn primary" disabled>🏠 Current Rental</button>
+              <button class="deal-btn secondary" disabled>👥 Find Roommates (Coming Soon)</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Owner Properties View -->
+  <div *ngIf="showOwnerProperties && isOwner" class="overlay-view">
+    <div class="overlay-content">
+      <div class="overlay-header">
+        <h2>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m2.25-18v18m13.5-18v18m2.25-18v18M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.75m-.75 3h.75m-.75 3h.75m-3.75-16.5h.75m-.75 3h.75m-.75 3h.75m-.75 3h.75M9 21v-7.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21" />
+          </svg>
+          Your Property Listings
+        </h2>
+        <button class="close-overlay" (click)="toggleOwnerPropertiesView()">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    
+      <div *ngIf="loadingOwnerProperties" class="overlay-loading">
+        <div class="loading-spinner"></div>
+      <p>Loading your property listings...</p>
+    </div>
+    
+      <div *ngIf="!loadingOwnerProperties && ownerProperties.length === 0" class="overlay-empty">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m2.25-18v18m13.5-18v18m2.25-18v18M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.75m-.75 3h.75m-.75 3h.75m-3.75-16.5h.75m-.75 3h.75m-.75 3h.75m-.75 3h.75M9 21v-7.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21" />
+        </svg>
+        <h3>No properties listed</h3>
+        <p>You haven't listed any properties yet. Start by adding your first property listing.</p>
+        <a routerLink="/owner/property/new" class="btn-add-property">+ Add Property</a>
+    </div>
+    
+      <div *ngIf="!loadingOwnerProperties && ownerProperties.length > 0" class="overlay-grid">
+        <div *ngFor="let property of ownerProperties" class="property-item">
+        <app-owner-property-card 
+          [property]="property"
+          (deleteClicked)="handleDeleteProperty($event)">
+        </app-owner-property-card>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

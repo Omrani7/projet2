@@ -1,0 +1,294 @@
+@startuml
+title "Student Real-time Messaging System"\n"Sprint 3 - Connected Students Communication Flow"
+
+!define STUDENT1_COLOR #E3F2FD
+!define STUDENT2_COLOR #F3E5F5
+!define BACKEND_COLOR #E8F5E9
+!define WEBSOCKET_COLOR #FFF3E0
+
+actor "Student A\n(Connected)" as StudentA
+actor "Student B\n(Connected)" as StudentB
+participant "Angular Frontend\n(Student A)" as FrontendA
+participant "Angular Frontend\n(Student B)" as FrontendB
+
+box "Backend Services"
+    participant "MessagingController" as Controller
+    participant "MessagingService" as Service
+    participant "WebSocketHandler" as WSHandler
+    participant "Database" as DB
+end box
+
+note over StudentA, StudentB
+    **Prerequisites**: Students A & B are already connected
+    (Connection request was accepted previously)
+end note
+
+== WebSocket Connection Setup ==
+
+FrontendA -> WSHandler: 1. Connect WebSocket\nws://localhost:8080/ws/messaging?userId=StudentA
+activate WSHandler
+WSHandler -> WSHandler: Store session for Student A
+WSHandler --> FrontendA: 2. Connection established
+deactivate WSHandler
+
+FrontendB -> WSHandler: 3. Connect WebSocket\nws://localhost:8080/ws/messaging?userId=StudentB
+activate WSHandler
+WSHandler -> WSHandler: Store session for Student B
+WSHandler --> FrontendB: 4. Connection established
+deactivate WSHandler
+
+== Conversation Initiation ==
+
+StudentA -> FrontendA: 5. Navigate to "My Network"
+activate FrontendA
+
+FrontendA -> Controller: 6. GET /api/connections/accepted
+activate Controller
+
+Controller -> Service: 7. getAcceptedConnections()
+activate Service
+
+Service -> DB: 8. Query accepted connections
+activate DB
+DB --> Service: 9. List of connected students
+deactivate DB
+
+Service --> Controller: 10. Connected students DTO
+deactivate Service
+
+Controller --> FrontendA: 11. 200 OK
+deactivate Controller
+
+FrontendA --> StudentA: 12. Show connected students\nwith "💬 Message" buttons
+deactivate FrontendA
+
+StudentA -> FrontendA: 13. Click "💬 Message" for Student B
+activate FrontendA
+
+FrontendA -> Controller: 14. POST /api/conversations\n{participantId: StudentB.id}
+activate Controller
+
+Controller -> Service: 15. getOrCreateConversation()
+activate Service
+
+Service -> DB: 16. Check existing conversation
+activate DB
+DB --> Service: 17. No conversation found
+deactivate DB
+
+Service -> DB: 18. Create new conversation
+activate DB
+DB --> Service: 19. Conversation created (ID: 123)
+deactivate DB
+
+Service --> Controller: 20. ConversationDTO
+deactivate Service
+
+Controller --> FrontendA: 21. 201 Created
+deactivate Controller
+
+FrontendA --> StudentA: 22. Open chat interface
+deactivate FrontendA
+
+== Real-time Messaging Flow ==
+
+StudentA -> FrontendA: 23. Type message: "Hi! Ready to find an apartment?"
+activate FrontendA
+
+FrontendA -> Controller: 24. POST /api/messages\n{conversationId: 123, content: "Hi! Ready..."}
+activate Controller
+
+Controller -> Service: 25. sendMessage()
+activate Service
+
+Service -> DB: 26. Save message
+activate DB
+DB --> Service: 27. Message saved (ID: 456)
+deactivate DB
+
+Service -> WSHandler: 28. notifyUser(StudentB, messageData)
+activate WSHandler
+
+WSHandler -> FrontendB: 29. WebSocket push\n{type: "NEW_MESSAGE", data: messageDTO}
+activate FrontendB
+
+alt Student B is on Messages page
+    FrontendB -> FrontendB: 30a. Add message to chat UI instantly
+    FrontendB --> StudentB: 31a. 💬 Message appears in real-time
+else Student B is on different page
+    FrontendB -> FrontendB: 30b. Update notification badge
+    FrontendB --> StudentB: 31b. 🔔 "New message from Student A"
+end
+
+deactivate FrontendB
+deactivate WSHandler
+
+Service --> Controller: 32. MessageDTO
+deactivate Service
+
+Controller --> FrontendA: 33. 201 Created
+deactivate Controller
+
+FrontendA -> FrontendA: 34. Add message to chat UI
+FrontendA --> StudentA: 35. Message sent ✓
+deactivate FrontendA
+
+== Message Response ==
+
+StudentB -> FrontendB: 36. Navigate to Messages
+activate FrontendB
+
+FrontendB -> Controller: 37. GET /api/conversations
+activate Controller
+
+Controller -> Service: 38. getUserConversations()
+activate Service
+
+Service -> DB: 39. Query user conversations
+activate DB
+DB --> Service: 40. Conversations with unread counts
+deactivate DB
+
+Service --> Controller: 41. ConversationDTO list
+deactivate Service
+
+Controller --> FrontendB: 42. 200 OK
+deactivate Controller
+
+FrontendB --> StudentB: 43. Show conversations\n(Student A: 1 unread)
+deactivate FrontendB
+
+StudentB -> FrontendB: 44. Click conversation with Student A
+activate FrontendB
+
+FrontendB -> Controller: 45. GET /api/conversations/123/messages
+activate Controller
+
+Controller -> Service: 46. getConversationMessages()
+activate Service
+
+Service -> DB: 47. Query messages
+activate DB
+DB --> Service: 48. Message history
+deactivate DB
+
+Service --> Controller: 49. MessageDTO list
+deactivate Service
+
+Controller --> FrontendB: 50. 200 OK
+deactivate Controller
+
+FrontendB -> Controller: 51. PUT /api/conversations/123/read
+activate Controller
+
+Controller -> Service: 52. markMessagesAsRead()
+activate Service
+
+Service -> DB: 53. Update isRead = true
+activate DB
+DB --> Service: 54. Messages marked as read
+deactivate DB
+
+Service --> Controller: 55. Success
+deactivate Service
+
+Controller --> FrontendB: 56. 200 OK
+deactivate Controller
+
+FrontendB --> StudentB: 57. Show chat with Student A's message
+deactivate FrontendB
+
+StudentB -> FrontendB: 58. Type reply: "Yes! I found some great options"
+activate FrontendB
+
+FrontendB -> Controller: 59. POST /api/messages\n{conversationId: 123, content: "Yes! I found..."}
+activate Controller
+
+Controller -> Service: 60. sendMessage()
+activate Service
+
+Service -> DB: 61. Save message
+activate DB
+DB --> Service: 62. Message saved (ID: 789)
+deactivate DB
+
+Service -> WSHandler: 63. notifyUser(StudentA, messageData)
+activate WSHandler
+
+WSHandler -> FrontendA: 64. WebSocket push\n{type: "NEW_MESSAGE", data: messageDTO}
+activate FrontendA
+FrontendA -> FrontendA: 65. Add message to chat UI instantly
+FrontendA --> StudentA: 66. 💬 Reply appears in real-time
+deactivate FrontendA
+
+deactivate WSHandler
+
+Service --> Controller: 67. MessageDTO
+deactivate Service
+
+Controller --> FrontendB: 68. 201 Created
+deactivate Controller
+
+FrontendB -> FrontendB: 69. Add message to chat UI
+FrontendB --> StudentB: 70. Message sent ✓
+deactivate FrontendB
+
+== Continuous Real-time Communication ==
+
+loop Ongoing Conversation
+    alt Student A sends message
+        StudentA -> FrontendA: Type and send message
+        activate FrontendA
+        FrontendA -> Service: Send via API
+        activate Service
+        Service -> DB: Save message
+        activate DB
+        DB --> Service: Saved
+        deactivate DB
+        Service -> WSHandler: Notify Student B
+        activate WSHandler
+        WSHandler -> FrontendB: Real-time push
+        activate FrontendB
+        FrontendB --> StudentB: Message appears instantly
+        deactivate FrontendB
+        deactivate WSHandler
+        Service --> FrontendA: Success
+        deactivate Service
+        FrontendA --> StudentA: Message sent
+        deactivate FrontendA
+    else Student B sends message
+        StudentB -> FrontendB: Type and send message
+        activate FrontendB
+        FrontendB -> Service: Send via API
+        activate Service
+        Service -> DB: Save message
+        activate DB
+        DB --> Service: Saved
+        deactivate DB
+        Service -> WSHandler: Notify Student A
+        activate WSHandler
+        WSHandler -> FrontendA: Real-time push
+        activate FrontendA
+        FrontendA --> StudentA: Message appears instantly
+        deactivate FrontendA
+        deactivate WSHandler
+        Service --> FrontendB: Success
+        deactivate Service
+        FrontendB --> StudentB: Message sent
+        deactivate FrontendB
+    end
+end
+
+note over StudentA, StudentB
+    **Real-time Messaging System Complete**
+    
+    ✅ WebSocket connections for real-time communication
+    ✅ Conversation management and message history
+    ✅ Instant message delivery and notifications
+    ✅ Read status tracking and unread counts
+    ✅ Seamless chat experience for connected students
+    
+    **Result: Students can now communicate effectively to coordinate roommate arrangements**
+end note
+
+@enduml 

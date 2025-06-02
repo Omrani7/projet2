@@ -1,0 +1,136 @@
+<div class="my-inquiries-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1>My Inquiries</h1>
+    <button class="refresh-btn" (click)="refresh()" [disabled]="isLoading">
+      <span [class.spinning]="isLoading">🔄</span> Refresh
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Loading your inquiries...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-container" *ngIf="error && !isLoading">
+    <div class="error-message">
+      <p>❌ {{ error }}</p>
+      <button class="retry-btn" (click)="refresh()">Try Again</button>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!isLoading && !error && inquiries.length === 0">
+    <div class="empty-icon">📝</div>
+    <h3>No Inquiries Yet</h3>
+    <p>You haven't made any inquiries about properties yet.</p>
+    <p>Browse properties and send inquiries to get started!</p>
+  </div>
+
+  <!-- Inquiries List -->
+  <div class="inquiries-list" *ngIf="!isLoading && !error && inquiries.length > 0">
+    <!-- Results Info -->
+    <div class="results-info">
+      <p>Showing {{ inquiries.length }} of {{ totalElements }} inquiries</p>
+    </div>
+
+    <!-- Inquiry Cards -->
+    <div class="inquiry-card" *ngFor="let inquiry of inquiries; trackBy: trackByInquiryId">
+      <!-- Card Header -->
+      <div class="card-header">
+        <div class="property-info">
+          <h3>{{ inquiry.property.title }}</h3>
+          <p class="property-location">📍 {{ inquiry.property.location }}</p>
+          <p class="property-price">💰 {{ inquiry.property.price | currency:'TND':'symbol':'1.0-0' }}/month</p>
+        </div>
+        <div class="status-container">
+          <span class="status-badge" [ngClass]="getStatusBadgeClass(inquiry.status)">
+            {{ getStatusText(inquiry.status) }}
+          </span>
+          <span class="inquiry-date">{{ formatDate(inquiry.timestamp) }}</span>
+        </div>
+      </div>
+
+      <!-- Property Images -->
+      <div class="property-images" *ngIf="inquiry.property.imageUrls && inquiry.property.imageUrls.length > 0">
+        <img [src]="inquiry.property.imageUrls[0]" [alt]="inquiry.property.title" class="property-image">
+      </div>
+
+      <!-- Inquiry Content -->
+      <div class="card-content">
+        <!-- Your Message -->
+        <div class="message-section">
+          <h4>Your Message:</h4>
+          <div class="message-content">{{ inquiry.message }}</div>
+        </div>
+
+        <!-- Owner Reply -->
+        <div class="reply-section" *ngIf="inquiry.reply">
+          <h4>Owner's Reply:</h4>
+          <div class="reply-content">{{ inquiry.reply }}</div>
+          <div class="owner-contact" *ngIf="inquiry.ownerPhoneNumber">
+            <p class="owner-phone">📞 Owner's Contact: {{ inquiry.ownerPhoneNumber }}</p>
+          </div>
+          <div class="reply-date">
+            Replied on {{ formatDate(inquiry.replyTimestamp!) }}
+          </div>
+        </div>
+
+        <!-- Pending Reply -->
+        <div class="pending-reply" *ngIf="!inquiry.reply && inquiry.status === 'PENDING_REPLY'">
+          <p>⏳ Waiting for owner's reply...</p>
+        </div>
+
+        <!-- Property No Longer Available -->
+        <div class="property-unavailable" *ngIf="inquiry.status === 'PROPERTY_NO_LONGER_AVAILABLE'">
+          <p>🚫 This property is no longer available.</p>
+          <p>The owner has closed a deal with another applicant. We encourage you to browse other properties on our platform.</p>
+        </div>
+      </div>
+
+      <!-- Card Footer -->
+      <div class="card-footer">
+        <div class="owner-info">
+          <p><strong>Property Owner:</strong> {{ inquiry.owner.username }}</p>
+        </div>
+        <div class="inquiry-id">
+          <small>Inquiry #{{ inquiry.id }}</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination" *ngIf="!isLoading && !error && totalPages > 1">
+    <button 
+      class="page-btn"
+      [disabled]="currentPage === 0"
+      (click)="previousPage()">
+      ← Previous
+    </button>
+
+    <div class="page-numbers">
+      <button
+        *ngFor="let page of getPageNumbers()"
+        class="page-number"
+        [class.active]="page === currentPage"
+        (click)="goToPage(page)">
+        {{ page + 1 }}
+      </button>
+    </div>
+
+    <button 
+      class="page-btn"
+      [disabled]="currentPage === totalPages - 1"
+      (click)="nextPage()">
+      Next →
+    </button>
+  </div>
+
+  <!-- Pagination Info -->
+  <div class="pagination-info" *ngIf="!isLoading && !error && totalElements > 0">
+    <p>Page {{ currentPage + 1 }} of {{ totalPages }} ({{ totalElements }} total inquiries)</p>
+  </div>
+</div> 

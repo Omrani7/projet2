@@ -1,0 +1,93 @@
+High‑Level Implementation Plan for Cursor.ai
+Below is a structured roadmap to implement the UNInest platform from Student Profile to Property Taken status. Each step highlights key deliverables, technologies, and sequence.
+Student Profile Management
+Backend: Student Profile API
+
+Create StudentProfile entity (fields: university, major, year, favorites) and expose REST endpoints (GET/PUT /profiles/students/{id}) 
+Harness.io
+.
+
+Frontend: ProfileComponent
+
+Build Angular ProfileFormComponent with reactive forms to view/edit student details, validating fields client‑side 
+Medium
+.
+
+Persistence & Validation
+
+Use Hibernate Validator for server‑side checks (e.g., non‑empty university) and map DTOs to entities via MapStruct or manual mapping 
+Medium
+.
+
+nquiry & Short‑List Feature
+Inquiry Entity & API
+
+Define Inquiry entity linking Student, Property, and message. Expose POST /inquiries and GET /inquiries/student/{id} 
+IJRPR
+.
+
+Short‑List (Favorites)
+
+Add favorites relation in StudentProfile. Endpoints: POST /profiles/students/{id}/favorites and GET /profiles/students/{id}/favorites 
+Harness.io
+.
+
+Angular: InquiryForm & FavoritesComponent
+
+Build InquiryFormComponent on listing detail pages; create FavoritesListComponent showing saved properties.
+
+5. Owner Profile & Listing Management
+OwnerProfile API
+
+Mirror Student: create OwnerProfile with fields (contactNumber, isAgency) and expose GET/PUT /profiles/owners/{id} 
+Medium
+.
+
+Listing CRUD
+
+Implement POST/PUT/DELETE /announcements secured to ROLE_OWNER; ensure geocoding on create/update 
+YouTube
+.
+
+Angular: OwnerDashboardComponent
+
+Provide ListingManagementComponent with forms for add/edit, and a table of owner’s listings showing status and inquiry counts 
+YouTube
+.
+
+6. Real‑Time Messaging & Notifications
+WebSocket Chat Service
+
+Configure Spring WebSocket + STOMP endpoints (/topic/inquiries.{ownerId}) for two‑way messaging 
+Harness.io
+.
+
+Message Entity & Persistence
+
+Create Message entity linked to Inquiry; persist chat history for audit trail 
+YouTube
+.
+
+Angular: ChatComponent
+
+Implement ChatThreadComponent subscribing to WebSocket topics, sending messages via sendMessage() service 
+Home
+.
+
+Push Notifications
+
+Integrate Firebase Cloud Messaging to notify owners/students of new messages or inquiries 
+Okta Developer
+.
+
+Owner Archive Action
+
+Add POST /announcements/{id}/archive to set status ARCHIVED, removing it from public search 
+IJRPR
+.
+
+UI Update
+
+In OwnerDashboard, provide “Archive” button; in student view, hide archived listings and show confirmation message 
+Harness.io
+.

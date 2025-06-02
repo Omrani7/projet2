@@ -1,0 +1,107 @@
+<div class="owner-profile-setup-container">
+    <div class="form-container">
+        <div class="header">
+            <h1>Please enter the information to continue</h1>
+        </div>
+        
+        <div *ngIf="errorMessage" class="alert alert-danger">
+            {{ errorMessage }}
+        </div>
+        
+        <div *ngIf="successMessage" class="alert alert-success">
+            {{ successMessage }}
+        </div>
+        
+        <form [formGroup]="ownerProfileForm" (ngSubmit)="onSubmit()">
+            <div class="form-row">
+                <div class="form-group title-container">
+                    <select formControlName="title" class="form-control" id="title">
+                        <option *ngFor="let title of titleOptions" [value]="title">{{ title }}</option>
+                    </select>
+                </div>
+                
+                <div class="form-group full-name-container">
+                    <label for="fullName">Full Name <span class="required">*</span></label>
+                    <input type="text" formControlName="fullName" class="form-control" id="fullName" placeholder="Enter your full name">
+                    <div *ngIf="ownerProfileForm.get('fullName')?.invalid && ownerProfileForm.get('fullName')?.touched" class="error-message">
+                        Full name is required
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email Address <span class="required">*</span></label>
+                <input type="email" formControlName="email" class="form-control" id="email" placeholder="Enter your email address">
+                <div *ngIf="ownerProfileForm.get('email')?.invalid && ownerProfileForm.get('email')?.touched" class="error-message">
+                    <span *ngIf="ownerProfileForm.get('email')?.errors?.['required']">Email is required</span>
+                    <span *ngIf="ownerProfileForm.get('email')?.errors?.['email']">Please enter a valid email address</span>
+                </div>
+            </div>
+            
+            <div class="form-row mobile-row">
+                <div class="form-group code-container">
+                    <label for="phoneCode">Code <span class="required">*</span></label>
+                    <div class="code-input-container">
+                        <input type="text" formControlName="phoneCode" class="form-control" id="phoneCode" value="+216">
+                        <span class="clear-btn">×</span>
+                    </div>
+                </div>
+                
+                <div class="form-group mobile-container">
+                    <label for="contactNumber">Mobile Number <span class="required">*</span></label>
+                    <input type="text" formControlName="contactNumber" class="form-control" id="contactNumber" placeholder="Enter your mobile number">
+                    <div *ngIf="ownerProfileForm.get('contactNumber')?.invalid && ownerProfileForm.get('contactNumber')?.touched" class="error-message">
+                        <span *ngIf="ownerProfileForm.get('contactNumber')?.errors?.['required']">Mobile number is required</span>
+                        <span *ngIf="ownerProfileForm.get('contactNumber')?.errors?.['pattern']">Please enter a valid mobile number</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="state">Country <span class="required">*</span></label>
+                <select formControlName="state" class="form-control" id="state">
+                    <option value="" disabled selected>Select your country</option>
+                    <option *ngFor="let country of countryOptions" [value]="country">{{ country }}</option>
+                </select>
+                <div *ngIf="ownerProfileForm.get('state')?.invalid && ownerProfileForm.get('state')?.touched" class="error-message">
+                    Country is required
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="accommodationType">Accommodation Type <span class="required">*</span></label>
+                <select formControlName="accommodationType" class="form-control" id="accommodationType">
+                    <option value="" disabled selected>Select accommodation type</option>
+                    <option *ngFor="let type of accommodationTypeOptions" [value]="type">{{ type }}</option>
+                </select>
+                <div *ngIf="ownerProfileForm.get('accommodationType')?.invalid && ownerProfileForm.get('accommodationType')?.touched" class="error-message">
+                    Accommodation type is required
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="propertyManagementSystem">Property Management System</label>
+                <input type="text" formControlName="propertyManagementSystem" class="form-control" id="propertyManagementSystem" placeholder="Enter property management system">
+            </div>
+            
+            <div class="form-group">
+                <label for="additionalInformation">Additional Information</label>
+                <textarea formControlName="additionalInformation" class="form-control" id="additionalInformation" placeholder="Enter additional information" rows="3"></textarea>
+            </div>
+            
+            <div class="form-group checkbox-group">
+                <div class="custom-checkbox">
+                    <input type="checkbox" formControlName="isAgency" id="isAgency" class="custom-control-input">
+                    <label class="custom-control-label" for="isAgency">I am an agency</label>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+                    <span *ngIf="isLoading">Saving...</span>
+                    <span *ngIf="!isLoading">Submit</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

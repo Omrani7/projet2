@@ -1,0 +1,67 @@
+@startuml Class Diagram - Spring Security Authentication System
+
+' Updated to include logout functionality
+
+' Main entities
+class User {
+  -id: int
+  -email: String
+  -username: String
+  -password: String
+  -phoneNumber: String
+  -provider: AuthProvider
+  -providerId: String
+  -enabled: boolean
+  -role: UserRole
+  +getProvider(): AuthProvider
+  +setProvider(AuthProvider): void
+  +getProviderId(): String
+  +setProviderId(String): void
+}
+
+' Controllers
+class AuthController {
+  -userService: UserService
+  -tokenService: TokenService
+  -authenticationManager: AuthenticationManager
+  +register(SignupRequest request): ResponseEntity<?>
+  +login(LoginRequest request): ResponseEntity<?>
+  +logout(HttpServletRequest request): ResponseEntity<?>
+}
+
+' Angular services
+class AuthService {
+  -apiUrl: String
+  -tokenKey: String
+  -http: HttpClient
+  -router: Router
+  +login(email, password): Observable<any>
+  +register(userData): Observable<any>
+  +forgotPassword(email): Observable<any>
+  +validateResetToken(token): Observable<any>
+  +resetPassword(token, password, confirmPassword): Observable<any>
+  +oauthLogin(provider): void
+  +logout(): void
+  +isLoggedIn(): boolean
+  +getToken(): String
+  +saveToken(token): void
+  +handleOAuth2Callback(): Observable<any>
+}
+
+' Angular components
+class HomeComponent {
+  -isLoginModalOpen: boolean
+  -router: Router
+  -authService: AuthService
+  +login(): void
+  +logout(): void
+  +isLoggedIn(): boolean
+  +closeLoginModal(): void
+}
+
+' Relationships
+AuthController ..> HttpServletRequest : uses in logout
+HomeComponent --> AuthService : uses for logout
+AuthService ..> HttpClient : uses for API calls
+
+@enduml 

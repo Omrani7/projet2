@@ -1,0 +1,89 @@
+<div class="bg-gradient-to-br from-slate-50 to-slate-100 py-12 px-4 md:py-16">
+  <div class="max-w-7xl mx-auto">
+    <!-- Section header with animation -->
+    <div class="text-center mb-10">
+      <h2 class="text-3xl md:text-4xl font-bold mb-3 text-gray-800 relative inline-block">
+        Latest Properties
+        <span class="absolute -bottom-2 left-0 right-0 h-1 bg-pink-500 rounded-full transform scale-x-50 opacity-0 animate-underline"></span>
+      </h2>
+      <p class="text-gray-600 max-w-2xl mx-auto">Discover the newest property listings from property owners around Tunisia.</p>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-indicator flex justify-center items-center py-20">
+      <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-pink-500"></div>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error" class="error-message bg-red-50 text-red-600 p-8 rounded-lg text-center max-w-2xl mx-auto shadow-sm">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 mx-auto mb-3 text-red-500">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+      </svg>
+      <p>{{ error }}</p>
+      <button class="mt-4 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors" (click)="fetchLatestProperties()">
+        Try Again
+      </button>
+    </div>
+
+    <!-- Horizontal Scroll Container -->
+    <div *ngIf="!isLoading && !error" class="relative">
+      <!-- Desktop Card Grid (hidden on mobile) -->
+      <div class="hidden md:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+        <div *ngFor="let prop of latestProperties">
+          <app-property-card [property]="prop"></app-property-card>
+        </div>
+      </div>
+      
+      <!-- Mobile Scrollable Container (hidden on desktop) -->
+      <div class="md:hidden relative">
+        <div #scrollContainer class="flex space-x-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory">
+          <div *ngFor="let prop of latestProperties" class="flex-shrink-0 w-80 snap-center">
+            <app-property-card [property]="prop"></app-property-card>
+          </div>
+        </div>
+        
+        <!-- Scroll Indicators (Mobile) -->
+        <div class="flex justify-center mt-4 gap-1">
+          <div *ngFor="let prop of latestProperties; let i = index" 
+               class="h-1 rounded-full transition-all duration-300"
+               [class.w-6]="currentMobileScrollIndex === i"
+               [class.w-2]="currentMobileScrollIndex !== i"
+               [class.bg-pink-500]="currentMobileScrollIndex === i"
+               [class.bg-gray-300]="currentMobileScrollIndex !== i">
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="latestProperties.length === 0" class="flex-shrink-0 w-full text-center py-16 bg-gray-50 rounded-lg border border-gray-200">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 mx-auto text-gray-300 mb-4">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+        </svg>
+        <p class="text-gray-500 text-lg">No properties available right now.</p>
+        <p class="text-gray-400 mt-2">Check back soon for new listings!</p>
+      </div>
+
+      <!-- Navigation Arrows (Desktop only) -->
+      <button *ngIf="showLeftArrow" (click)="scrollLeft()" class="hidden md:block absolute top-1/2 left-0 transform -translate-y-1/2 -translate-x-5 bg-white rounded-full shadow-lg p-3 z-10 hover:bg-gray-50 focus:outline-none border border-gray-100 transition-transform hover:scale-110">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-gray-700">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+        </svg>
+      </button>
+      <button *ngIf="showRightArrow" (click)="scrollRight()" class="hidden md:block absolute top-1/2 right-0 transform -translate-y-1/2 translate-x-5 bg-white rounded-full shadow-lg p-3 z-10 hover:bg-gray-50 focus:outline-none border border-gray-100 transition-transform hover:scale-110">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-gray-700">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+        </svg>
+      </button>
+    </div>
+    
+    <!-- "View All" Button -->
+    <div *ngIf="!isLoading && !error && latestProperties.length > 0" class="mt-8 text-center">
+      <a routerLink="/discovery" class="inline-flex items-center px-6 py-3 rounded-full bg-white border border-pink-500 text-pink-600 hover:bg-pink-50 transition-colors shadow-sm">
+        <span class="font-medium">View All Properties</span>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 ml-2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
+        </svg>
+      </a>
+    </div>
+  </div>
+</div>

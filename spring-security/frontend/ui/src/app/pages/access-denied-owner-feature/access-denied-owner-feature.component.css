@@ -1,0 +1,13 @@
+/* Basic styling for the access denied page */
+.access-denied-container {
+  /* Uses Tailwind classes for layout, additional styles can go here if needed */
+}
+
+.modal-content {
+  /* Tailwind classes define most of this */
+}
+
+/* You can add more specific styles if Tailwind isn't covering something, e.g.: */
+.modal-content h2 {
+  /* Example: if you wanted a very specific font or spacing not easily done with Tailwind */
+} 

@@ -1,0 +1,204 @@
+<div class="owner-inquiries-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>Property Inquiries</h1>
+      <div class="unread-badge" *ngIf="unreadCount > 0">
+        {{ unreadCount }} new
+      </div>
+    </div>
+    <button class="refresh-btn" (click)="refresh()" [disabled]="isLoading">
+      <span [class.spinning]="isLoading">🔄</span> Refresh
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Loading inquiries...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-container" *ngIf="error && !isLoading">
+    <div class="error-message">
+      <p>❌ {{ error }}</p>
+      <button class="retry-btn" (click)="refresh()">Try Again</button>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!isLoading && !error && inquiries.length === 0">
+    <div class="empty-icon">📬</div>
+    <h3>No Inquiries Yet</h3>
+    <p>You haven't received any inquiries about your properties yet.</p>
+    <p>When students are interested in your properties, their inquiries will appear here.</p>
+  </div>
+
+  <!-- Inquiries List -->
+  <div class="inquiries-list" *ngIf="!isLoading && !error && inquiries.length > 0">
+    <!-- Results Info -->
+    <div class="results-info">
+      <p>Showing {{ inquiries.length }} of {{ totalElements }} inquiries</p>
+    </div>
+
+    <!-- Inquiry Cards -->
+    <div class="inquiry-card" *ngFor="let inquiry of inquiries; trackBy: trackByInquiryId">
+      <!-- Card Header -->
+      <div class="card-header">
+        <div class="student-info">
+          <h3>{{ inquiry.student.username }}</h3>
+          <p class="student-email">📧 {{ inquiry.student.email }}</p>
+          <p class="student-phone" *ngIf="inquiry.studentPhoneNumber">📞 {{ inquiry.studentPhoneNumber }}</p>
+        </div>
+        <div class="status-container">
+          <span class="status-badge" [ngClass]="getStatusBadgeClass(inquiry.status)">
+            {{ getStatusText(inquiry.status) }}
+          </span>
+          <span class="inquiry-date">{{ formatDate(inquiry.timestamp) }}</span>
+        </div>
+      </div>
+
+      <!-- Property Info -->
+      <div class="property-section">
+        <h4>Property: {{ inquiry.property.title }}</h4>
+        <p class="property-details">
+          📍 {{ inquiry.property.location }} • 
+          💰 {{ inquiry.property.price | currency:'TND':'symbol':'1.0-0' }}/month
+        </p>
+      </div>
+
+      <!-- Student Message -->
+      <div class="message-section">
+        <h4>Student's Message:</h4>
+        <div class="message-content">{{ inquiry.message }}</div>
+        <div class="message-date">
+          Sent on {{ formatDate(inquiry.timestamp) }}
+        </div>
+      </div>
+
+      <!-- Owner Reply Section -->
+      <div class="reply-section">
+        <!-- Existing Reply -->
+        <div class="existing-reply" *ngIf="inquiry.reply">
+          <h4>Your Reply:</h4>
+          <div class="reply-content">{{ inquiry.reply }}</div>
+          <div class="reply-date">
+            Replied on {{ formatDate(inquiry.replyTimestamp!) }}
+          </div>
+        </div>
+
+        <!-- Reply Form -->
+        <div class="reply-form" *ngIf="!inquiry.reply">
+          <div class="reply-actions" *ngIf="replyingTo !== inquiry.id">
+            <button class="reply-btn" (click)="startReply(inquiry.id)">
+              Reply to Student
+            </button>
+          </div>
+
+          <form [formGroup]="replyForms[inquiry.id]" (ngSubmit)="submitReply(inquiry)" *ngIf="replyingTo === inquiry.id">
+            <div class="form-group">
+              <label for="reply-{{ inquiry.id }}">Your Reply *</label>
+              <textarea 
+                id="reply-{{ inquiry.id }}"
+                formControlName="reply"
+                class="form-control"
+                [class.error]="getReplyControl(inquiry.id)?.invalid && getReplyControl(inquiry.id)?.touched"
+                rows="4"
+                placeholder="Thank you for your interest. I'd be happy to answer your questions..."
+                maxlength="1000">
+              </textarea>
+              
+              <!-- Character count -->
+              <div class="char-count">
+                {{ getReplyControl(inquiry.id)?.value?.length || 0 }}/1000
+              </div>
+
+              <!-- Validation errors -->
+              <div class="field-errors" *ngIf="getReplyControl(inquiry.id)?.invalid && getReplyControl(inquiry.id)?.touched">
+                <small *ngIf="getReplyControl(inquiry.id)?.errors?.['required']">Reply is required</small>
+                <small *ngIf="getReplyControl(inquiry.id)?.errors?.['minlength']">Reply must be at least 10 characters</small>
+                <small *ngIf="getReplyControl(inquiry.id)?.errors?.['maxlength']">Reply cannot exceed 1000 characters</small>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button 
+                type="button" 
+                class="btn btn-secondary"
+                (click)="cancelReply()"
+                [disabled]="isSubmittingReply">
+                Cancel
+              </button>
+              <button 
+                type="submit" 
+                class="btn btn-primary"
+                [disabled]="replyForms[inquiry.id].invalid || isSubmittingReply">
+                <span *ngIf="isSubmittingReply">Sending...</span>
+                <span *ngIf="!isSubmittingReply">Send Reply</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Card Footer -->
+      <div class="card-footer">
+        <div class="inquiry-id">
+          <small>Inquiry #{{ inquiry.id }}</small>
+        </div>
+        <div class="status-actions">
+          <!-- Deal closure action for pending/replied inquiries -->
+          <div class="deal-actions" *ngIf="inquiry.status === 'PENDING_REPLY' || inquiry.status === 'REPLIED'">
+            <button class="close-deal-btn" (click)="closeDealWithStudent(inquiry.id)">
+              🎯 Close Deal with {{ inquiry.student.username }}
+            </button>
+          </div>
+          
+          <!-- Standard status actions -->
+          <div class="standard-actions" *ngIf="inquiry.reply && inquiry.status !== 'CLOSED' && inquiry.status !== 'PROPERTY_NO_LONGER_AVAILABLE'">
+            <button class="status-btn" (click)="updateStatus(inquiry.id, 'CLOSED')">
+              Mark as Closed
+            </button>
+          </div>
+          
+          <!-- Status info for unavailable properties -->
+          <div class="unavailable-info" *ngIf="inquiry.status === 'PROPERTY_NO_LONGER_AVAILABLE'">
+            <small class="unavailable-text">🚫 Deal closed with another student</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination" *ngIf="!isLoading && !error && totalPages > 1">
+    <button 
+      class="page-btn"
+      [disabled]="currentPage === 0"
+      (click)="previousPage()">
+      ← Previous
+    </button>
+
+    <div class="page-numbers">
+      <button
+        *ngFor="let page of getPageNumbers()"
+        class="page-number"
+        [class.active]="page === currentPage"
+        (click)="goToPage(page)">
+        {{ page + 1 }}
+      </button>
+    </div>
+
+    <button 
+      class="page-btn"
+      [disabled]="currentPage === totalPages - 1"
+      (click)="nextPage()">
+      Next →
+    </button>
+  </div>
+
+  <!-- Pagination Info -->
+  <div class="pagination-info" *ngIf="!isLoading && !error && totalElements > 0">
+    <p>Page {{ currentPage + 1 }} of {{ totalPages }} ({{ totalElements }} total inquiries)</p>
+  </div>
+</div> 

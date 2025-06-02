@@ -1,0 +1,46 @@
+<app-header></app-header>
+<div class="discovery-page">
+  <!-- Sticky filter bar -->
+  <app-filter-bar
+    [currentSelectedInstitute]="selectedInstitute"
+    (instituteSelected)="onInstituteSelected($event)"
+    (sortChanged)="onSortChanged($event)"
+    (filtersChanged)="onFiltersChanged($event)"
+  ></app-filter-bar>
+
+  <!-- Main scrollable grid with fixed height -->
+  <div class="main-content-area">
+    <!-- Left column: scrollable property list -->
+    <aside class="property-list-area">
+      <p *ngIf="selectedInstitute && !isLoading" class="location-info">
+        <span class="location-text">Showing properties near</span>
+        <strong>{{ selectedInstitute.name }}</strong>
+      </p>
+
+      <app-property-list
+        [propertiesPage]="(propertyPage$ | async)"
+        [isLoading]="isLoading"
+        [errorMessage]="errorMessage"
+        [selectedPropertyId]="selectedPropertyId"
+        (pageChanged)="onPageChanged($event)"
+        (propertySelected)="onPropertySelected($event)"
+      ></app-property-list>
+    </aside>
+
+    <!-- Right column: sticky map -->
+    <div class="map-container-wrapper">
+      <main class="map-area">
+        <app-map-display
+          [hidden]="true"
+          [properties]="(propertyPage$ | async)?.content || []"
+          [selectedInstitute]="selectedInstitute"
+          [visiblePropertyIds]="visiblePropertyIds"
+          [selectedPropertyId]="selectedPropertyId"
+          (propertySelected)="onPropertySelected($event)"
+        ></app-map-display>
+      </main>
+    </div>
+  </div>
+
+
+</div>

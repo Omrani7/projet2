@@ -1,0 +1,201 @@
+@startuml "Updated Authentication Class Diagram"
+
+' Core Backend Classes
+package "Backend" {
+  class User {
+    -id: Long
+    -username: String
+    -email: String
+    -password: String
+    -enabled: boolean
+    -userProfile: UserProfile
+    -role: UserRole
+    -provider: AuthProvider
+    -providerId: String
+    +getters/setters()
+    
+    <<enum>> UserRole {
+      USER
+      ADMIN
+    }
+    
+    <<enum>> AuthProvider {
+      LOCAL
+      GOOGLE
+    }
+  }
+  
+  class TokenService {
+    -secretKey: String
+    -expirationTime: Long
+    +generateToken(user: User): String
+    +validateToken(token: String): boolean
+    +getUsernameFromToken(token: String): String
+  }
+  
+  class UserService {
+    -userRepo: UserRepo
+    -tokenService: TokenService
+    -passwordEncoder: BCryptPasswordEncoder
+    -emailService: EmailService
+    +saveUser(user: User): User
+    +registerUser(signupRequest: SignupRequest): User
+    +createPasswordResetTokenForUser(user: User): PasswordResetToken
+    +validatePasswordResetToken(token: String): boolean
+    +resetPassword(token: String, newPassword: String): boolean
+    +sendPasswordResetEmail(email: String): void
+    +createOrUpdateOAuth2User(email: String, name: String, providerId: String, provider: AuthProvider): User
+  }
+  
+  class PasswordResetToken {
+    -id: Long
+    -token: String
+    -user: User
+    -expiryDate: Date
+    +isExpired(): boolean
+  }
+  
+  class OAuth2Controller {
+    -userService: UserService
+    -tokenService: TokenService
+    -appConfig: AppConfig
+    +handleOAuth2Success(response: HttpServletResponse): void
+    +handleOAuth2Error(request: HttpServletRequest, response: HttpServletResponse): void
+    +logout(request: HttpServletRequest, response: HttpServletResponse): void
+  }
+  
+  class AppConfig {
+    -frontendUrl: String
+    +getFrontendUrl(): String
+    +getOAuth2CallbackUrl(): String
+    +getOAuth2CallbackUrlWithToken(token: String): String
+    +getOAuth2CallbackUrlWithError(error: String): String
+  }
+  
+  class SecurityConfig {
+    -userDetailsService: UserDetailsService
+    -jwtFilter: JwtFilter
+    -oAuth2SuccessHandler: OAuth2SuccessHandler
+    -oAuth2FailureHandler: OAuth2FailureHandler
+    -authorizationRequestRepository: StatelessOAuth2AuthorizationRequestRepository
+    -appConfig: AppConfig
+    +authProvider(): AuthenticationProvider
+    +securityFilterChain(http: HttpSecurity): SecurityFilterChain
+    +corsConfigurationSource(): CorsConfigurationSource
+    +authenticationManager(): AuthenticationManager
+    +passwordEncoder(): BCryptPasswordEncoder
+  }
+  
+  class OAuth2SuccessHandler {
+    -userService: UserService
+    -tokenService: TokenService
+    -authorizationRequestRepository: StatelessOAuth2AuthorizationRequestRepository
+    -appConfig: AppConfig
+    +onAuthenticationSuccess(request: HttpServletRequest, response: HttpServletResponse, authentication: Authentication): void
+  }
+  
+  class OAuth2FailureHandler {
+    -appConfig: AppConfig
+    -authorizationRequestRepository: StatelessOAuth2AuthorizationRequestRepository
+    +onAuthenticationFailure(request: HttpServletRequest, response: HttpServletResponse, exception: AuthenticationException): void
+  }
+  
+  class StatelessOAuth2AuthorizationRequestRepository {
+    -authRequests: Map<String, OAuth2AuthorizationRequest>
+    +loadAuthorizationRequest(request: HttpServletRequest): OAuth2AuthorizationRequest
+    +saveAuthorizationRequest(authorizationRequest: OAuth2AuthorizationRequest, request: HttpServletRequest, response: HttpServletResponse): void
+    +removeAuthorizationRequest(request: HttpServletRequest, response: HttpServletResponse): OAuth2AuthorizationRequest
+  }
+}
+
+' Frontend Classes
+package "Frontend" {
+  class AuthService {
+    -apiUrl: String
+    -tokenKey: String
+    -authStateSubject: BehaviorSubject<boolean>
+    +authState$: Observable<boolean>
+    -hasValidToken(): boolean
+    -checkTokenValidity(): void
+    +login(email: String, password: String): Observable<any>
+    +register(userData: any): Observable<any>
+    +forgotPassword(email: String): Observable<any>
+    +validateResetToken(token: String): Observable<any>
+    +resetPassword(token: String, password: String, confirmPassword: String): Observable<any>
+    +oauthLogin(provider: String): void
+    +logout(): Observable<any>
+    +isLoggedIn(): boolean
+    +getToken(): String
+    +saveToken(token: String): void
+    +handleOAuth2Callback(): Observable<any>
+    -handleError<T>(operation: String): Function
+  }
+  
+  class LoginComponent {
+    -email: String
+    -password: String
+    -isPasswordVisible: boolean
+    -errorMessage: String
+    -isLoggingIn: boolean
+    -isGoogleLoginInProgress: boolean
+    +closeModalEvent: EventEmitter<void>
+    +continueWithEmail(): void
+    +loginWithGoogle(): void
+    +closeModal(): void
+  }
+  
+  class OAuth2CallbackComponent {
+    -loading: boolean
+    -error: boolean
+    -errorMessage: String
+    -token: String
+    +ngOnInit(): void
+    +retry(): void
+  }
+  
+  class HomeComponent {
+    -isLoginModalOpen: boolean
+    -isUserLoggedIn: boolean
+    -authSubscription: Subscription
+    -logoutInProgress: boolean
+    +ngOnInit(): void
+    +ngOnDestroy(): void
+    +login(): void
+    +logout(): void
+    +isLoggedIn(): boolean
+    +closeLoginModal(): void
+  }
+  
+  class AuthStatusComponent {
+    -isAuthenticated: boolean
+    -authSubscription: Subscription
+    +ngOnInit(): void
+    +ngOnDestroy(): void
+  }
+}
+
+' Relationships
+UserService --> User : manages
+UserService --> PasswordResetToken : creates
+TokenService --> User : generates tokens for
+OAuth2Controller --> UserService : uses
+OAuth2Controller --> TokenService : uses
+OAuth2Controller --> AppConfig : uses
+SecurityConfig --> OAuth2SuccessHandler : uses
+SecurityConfig --> OAuth2FailureHandler : uses
+SecurityConfig --> StatelessOAuth2AuthorizationRequestRepository : uses
+SecurityConfig --> AppConfig : uses
+OAuth2SuccessHandler --> UserService : uses
+OAuth2SuccessHandler --> TokenService : uses
+OAuth2SuccessHandler --> StatelessOAuth2AuthorizationRequestRepository : uses
+OAuth2SuccessHandler --> AppConfig : uses
+OAuth2FailureHandler --> StatelessOAuth2AuthorizationRequestRepository : uses
+OAuth2FailureHandler --> AppConfig : uses
+
+LoginComponent --> AuthService : uses
+OAuth2CallbackComponent --> AuthService : uses
+HomeComponent --> AuthService : uses
+AuthStatusComponent --> AuthService : subscribes to
+HomeComponent --> LoginComponent : contains
+
+@enduml 

@@ -1,0 +1,178 @@
+<div class="messages-container">
+  <!-- Header -->
+  <div class="messages-header">
+    <h1>💬 Messages</h1>
+    <p class="subtitle">Chat with your connected roommates</p>
+    <button class="refresh-btn" (click)="refresh()" [disabled]="isLoadingConversations">
+      <i class="fas fa-sync-alt" [class.spinning]="isLoadingConversations"></i>
+      Refresh
+    </button>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="error-container">
+    <i class="fas fa-exclamation-triangle"></i>
+    <p>{{ error }}</p>
+    <button class="retry-btn" (click)="refresh()">Try Again</button>
+  </div>
+
+  <!-- Main Chat Interface -->
+  <div class="chat-interface" *ngIf="!error">
+    
+    <!-- Conversations Sidebar -->
+    <div class="conversations-sidebar">
+      <div class="sidebar-header">
+        <h3>Conversations</h3>
+        <span class="conversation-count" *ngIf="conversations.length > 0">{{ conversations.length }}</span>
+      </div>
+      
+      <!-- Loading State -->
+      <div *ngIf="isLoadingConversations" class="loading-conversations">
+        <div class="loading-spinner"></div>
+        <p>Loading conversations...</p>
+      </div>
+      
+      <!-- Empty State -->
+      <div *ngIf="!isLoadingConversations && conversations.length === 0" class="empty-conversations">
+        <div class="empty-icon">💬</div>
+        <h4>No Conversations Yet</h4>
+        <p>Start connecting with other students to begin messaging!</p>
+        <button class="browse-btn" routerLink="/roommates/connections">
+          View Connections
+        </button>
+      </div>
+      
+      <!-- Conversations List -->
+      <div class="conversations-list" *ngIf="!isLoadingConversations && conversations.length > 0">
+        <div 
+          *ngFor="let conversation of conversations" 
+          class="conversation-item"
+          [class.active]="selectedConversation?.id === conversation.id"
+          (click)="selectConversation(conversation)">
+          
+          <div class="conversation-avatar">
+            <span class="avatar-text">{{ getConversationDisplayName(conversation).charAt(0).toUpperCase() }}</span>
+          </div>
+          
+          <div class="conversation-info">
+            <div class="conversation-header">
+              <h4 class="conversation-name">{{ getConversationDisplayName(conversation) }}</h4>
+              <span class="conversation-time" *ngIf="conversation.lastMessage">
+                {{ conversation.lastMessage.timeAgo }}
+              </span>
+            </div>
+            
+            <div class="conversation-preview">
+              <p class="preview-text">{{ getConversationPreview(conversation) }}</p>
+              <span class="unread-badge" *ngIf="conversation.unreadCount > 0">
+                {{ conversation.unreadCount }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Chat Area -->
+    <div class="chat-area">
+      
+      <!-- No Conversation Selected -->
+      <div *ngIf="!selectedConversation" class="no-conversation-selected">
+        <div class="welcome-message">
+          <i class="fas fa-comments"></i>
+          <h3>Welcome to Messages</h3>
+          <p>Select a conversation from the sidebar to start chatting, or connect with new students to begin messaging.</p>
+        </div>
+      </div>
+      
+      <!-- Active Conversation -->
+      <div *ngIf="selectedConversation" class="active-conversation">
+        
+        <!-- Chat Header -->
+        <div class="chat-header">
+          <div class="chat-user-info">
+            <div class="chat-avatar">
+              <span class="avatar-text">{{ getConversationDisplayName(selectedConversation).charAt(0).toUpperCase() }}</span>
+            </div>
+            <div class="chat-user-details">
+              <h3>{{ getConversationDisplayName(selectedConversation) }}</h3>
+              <p class="user-status">Connected Student</p>
+            </div>
+          </div>
+          
+          <div class="chat-actions">
+            <button class="action-btn" title="View Profile">
+              <i class="fas fa-user"></i>
+            </button>
+            <button class="action-btn" title="More Options">
+              <i class="fas fa-ellipsis-v"></i>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Messages Container -->
+        <div class="messages-container" #messagesContainer>
+          
+          <!-- Loading Messages -->
+          <div *ngIf="isLoadingMessages" class="loading-messages">
+            <div class="loading-spinner"></div>
+            <p>Loading messages...</p>
+          </div>
+          
+          <!-- Messages List -->
+          <div *ngIf="!isLoadingMessages" class="messages-list">
+            <div 
+              *ngFor="let message of messages" 
+              class="message-item"
+              [class.my-message]="isMyMessage(message)"
+              [class.other-message]="!isMyMessage(message)">
+              
+              <div class="message-content">
+                <div class="message-bubble">
+                  <p class="message-text">{{ message.content }}</p>
+                  <div class="message-meta">
+                    <span class="message-time">{{ message.timeAgo }}</span>
+                    <span class="message-status" *ngIf="isMyMessage(message)">
+                      <i class="fas fa-check" *ngIf="message.isRead"></i>
+                      <i class="fas fa-check-double" *ngIf="!message.isRead"></i>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Message Input -->
+        <div class="message-input-container">
+          <form [formGroup]="messageForm" (ngSubmit)="sendMessage()" class="message-form">
+            <div class="input-group">
+              <textarea 
+                formControlName="content"
+                placeholder="Type your message..."
+                class="message-input"
+                rows="1"
+                (keypress)="onKeyPress($event)"
+                [disabled]="isSendingMessage"></textarea>
+              
+              <button 
+                type="submit" 
+                class="send-btn"
+                [disabled]="!messageForm.valid || isSendingMessage">
+                <i class="fas fa-paper-plane" *ngIf="!isSendingMessage"></i>
+                <div class="loading-spinner small" *ngIf="isSendingMessage"></div>
+              </button>
+            </div>
+            
+            <div class="input-footer">
+              <span class="char-count">
+                {{ messageForm.get('content')?.value?.length || 0 }}/2000
+              </span>
+              <span class="input-hint">Press Enter to send, Shift+Enter for new line</span>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

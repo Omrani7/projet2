@@ -1,0 +1,474 @@
+<div class="property-form-container">
+  <div class="form-header">
+    <h1 class="form-title">List Your Property</h1>
+    <p class="form-subtitle">Fill in the details below to list your property on UniNest</p>
+  </div>
+
+  <!-- Progress Bar -->
+  <div class="progress-container">
+    <div class="progress-steps">
+      <div 
+        *ngFor="let title of stepTitles; let i = index" 
+        class="step-item" 
+        [class.active]="currentStep === i + 1"
+        [class.completed]="currentStep > i + 1">
+        <div class="step-number">{{ i + 1 }}</div>
+        <div class="step-title">{{ title }}</div>
+      </div>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-completed" [style.width.%]="(currentStep - 1) / (totalSteps - 1) * 100"></div>
+    </div>
+  </div>
+
+  <!-- Form Alert Messages -->
+  <div *ngIf="formSubmitError" class="alert alert-error">
+    <span class="alert-icon">⚠️</span>
+    <span>{{ formSubmitError }}</span>
+  </div>
+  
+  <div *ngIf="formSubmitSuccess" class="alert alert-success">
+    <span class="alert-icon">✅</span>
+    <span>{{ formSubmitSuccess }}</span>
+  </div>
+
+  <!-- Form Steps -->
+  <div class="form-content">
+    <!-- Step 1: Basic Information -->
+    <div *ngIf="currentStep === 1" class="step-content animate-fade-in">
+      <h2 class="step-heading">Basic Information</h2>
+      <p class="step-description">Provide essential details about your property</p>
+      
+      <form [formGroup]="basicInfoForm" class="form-fields">
+        <div class="form-group">
+          <label for="title">Property Title <span class="required">*</span></label>
+          <input 
+            type="text" 
+            id="title" 
+            formControlName="title" 
+            placeholder="E.g., Modern Studio Near University Campus"
+            class="form-control"
+            [class.invalid]="hasError(basicInfoForm, 'title', 'required') || 
+                            hasError(basicInfoForm, 'title', 'minlength') ||
+                            hasError(basicInfoForm, 'title', 'maxlength')">
+          <div class="error-message" *ngIf="hasError(basicInfoForm, 'title', 'required')">
+            Title is required
+          </div>
+          <div class="error-message" *ngIf="hasError(basicInfoForm, 'title', 'minlength')">
+            Title must be at least 5 characters
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="description">Description <span class="required">*</span></label>
+          <textarea 
+            id="description" 
+            formControlName="description" 
+            rows="5" 
+            placeholder="Describe your property's features, location advantages, etc."
+            class="form-control"
+            [class.invalid]="hasError(basicInfoForm, 'description', 'required') || 
+                            hasError(basicInfoForm, 'description', 'minlength')"></textarea>
+          <div class="error-message" *ngIf="hasError(basicInfoForm, 'description', 'required')">
+            Description is required
+          </div>
+          <div class="error-message" *ngIf="hasError(basicInfoForm, 'description', 'minlength')">
+            Description must be at least 20 characters
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="fullAddress">Full Address <span class="required">*</span></label>
+          <input 
+            type="text" 
+            id="fullAddress" 
+            formControlName="fullAddress" 
+            placeholder="Street address"
+            class="form-control"
+            [class.invalid]="hasError(basicInfoForm, 'fullAddress', 'required')">
+          <div class="error-message" *ngIf="hasError(basicInfoForm, 'fullAddress', 'required')">
+            Address is required
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group half-width">
+            <label for="city">City <span class="required">*</span></label>
+            <input 
+              type="text" 
+              id="city" 
+              formControlName="city" 
+              placeholder="City"
+              class="form-control"
+              [class.invalid]="hasError(basicInfoForm, 'city', 'required')">
+            <div class="error-message" *ngIf="hasError(basicInfoForm, 'city', 'required')">
+              City is required
+            </div>
+          </div>
+          
+          <div class="form-group half-width">
+            <label for="district">District <span class="required">*</span></label>
+            <input 
+              type="text" 
+              id="district" 
+              formControlName="district" 
+              placeholder="District/Area"
+              class="form-control"
+              [class.invalid]="hasError(basicInfoForm, 'district', 'required')">
+            <div class="error-message" *ngIf="hasError(basicInfoForm, 'district', 'required')">
+              District is required
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    
+    <!-- Step 2: Property Details -->
+    <div *ngIf="currentStep === 2" class="step-content animate-fade-in">
+      <h2 class="step-heading">Property Details</h2>
+      <p class="step-description">Provide specific details about your property</p>
+      
+      <form [formGroup]="detailsForm" class="form-fields">
+        <div class="form-group">
+          <label for="propertyType">Property Type <span class="required">*</span></label>
+          <select 
+            id="propertyType" 
+            formControlName="propertyType" 
+            class="form-control"
+            [class.invalid]="hasError(detailsForm, 'propertyType', 'required')">
+            <option value="" disabled selected>Select property type</option>
+            <option *ngFor="let type of propertyTypes" [value]="type">{{ type }}</option>
+          </select>
+          <div class="error-message" *ngIf="hasError(detailsForm, 'propertyType', 'required')">
+            Property type is required
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group third-width">
+            <label for="rooms">Total Rooms <span class="required">*</span></label>
+            <input 
+              type="number" 
+              id="rooms" 
+              formControlName="rooms" 
+              min="1"
+              class="form-control"
+              [class.invalid]="hasError(detailsForm, 'rooms', 'required') || 
+                              hasError(detailsForm, 'rooms', 'min')">
+            <div class="error-message" *ngIf="hasError(detailsForm, 'rooms', 'required') || 
+                                            hasError(detailsForm, 'rooms', 'min')">
+              Must be at least 1
+            </div>
+          </div>
+          
+          <div class="form-group third-width">
+            <label for="bedrooms">Bedrooms <span class="required">*</span></label>
+            <input 
+              type="number" 
+              id="bedrooms" 
+              formControlName="bedrooms" 
+              min="0"
+              class="form-control"
+              [class.invalid]="hasError(detailsForm, 'bedrooms', 'required') || 
+                              hasError(detailsForm, 'bedrooms', 'min')">
+            <div class="error-message" *ngIf="hasError(detailsForm, 'bedrooms', 'required') || 
+                                            hasError(detailsForm, 'bedrooms', 'min')">
+              Cannot be negative
+            </div>
+          </div>
+          
+          <div class="form-group third-width">
+            <label for="bathrooms">Bathrooms <span class="required">*</span></label>
+            <input 
+              type="number" 
+              id="bathrooms" 
+              formControlName="bathrooms" 
+              min="0"
+              class="form-control"
+              [class.invalid]="hasError(detailsForm, 'bathrooms', 'required') || 
+                              hasError(detailsForm, 'bathrooms', 'min')">
+            <div class="error-message" *ngIf="hasError(detailsForm, 'bathrooms', 'required') || 
+                                            hasError(detailsForm, 'bathrooms', 'min')">
+              Cannot be negative
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group half-width">
+            <label for="area">Area (m²) <span class="required">*</span></label>
+            <input 
+              type="number" 
+              id="area" 
+              formControlName="area" 
+              placeholder="Property size in square meters"
+              min="1"
+              class="form-control"
+              [class.invalid]="hasError(detailsForm, 'area', 'required') || 
+                              hasError(detailsForm, 'area', 'min')">
+            <div class="error-message" *ngIf="hasError(detailsForm, 'area', 'required')">
+              Area is required
+            </div>
+            <div class="error-message" *ngIf="hasError(detailsForm, 'area', 'min')">
+              Area must be greater than 0
+            </div>
+          </div>
+          
+          <div class="form-group half-width">
+            <label for="floor">Floor</label>
+            <input 
+              type="number" 
+              id="floor" 
+              formControlName="floor" 
+              min="0"
+              class="form-control">
+            <div class="helper-text">Enter 0 for ground floor</div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label>Amenities</label>
+          <div class="amenities-grid">
+            <div *ngFor="let amenity of amenities" 
+                class="amenity-item" 
+                [class.selected]="isAmenitySelected(amenity)"
+                (click)="toggleAmenity(amenity)">
+              <span class="amenity-checkbox">
+                <span *ngIf="isAmenitySelected(amenity)" class="checkmark">✓</span>
+              </span>
+              <span class="amenity-label">{{ amenity }}</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <div class="checkbox-group">
+            <input 
+              type="checkbox" 
+              id="hasBalcony" 
+              formControlName="hasBalcony">
+            <label for="hasBalcony">Property has a balcony or terrace</label>
+          </div>
+        </div>
+      </form>
+    </div>
+    
+    <!-- Step 3: Pricing -->
+    <div *ngIf="currentStep === 3" class="step-content animate-fade-in">
+      <h2 class="step-heading">Pricing & Availability</h2>
+      <p class="step-description">Set your rental terms and pricing</p>
+      
+      <form [formGroup]="pricingForm" class="form-fields">
+        <div class="form-row">
+          <div class="form-group half-width">
+            <label for="price">Monthly Rent (TND) <span class="required">*</span></label>
+            <input 
+              type="number" 
+              id="price" 
+              formControlName="price" 
+              placeholder="Monthly rent amount"
+              min="1"
+              class="form-control"
+              [class.invalid]="hasError(pricingForm, 'price', 'required') || 
+                              hasError(pricingForm, 'price', 'min')">
+            <div class="error-message" *ngIf="hasError(pricingForm, 'price', 'required')">
+              Price is required
+            </div>
+            <div class="error-message" *ngIf="hasError(pricingForm, 'price', 'min')">
+              Price must be greater than 0
+            </div>
+          </div>
+          
+          <div class="form-group half-width">
+            <label for="securityDeposit">Security Deposit (TND)</label>
+            <input 
+              type="number" 
+              id="securityDeposit" 
+              formControlName="securityDeposit" 
+              placeholder="Optional security deposit"
+              min="0"
+              class="form-control">
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group half-width">
+            <label for="availableFrom">Available From <span class="required">*</span></label>
+            <input 
+              type="date" 
+              id="availableFrom" 
+              formControlName="availableFrom" 
+              class="form-control"
+              [class.invalid]="hasError(pricingForm, 'availableFrom', 'required')">
+            <div class="error-message" *ngIf="hasError(pricingForm, 'availableFrom', 'required')">
+              Start date is required
+            </div>
+          </div>
+          
+          <div class="form-group half-width">
+            <label for="availableTo">Available Until</label>
+            <input 
+              type="date" 
+              id="availableTo" 
+              formControlName="availableTo" 
+              class="form-control"
+              [min]="minAvailableToDate"
+              [class.invalid]="hasDateRangeError(pricingForm)">
+            <div class="error-message" *ngIf="hasDateRangeError(pricingForm)">
+              End date must be after start date
+            </div>
+            <div class="helper-text" *ngIf="!hasDateRangeError(pricingForm)">Leave empty if no end date</div>
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group half-width">
+            <label for="paymentFrequency">Payment Frequency <span class="required">*</span></label>
+            <select 
+              id="paymentFrequency" 
+              formControlName="paymentFrequency" 
+              class="form-control">
+              <option value="monthly">Monthly</option>
+              <option value="quarterly">Quarterly</option>
+              <option value="yearly">Yearly</option>
+            </select>
+          </div>
+          
+          <div class="form-group half-width">
+            <label for="minimumStayMonths">Minimum Stay (months) <span class="required">*</span></label>
+            <input 
+              type="number" 
+              id="minimumStayMonths" 
+              formControlName="minimumStayMonths" 
+              min="1"
+              class="form-control"
+              [class.invalid]="hasError(pricingForm, 'minimumStayMonths', 'required') || 
+                              hasError(pricingForm, 'minimumStayMonths', 'min')">
+            <div class="error-message" *ngIf="hasError(pricingForm, 'minimumStayMonths', 'required') || 
+                                          hasError(pricingForm, 'minimumStayMonths', 'min')">
+              Must be at least 1 month
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="contactInfo">Contact Information <span class="required">*</span></label>
+          <input 
+            type="tel" 
+            id="contactInfo" 
+            formControlName="contactInfo" 
+            placeholder="Your phone number for inquiries (e.g., +216 XX XXX XXX)"
+            class="form-control"
+            [class.invalid]="hasError(pricingForm, 'contactInfo', 'required') || 
+                            hasError(pricingForm, 'contactInfo', 'pattern')">
+          <div class="error-message" *ngIf="hasError(pricingForm, 'contactInfo', 'required')">
+            Contact information is required
+          </div>
+          <div class="error-message" *ngIf="hasError(pricingForm, 'contactInfo', 'pattern')">
+            Please enter a valid phone number
+          </div>
+          <div class="helper-text">This will be shared with interested students when they inquire about your property</div>
+        </div>
+      </form>
+    </div>
+    
+    <!-- Step 4: Media -->
+    <div *ngIf="currentStep === 4" class="step-content animate-fade-in">
+      <h2 class="step-heading">Media Gallery</h2>
+      <p class="step-description">Upload photos of your property (up to 10 images)</p>
+      
+      <form [formGroup]="mediaForm" class="form-fields">
+        <div 
+          class="file-upload-container"
+          [class]="dragAreaClass"
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave($event)"
+          (drop)="onDrop($event)">
+          
+          <div class="file-upload-content">
+            <div class="upload-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+            </div>
+            <h3>Drag & Drop Photos Here</h3>
+            <p>or</p>
+            <label class="file-select-button">
+              <span>Browse Files</span>
+              <input 
+                type="file" 
+                accept="image/*" 
+                multiple 
+                (change)="onFileChange($event)" 
+                hidden>
+            </label>
+            <p class="upload-help-text">JPEG, PNG or WebP, up to 5MB each</p>
+          </div>
+        </div>
+        
+        <!-- Preview images -->
+        <div *ngIf="previewUrls.length > 0" class="image-preview-container">
+          <h3>Image Preview</h3>
+          <div class="image-preview-grid">
+            <div *ngFor="let preview of previewUrls; let i = index" class="image-preview-item">
+              <img [src]="preview" alt="Preview">
+              <button type="button" class="remove-image-btn" (click)="removeNewImage(i)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="15" y1="9" x2="9" y2="15"></line>
+                  <line x1="9" y1="9" x2="15" y2="15"></line>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Form Actions -->
+  <div class="form-actions">
+    <button *ngIf="currentStep > 1" 
+            class="btn btn-outline" 
+            type="button" 
+            (click)="prevStep()">
+      Previous
+    </button>
+    
+    <button *ngIf="currentStep < totalSteps" 
+            class="btn btn-primary" 
+            type="button" 
+            (click)="nextStep()"
+            [disabled]="!validateCurrentStep()">
+      Next
+    </button>
+    
+    <button *ngIf="currentStep === totalSteps" 
+            class="btn btn-success" 
+            type="button" 
+            (click)="submitForm()"
+            [disabled]="isSubmitting || !validateAllForms()">
+      <span *ngIf="!isSubmitting">{{ isEditMode ? 'Update Property' : 'List Property' }}</span>
+      <span *ngIf="isSubmitting">
+        <svg class="spinner" viewBox="0 0 50 50">
+          <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+        </svg>
+        Uploading...
+      </span>
+    </button>
+    
+    <button class="btn btn-link" type="button" (click)="cancelForm()">
+      Cancel
+    </button>
+  </div>
+
+  <!-- Upload Progress Bar (shown when submitting) -->
+  <div *ngIf="isSubmitting && uploadProgress > 0" class="upload-progress">
+    <div class="progress-label">Uploading: {{ uploadProgress }}%</div>
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill" [style.width.%]="uploadProgress"></div>
+    </div>
+  </div>
+</div>

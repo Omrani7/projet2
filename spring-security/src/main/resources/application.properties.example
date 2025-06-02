@@ -1,0 +1,57 @@
+spring.application.name=spring-security
+#spring.security.user.name=user
+#spring.security.user.password=password
+
+# PostgreSQL Database Configuration
+spring.datasource.url=jdbc:postgresql://localhost:5432/your_database_name
+spring.datasource.username=your_db_username
+spring.datasource.password=your_db_password
+spring.datasource.driver-class-name=org.postgresql.Driver
+server.servlet.session.cookie.same-site=strict
+
+# Hibernate Configuration - Update database schema automatically
+spring.jpa.hibernate.ddl-auto=create-drop
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+
+# Logging Configuration
+logging.level.org.springframework.security=DEBUG
+logging.level.org.hibernate.SQL=DEBUG
+logging.level.org.hibernate.type.descriptor.sql.BasicBinder=TRACE
+logging.level.com.example.spring_security=DEBUG
+
+# JWT Configuration
+jwt.secret.key=your_jwt_secret_key_should_be_at_least_256_bits
+jwt.expiration.time=86400000
+
+# OAuth2 Google Configuration
+spring.security.oauth2.client.registration.google.client-id=your_google_client_id
+spring.security.oauth2.client.registration.google.client-secret=your_google_client_secret
+spring.security.oauth2.client.registration.google.scope=openid,email,profile
+spring.security.oauth2.client.registration.google.redirect-uri=http://localhost:8080/login/oauth2/code/google
+spring.security.oauth2.client.registration.google.client-name=Google
+spring.security.oauth2.client.registration.google.client-authentication-method=client_secret_basic
+spring.security.oauth2.client.registration.google.authorization-grant-type=authorization_code
+
+# OAuth2 Provider configurations
+spring.security.oauth2.client.provider.google.authorization-uri=https://accounts.google.com/o/oauth2/v2/auth
+spring.security.oauth2.client.provider.google.token-uri=https://oauth2.googleapis.com/token
+spring.security.oauth2.client.provider.google.user-info-uri=https://www.googleapis.com/oauth2/v3/userinfo
+spring.security.oauth2.client.provider.google.jwk-set-uri=https://www.googleapis.com/oauth2/v3/certs
+spring.security.oauth2.client.provider.google.user-name-attribute=sub
+
+# CORS Configuration
+spring.web.cors.allowed-origins=http://localhost:4200
+spring.web.cors.allowed-methods=GET,POST,PUT,DELETE,OPTIONS
+spring.web.cors.allowed-headers=*
+spring.web.cors.allow-credentials=true
+
+# Server port (if needed to change from default 8080)
+server.port=8080
+
+# Server and Session Configuration
+server.servlet.session.cookie.http-only=true
+server.servlet.session.cookie.secure=false
+server.servlet.session.cookie.same-site=none
+spring.servlet.multipart.enabled=true 

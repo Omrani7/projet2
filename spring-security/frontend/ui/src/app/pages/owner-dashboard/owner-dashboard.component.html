@@ -1,0 +1,256 @@
+<div class="dashboard-container">
+  <!-- Header Section -->
+  <div class="dashboard-header">
+    <div class="header-content">
+      <div class="welcome-section">
+        <h1 class="dashboard-title">
+          <span class="gradient-text">Property Owner Dashboard</span>
+        </h1>
+        <p class="dashboard-subtitle">Manage your properties and connect with students</p>
+      </div>
+            <div class="header-actions">        <button class="refresh-btn" (click)="refresh()" [disabled]="isLoading">          <i class="icon-refresh" [class.spinning]="isLoading">🔄</i>          <span>Refresh</span>        </button>        <button class="quick-action-btn" routerLink="/owner/my-properties">          <i class="icon">🏠</i>          <span>Manage Properties</span>        </button>      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Loading your dashboard...</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-banner" *ngIf="error && !isLoading">
+    <div class="error-content">
+      <i class="error-icon">⚠️</i>
+      <div class="error-text">
+        <h3>Unable to load dashboard</h3>
+        <p>{{ error }}</p>
+      </div>
+      <button class="retry-btn" (click)="refresh()">Try Again</button>
+    </div>
+  </div>
+
+  <!-- Main Dashboard Content -->
+  <div class="dashboard-content" *ngIf="!isLoading && !error">
+    
+    <!-- KPI Cards Section -->
+    <div class="kpi-section">
+      <h2 class="section-title">
+        <i class="section-icon">📊</i>
+        Overview & Analytics
+      </h2>
+      
+      <div class="kpi-grid">
+        <!-- Total Inquiries -->
+        <div class="kpi-card primary">
+          <div class="kpi-header">
+            <div class="kpi-icon">📧</div>
+            <div class="kpi-trend">+12%</div>
+          </div>
+          <div class="kpi-content">
+            <h3 class="kpi-value">{{ stats.totalInquiries }}</h3>
+            <p class="kpi-label">Total Inquiries</p>
+          </div>
+          <div class="kpi-footer">
+            <small>All time inquiries received</small>
+          </div>
+        </div>
+
+        <!-- Pending Replies -->
+        <div class="kpi-card warning">
+          <div class="kpi-header">
+            <div class="kpi-icon">⏰</div>
+            <div class="kpi-trend" [class.urgent]="stats.pendingReplies > 5">{{ stats.pendingReplies }}</div>
+          </div>
+          <div class="kpi-content">
+            <h3 class="kpi-value">{{ stats.pendingReplies }}</h3>
+            <p class="kpi-label">Pending Replies</p>
+          </div>
+          <div class="kpi-footer">
+            <small>Need your attention</small>
+          </div>
+        </div>
+
+        <!-- Closed Deals -->
+        <div class="kpi-card success">
+          <div class="kpi-header">
+            <div class="kpi-icon">🎯</div>
+            <div class="kpi-trend">+8%</div>
+          </div>
+          <div class="kpi-content">
+            <h3 class="kpi-value">{{ stats.closedDeals }}</h3>
+            <p class="kpi-label">Closed Deals</p>
+          </div>
+          <div class="kpi-footer">
+            <small>Successful rentals</small>
+          </div>
+        </div>
+
+        <!-- Monthly Revenue -->
+        <div class="kpi-card revenue">
+          <div class="kpi-header">
+            <div class="kpi-icon">💰</div>
+            <div class="kpi-trend">{{ stats.monthlyRevenue > 0 ? '+' : '' }}{{ stats.monthlyRevenue }}د.ت</div>
+          </div>
+          <div class="kpi-content">
+            <h3 class="kpi-value">{{ stats.totalRevenue | currency:'TND':'symbol':'1.0-0' }}</h3>
+            <p class="kpi-label">Total Revenue</p>
+          </div>
+          <div class="kpi-footer">
+            <small>Estimated from closed deals</small>
+          </div>
+        </div>
+
+        <!-- Active Properties -->
+        <div class="kpi-card info">
+          <div class="kpi-header">
+            <div class="kpi-icon">🏢</div>
+            <div class="kpi-trend">{{ stats.activeProperties }}/{{ stats.totalProperties }}</div>
+          </div>
+          <div class="kpi-content">
+            <h3 class="kpi-value">{{ stats.activeProperties }}</h3>
+            <p class="kpi-label">Active Properties</p>
+          </div>
+          <div class="kpi-footer">
+            <small>Available for rent</small>
+          </div>
+        </div>
+
+        <!-- Response Rate -->
+        <div class="kpi-card accent">
+          <div class="kpi-header">
+            <div class="kpi-icon">⚡</div>
+            <div class="kpi-trend">95%</div>
+          </div>
+          <div class="kpi-content">
+            <h3 class="kpi-value">{{ stats.repliedInquiries }}</h3>
+            <p class="kpi-label">Replied Inquiries</p>
+          </div>
+          <div class="kpi-footer">
+            <small>Response rate</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="main-content-grid">
+      
+      <!-- Recent Inquiries Section -->
+      <div class="content-section recent-inquiries">
+        <div class="section-header">
+          <h3 class="section-title">
+            <i class="section-icon">📨</i>
+            Recent Inquiries
+          </h3>
+          <a routerLink="/owner/inquiries" class="view-all-btn">
+            View All
+            <i class="arrow">→</i>
+          </a>
+        </div>
+
+        <div class="inquiries-list" *ngIf="recentInquiries.length > 0; else noInquiries">
+          <div class="inquiry-item" *ngFor="let inquiry of recentInquiries">
+            <div class="inquiry-avatar">
+              <div class="avatar-placeholder">{{ inquiry.student.username.charAt(0).toUpperCase() }}</div>
+            </div>
+            <div class="inquiry-content">
+              <div class="inquiry-header">
+                <h4 class="student-name">{{ inquiry.student.username }}</h4>
+                <span class="inquiry-time">{{ formatDate(inquiry.timestamp) }}</span>
+              </div>
+              <p class="property-title">{{ inquiry.property.title }}</p>
+              <p class="inquiry-message">{{ inquiry.message | slice:0:80 }}{{ inquiry.message.length > 80 ? '...' : '' }}</p>
+            </div>
+            <div class="inquiry-status">
+              <span class="status-badge" [ngClass]="getStatusBadgeClass(inquiry.status)">
+                {{ inquiry.status.replace('_', ' ') }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <ng-template #noInquiries>
+          <div class="empty-state">
+            <div class="empty-icon">📭</div>
+            <h4>No Recent Inquiries</h4>
+            <p>New inquiries will appear here</p>
+          </div>
+        </ng-template>
+      </div>
+
+      <!-- Recent Activities Section -->
+      <div class="content-section recent-activities">
+        <div class="section-header">
+          <h3 class="section-title">
+            <i class="section-icon">🔔</i>
+            Recent Activity
+          </h3>
+        </div>
+
+        <div class="activities-list">
+          <div class="activity-item" *ngFor="let activity of recentActivities">
+            <div class="activity-icon" [ngClass]="'activity-' + activity.type">
+              <span *ngIf="activity.type === 'inquiry'">📧</span>
+              <span *ngIf="activity.type === 'reply'">💬</span>
+              <span *ngIf="activity.type === 'deal_closed'">🎉</span>
+            </div>
+            <div class="activity-content">
+              <h4 class="activity-title">{{ activity.title }}</h4>
+              <p class="activity-description">{{ activity.description }}</p>
+              <span class="activity-time">{{ formatTimeAgo(activity.timestamp) }}</span>
+            </div>
+            <div class="activity-status" [ngClass]="'status-' + activity.status"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions Section -->
+      <div class="content-section quick-actions">
+        <div class="section-header">
+          <h3 class="section-title">
+            <i class="section-icon">⚡</i>
+            Quick Actions
+          </h3>
+        </div>
+
+        <div class="actions-grid">
+          <a routerLink="/owner/inquiries" class="action-card" [class.highlighted]="stats.pendingReplies > 0">
+            <div class="action-icon">📨</div>
+            <div class="action-content">
+              <h4>View Inquiries</h4>
+              <p>Manage student inquiries</p>
+              <span class="action-badge" *ngIf="stats.pendingReplies > 0">{{ stats.pendingReplies }}</span>
+            </div>
+          </a>
+
+          <a routerLink="/owner/my-properties" class="action-card">
+            <div class="action-icon">🏠</div>
+            <div class="action-content">
+              <h4>Manage Properties</h4>
+              <p>Edit your listings</p>
+            </div>
+          </a>
+
+          <a routerLink="/owner/property/new" class="action-card">
+            <div class="action-icon">➕</div>
+            <div class="action-content">
+              <h4>Add Property</h4>
+              <p>List new property</p>
+            </div>
+          </a>
+
+          <a routerLink="/owner/analytics" class="action-card">
+            <div class="action-icon">📈</div>
+            <div class="action-content">
+              <h4>View Analytics</h4>
+              <p>Performance insights</p>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

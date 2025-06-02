@@ -1,0 +1,24 @@
+{
+  "dependencies": {
+    "@angular/common": "^19.2.12",
+    "@angular/core": "^19.2.12",
+    "@tailwindcss/postcss": "^4.1.7",
+    "axios": "^1.9.0",
+    "ol": "^10.5.0",
+    "playwright": "^1.52.0",
+    "rxjs": "^7.8.2"
+  },
+  "name": "spring-security",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@playwright/mcp": "^0.0.25"
+  }
+}

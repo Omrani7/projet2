@@ -1,0 +1,123 @@
+<div class="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-md flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6 md:p-8 relative animate-fade-in-up">
+    <!-- Close button -->
+    <button (click)="closeModal()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition-colors">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+
+    <!-- Login header -->
+    <h2 class="text-2xl font-semibold mb-6 text-center text-gray-800">Login to UniNest</h2>
+
+    <!-- Email login form -->
+    <form (ngSubmit)="continueWithEmail()" #loginForm="ngForm">
+      <div class="mb-4">
+        <label for="email" class="block text-gray-700 text-sm font-medium mb-2">Email Address</label>
+        <input
+          id="email"
+          type="email"
+          class="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#fa5864] focus:border-transparent transition-colors"
+          placeholder="Enter your email"
+          [(ngModel)]="email"
+          name="email"
+          required
+          email #emailInput="ngModel">
+         <!-- Basic validation message -->
+         <p *ngIf="emailInput.invalid && (emailInput.dirty || emailInput.touched)" class="text-red-500 text-xs mt-1">Please enter a valid email address.</p>
+      </div>
+
+      <!-- Password field (shown conditionally) -->
+      <div *ngIf="passwordStep" class="mb-4">
+        <div class="flex justify-between items-center mb-2">
+          <label for="password" class="block text-gray-700 text-sm font-medium">Password</label>
+          <a href="#" class="text-[#fa5864] text-xs hover:text-[#fa5864]/80 transition-colors">Forgot Password?</a>
+        </div>
+        <div class="relative">
+        <input
+          id="password"
+            [type]="isPasswordVisible ? 'text' : 'password'"
+            class="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#fa5864] focus:border-transparent transition-colors"
+          placeholder="Enter your password"
+          [(ngModel)]="password"
+          name="password"
+            required
+            #passwordInput="ngModel">
+          <button
+            type="button"
+            (click)="togglePasswordVisibility()"
+            class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" *ngIf="!isPasswordVisible">
+              <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+              <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" *ngIf="isPasswordVisible">
+              <path fill-rule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clip-rule="evenodd" />
+              <path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z" />
+            </svg>
+          </button>
+        </div>
+        <!-- Password validation message -->
+         <p *ngIf="passwordInput.invalid && (passwordInput.dirty || passwordInput.touched)" class="text-red-500 text-xs mt-1">Password is required.</p>
+      </div>
+
+      <!-- Error message -->
+      <div *ngIf="errorMessage" class="mb-4 text-red-500 text-sm p-3 bg-red-50 rounded-md border border-red-200">
+        {{ errorMessage }}
+      </div>
+
+      <!-- Loading state -->
+      <div *ngIf="isLoggingIn" class="w-full py-3 flex justify-center items-center mb-4 text-[#fa5864]">
+        <svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        {{ passwordStep ? 'Logging in...' : 'Checking email...' }}
+      </div>
+
+      <!-- Continue/Login Button -->
+      <button 
+        *ngIf="!isLoggingIn"
+        type="submit"
+        [disabled]="passwordStep ? loginForm.invalid : emailInput.invalid"
+        class="w-full bg-[#fa5864] text-white py-3 rounded-md hover:bg-[#e84c58] focus:outline-none focus:ring-2 focus:ring-[#fa5864] focus:ring-offset-1 transition mb-6 disabled:opacity-50 disabled:cursor-not-allowed">
+        {{ passwordStep ? 'Login' : 'Continue with Email' }}
+      </button>
+    </form>
+
+    <!-- Divider -->
+    <div class="flex items-center justify-center mb-6">
+      <div class="border-t border-gray-200 flex-grow"></div>
+      <div class="mx-4 text-xs text-gray-500 uppercase">or</div>
+      <div class="border-t border-gray-200 flex-grow"></div>
+    </div>
+
+    <!-- Google sign-in -->
+      <button
+      (click)="signInWithGoogle()"
+        [disabled]="isGoogleLoginInProgress"
+        class="w-full border border-gray-300 py-2.5 px-4 rounded-md flex items-center justify-center text-gray-700 hover:bg-gray-50 transition-colors relative disabled:opacity-60 disabled:cursor-wait">
+
+        <!-- Loading overlay for Google button -->
+        <div *ngIf="isGoogleLoginInProgress" class="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 rounded-md">
+         <svg class="animate-spin h-5 w-5 text-[#fa5864]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+        </div>
+
+      <!-- Google icon -->
+        <svg class="w-5 h-5 mr-3" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+          <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"/>
+        </svg>
+      
+      <span class="text-sm font-medium">Sign in with Google</span>
+      </button>
+
+    <!-- Register link -->
+    <div class="mt-6 text-center text-sm">
+      <span class="text-gray-600">Don't have an account?</span>
+      <a (click)="goToRegister()" class="text-[#fa5864] hover:text-[#fa5864]/80 font-medium ml-1 transition-colors cursor-pointer">Create an account</a>
+    </div>
+  </div>
+</div>

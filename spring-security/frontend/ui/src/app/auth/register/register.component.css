@@ -1,0 +1,14 @@
+/* Add custom styles for the registration component here */
+
+/* Styling for Role Selection */
+.role-option {
+  border-color: #e5e7eb; /* Equivalent to border-gray-300 */
+}
+
+.role-option.selected {
+  border-color: #fa5864; /* Pinkish-red color */
+  background-color: #fef2f3; /* A light pink background that matches the button color */
+  box-shadow: 0 0 0 2px #fa5864; /* Add a ring effect */
+}
+
+/* Add any other specific styles below */

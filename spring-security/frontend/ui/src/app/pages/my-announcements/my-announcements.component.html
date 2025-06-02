@@ -1,0 +1,278 @@
+<!-- Main Container -->
+<div class="my-announcements-container">
+  
+  <!-- Header Section -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <span class="title-icon">📋</span>
+        My Roommate Announcements
+      </h1>
+      <p class="page-subtitle">Manage your announcements and review applications</p>
+    </div>
+    
+    <div class="header-actions">
+      <button class="post-new-btn" (click)="postNewAnnouncement()">
+        <span class="btn-icon">➕</span>
+        Post New Announcement
+      </button>
+    </div>
+  </div>
+
+  <!-- Success Message -->
+  <div class="success-banner" *ngIf="successMessage">
+    <span class="success-icon">✅</span>
+    <span class="success-message">{{ successMessage }}</span>
+    <button class="success-close" (click)="clearMessages()">×</button>
+  </div>
+
+  <!-- Error Message -->
+  <div class="error-banner" *ngIf="error">
+    <span class="error-icon">⚠️</span>
+    <span class="error-message">{{ error }}</span>
+    <button class="error-close" (click)="clearMessages()">×</button>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoadingAnnouncements">
+    <div class="loading-spinner"></div>
+    <p class="loading-text">Loading your announcements...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!isLoadingAnnouncements && myAnnouncements.length === 0">
+    <div class="empty-icon">📝</div>
+    <h3 class="empty-title">No Announcements Yet</h3>
+    <p class="empty-description">
+      You haven't posted any roommate announcements yet. Start by posting your first announcement to find compatible roommates.
+    </p>
+    <button class="empty-action" (click)="postNewAnnouncement()">
+      <span class="btn-icon">➕</span>
+      Post Your First Announcement
+    </button>
+  </div>
+
+  <!-- Announcements List -->
+  <div class="announcements-list" *ngIf="!isLoadingAnnouncements && myAnnouncements.length > 0">
+    <div class="announcement-card" *ngFor="let announcement of myAnnouncements">
+      
+      <!-- Card Header -->
+      <div class="card-header">
+        <div class="announcement-info">
+          <h3 class="property-title">{{ announcement.propertyTitle }}</h3>
+          <div class="property-location">
+            <span class="location-icon">📍</span>
+            {{ announcement.propertyAddress }}
+          </div>
+        </div>
+        
+        <div class="announcement-status">
+          <span class="status-badge" [class]="announcement.status.toLowerCase()">
+            {{ announcement.status }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Card Content -->
+      <div class="card-content">
+        <div class="details-grid">
+          <div class="detail-item">
+            <span class="detail-icon">💰</span>
+            <span class="detail-text">{{ announcement.rentPerPerson }} TND/month</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-icon">🏠</span>
+            <span class="detail-text">{{ announcement.availableRooms }}/{{ announcement.totalRooms }} rooms available</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-icon">👥</span>
+            <span class="detail-text">Looking for {{ announcement.maxRoommates }} roommates</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-icon">📅</span>
+            <span class="detail-text">Move-in: {{ formatDate(announcement.moveInDate) }}</span>
+          </div>
+        </div>
+
+        <div class="announcement-meta">
+          <div class="meta-item">
+            <span class="meta-label">Posted:</span>
+            <span class="meta-value">{{ formatDate(announcement.createdAt) }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Expires:</span>
+            <span class="meta-value">{{ formatDate(announcement.expiresAt) }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Days left:</span>
+            <span class="meta-value">{{ getDaysUntilMoveIn(announcement.moveInDate) }} days</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Applications Summary -->
+      <div class="applications-summary">
+        <div class="summary-header">
+          <span class="summary-title">Applications</span>
+          <span class="applications-count">{{ announcement.applicationCount || 0 }} received</span>
+        </div>
+        
+        <div class="applications-actions" *ngIf="announcement.applicationCount && announcement.applicationCount > 0">
+          <button 
+            class="view-applications-btn" 
+            (click)="loadApplicationsForAnnouncement(announcement)">
+            <span class="btn-icon">👥</span>
+            View Applications
+          </button>
+        </div>
+        
+        <div class="no-applications" *ngIf="!announcement.applicationCount || announcement.applicationCount === 0">
+          <span class="no-apps-icon">📭</span>
+          <span class="no-apps-text">No applications yet</span>
+        </div>
+      </div>
+
+      <!-- Card Actions -->
+      <div class="card-actions">
+        <button class="view-details-btn" (click)="viewAnnouncementDetails(announcement)">
+          <span class="btn-icon">👁️</span>
+          View Details
+        </button>
+        <button class="edit-btn" disabled title="Coming soon">
+          <span class="btn-icon">✏️</span>
+          Edit
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Applications Modal -->
+<div class="modal-overlay" *ngIf="showApplicationsModal" (click)="closeApplicationsModal()">
+  <div class="modal-content large" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3 class="modal-title">Applications for "{{ selectedAnnouncement?.propertyTitle }}"</h3>
+      <button class="modal-close" (click)="closeApplicationsModal()">×</button>
+    </div>
+    
+    <div class="modal-body">
+      <!-- Loading Applications -->
+      <div class="loading-state small" *ngIf="isLoadingApplications">
+        <div class="loading-spinner small"></div>
+        <span>Loading applications...</span>
+      </div>
+      
+      <!-- Applications List -->
+      <div class="applications-list" *ngIf="!isLoadingApplications">
+        <!-- No Applications -->
+        <div class="empty-applications" *ngIf="applications.length === 0">
+          <span class="empty-icon">📭</span>
+          <p>No applications received yet.</p>
+        </div>
+        
+        <!-- Applications -->
+        <div class="application-item" *ngFor="let application of applications">
+          <div class="applicant-header">
+            <div class="applicant-info">
+              <div class="applicant-avatar">
+                {{ application.applicant.username.charAt(0).toUpperCase() }}
+              </div>
+              <div class="applicant-details">
+                <span class="applicant-name">{{ application.applicant.username }}</span>
+                <span class="applicant-email">{{ application.applicant.email }}</span>
+                <span class="application-date">Applied {{ formatDate(application.appliedAt) }}</span>
+              </div>
+            </div>
+            
+            <div class="application-status">
+              <span 
+                class="status-indicator" 
+                [style.color]="getStatusColor(application.status)">
+                {{ getStatusIcon(application.status) }}
+              </span>
+              <span class="status-text">{{ application.status }}</span>
+            </div>
+          </div>
+          
+          <div class="application-content">
+            <div class="compatibility-info" *ngIf="application.compatibilityScore">
+              <span class="compatibility-label">Compatibility:</span>
+              <span class="compatibility-value">{{ (application.compatibilityScore * 100).toFixed(0) }}%</span>
+            </div>
+            
+            <div class="application-message">
+              <h5>Message:</h5>
+              <p>{{ application.message }}</p>
+            </div>
+            
+            <div class="response-message" *ngIf="application.responseMessage">
+              <h5>Your Response:</h5>
+              <p>{{ application.responseMessage }}</p>
+            </div>
+          </div>
+          
+          <div class="application-actions" *ngIf="application.status === 'PENDING'">
+            <button 
+              class="accept-btn" 
+              (click)="openResponseModal(application)">
+              <span class="btn-icon">✅</span>
+              Accept
+            </button>
+            <button 
+              class="reject-btn" 
+              (click)="openResponseModal(application)">
+              <span class="btn-icon">❌</span>
+              Reject
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Response Modal -->
+<div class="modal-overlay" *ngIf="showResponseModal" (click)="closeResponseModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3 class="modal-title">Respond to Application</h3>
+      <button class="modal-close" (click)="closeResponseModal()">×</button>
+    </div>
+    
+    <div class="modal-body" *ngIf="selectedApplication">
+      <div class="applicant-summary">
+        <h4>{{ selectedApplication.applicant.username }}</h4>
+        <p>Applied {{ formatDate(selectedApplication.appliedAt) }}</p>
+        <div class="compatibility-summary" *ngIf="selectedApplication.compatibilityScore">
+          <span>Compatibility: {{ (selectedApplication.compatibilityScore * 100).toFixed(0) }}%</span>
+        </div>
+      </div>
+      
+      <form [formGroup]="responseForm" class="response-form">
+        <div class="form-group">
+          <label for="responseMessage">Response Message (Optional)</label>
+          <textarea 
+            id="responseMessage"
+            formControlName="responseMessage"
+            rows="4"
+            placeholder="Add a personal message to your response..."
+            class="response-textarea"></textarea>
+        </div>
+      </form>
+    </div>
+    
+    <div class="modal-footer">
+      <button type="button" class="cancel-btn" (click)="closeResponseModal()">
+        Cancel
+      </button>
+      <button type="button" class="accept-btn" (click)="respondToApplication('ACCEPTED')">
+        <span class="btn-icon">✅</span>
+        Accept Application
+      </button>
+      <button type="button" class="reject-btn" (click)="respondToApplication('REJECTED')">
+        <span class="btn-icon">❌</span>
+        Reject Application
+      </button>
+    </div>
+  </div>
+</div> 

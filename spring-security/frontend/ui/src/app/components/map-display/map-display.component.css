@@ -1,0 +1,349 @@
+.map-container {
+  width: 100%;
+  height: 100%;
+  background-color: #f8f9fa;
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex: 1;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* You will also need to import OpenLayers CSS globally */
+/* @import 'ol/ol.css'; */
+
+.popup-image {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
+.popup-image-placeholder {
+  width: 100%;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #eee;
+  color: #999;
+}
+
+:host {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.ol-map {
+  width: 100%;
+  height: 100%;
+}
+
+/* Improve OpenLayers controls */
+::ng-deep .ol-zoom {
+  top: 10px;
+  left: 10px;
+}
+
+::ng-deep .ol-zoom button {
+  background-color: white;
+  color: #333;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  margin-bottom: 5px;
+  font-size: 16px;
+  width: 32px;
+  height: 32px;
+}
+
+::ng-deep .ol-zoom button:hover {
+  background-color: #f5f5f5;
+}
+
+/* Custom popup styling */
+.popup-container {
+  position: absolute;
+  background: white;
+  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.25);
+  padding: 0;
+  border-radius: 12px;
+  border: none;
+  min-width: 280px;
+  max-width: 320px;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  pointer-events: auto;
+  overflow: hidden;
+  z-index: 10;
+  animation: popup-fadein 0.2s ease-out;
+}
+
+@keyframes popup-fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.popup-content {
+  padding: 0;
+}
+
+.popup-header {
+  height: 180px;
+  overflow: hidden;
+  position: relative;
+}
+
+.popup-image {
+  width: 100%;
+  object-fit: cover;
+  height: 100%;
+  transition: transform 0.3s ease;
+}
+
+.popup-header:hover .popup-image {
+  transform: scale(1.05);
+}
+
+.popup-image-placeholder {
+  width: 100%;
+  height: 100%;
+  background-color: #f0f0f0;
+  color: #999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.popup-content h5 {
+  margin: 12px 15px 5px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.popup-content p {
+  margin: 5px 15px;
+  color: #666;
+}
+
+.popup-content .property-type {
+  text-transform: capitalize;
+  color: #ff385c;
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: 0;
+}
+
+.popup-content .price {
+  color: #333;
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.popup-content .details {
+  font-size: 13px;
+  margin: 3px 15px;
+  display: inline-block;
+  background-color: #f8f9fa;
+  padding: 3px 8px;
+  border-radius: 100px;
+  margin-right: 5px;
+}
+
+.popup-content .address {
+  font-style: italic;
+  margin-bottom: 10px;
+  color: #777;
+}
+
+.cluster-badge {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background-color: #ff385c;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.other-properties {
+  margin: 12px 15px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.other-heading {
+  font-weight: 600;
+  font-size: 13px;
+  margin: 0 0 8px 0;
+  color: #444;
+}
+
+.other-list {
+  margin: 0;
+  padding: 0 0 0 15px;
+  font-size: 12px;
+  color: #666;
+}
+
+.other-list li {
+  margin: 5px 0;
+}
+
+.popup-closer {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.8);
+  color: #333;
+  text-decoration: none;
+  text-align: center;
+  line-height: 28px;
+  font-weight: bold;
+  z-index: 2;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s;
+}
+
+.popup-closer:hover {
+  background-color: white;
+  transform: scale(1.1);
+}
+
+.nearby-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: #ff385c;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.nearby-note {
+  margin: 12px 15px;
+  color: #777;
+  font-size: 12px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+}
+
+/* Popup carousel controls */
+.popup-carousel-controls {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 180px;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.popup-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(255, 255, 255, 0.7);
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.8rem;
+  color: #333;
+  opacity: 0;
+  transition: opacity 0.3s, background-color 0.3s;
+  pointer-events: auto;
+  z-index: 4;
+}
+
+.popup-container:hover .popup-nav-btn {
+  opacity: 1;
+}
+
+.popup-prev-btn {
+  left: 10px;
+}
+
+.popup-next-btn {
+  right: 10px;
+}
+
+.popup-nav-btn:hover {
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+/* Popup carousel indicators */
+.popup-carousel-indicators {
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.popup-indicators-container {
+  display: flex;
+  gap: 5px;
+}
+
+.popup-indicator-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.5);
+  display: inline-block;
+  transition: background-color 0.3s;
+}
+
+.popup-indicator-dot.active {
+  background-color: #fff;
+  transform: scale(1.2);
+}
+
+/* Property details link */
+.property-details-link {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+  background-color: #ff385c;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  z-index: 4;
+}
+
+.property-details-link:hover {
+  background-color: #e4173a;
+  transform: translateY(-2px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}

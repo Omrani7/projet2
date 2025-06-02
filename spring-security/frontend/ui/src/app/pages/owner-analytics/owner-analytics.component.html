@@ -1,0 +1,299 @@
+<div class="analytics-container">
+  <!-- Header Section -->
+  <div class="analytics-header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 class="analytics-title">
+          <span class="gradient-text">Property Analytics Dashboard</span>
+        </h1>
+        <p class="analytics-subtitle">Comprehensive insights and performance metrics for your properties</p>
+      </div>
+      
+      <div class="header-actions">
+        <div class="period-selector">
+          <select (change)="onPeriodChange($event)" [value]="selectedPeriod" class="period-select">
+            <option value="last7days">Last 7 Days</option>
+            <option value="last30days">Last 30 Days</option>
+            <option value="last3months">Last 3 Months</option>
+            <option value="lastyear">Last Year</option>
+          </select>
+        </div>
+        
+        <button class="action-btn refresh-btn" (click)="refresh()" [disabled]="isLoading">
+          <i class="icon" [class.spinning]="isLoading">🔄</i>
+          <span>Refresh</span>
+        </button>
+        
+        <button class="action-btn export-btn" (click)="exportData()">
+          <i class="icon">📊</i>
+          <span>Export</span>
+        </button>
+        
+        <a routerLink="/owner/dashboard" class="action-btn back-btn">
+          <i class="icon">←</i>
+          <span>Back to Dashboard</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Loading analytics data...</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-banner" *ngIf="error && !isLoading">
+    <div class="error-content">
+      <i class="error-icon">⚠️</i>
+      <div class="error-text">
+        <h3>Unable to load analytics</h3>
+        <p>{{ error }}</p>
+      </div>
+      <button class="retry-btn" (click)="refresh()">Try Again</button>
+    </div>
+  </div>
+
+  <!-- Main Analytics Content -->
+  <div class="analytics-content" *ngIf="!isLoading && !error && dashboardData">
+    
+    <!-- Overview KPIs -->
+    <div class="overview-section">
+      <h2 class="section-title">
+        <i class="section-icon">📊</i>
+        Performance Overview
+      </h2>
+      
+      <div class="kpi-grid">
+        <div class="kpi-card primary">
+          <div class="kpi-header">
+            <div class="kpi-icon">📧</div>
+            <div class="kpi-badge">{{ dashboardData.overview.totalInquiries }}</div>
+          </div>
+          <div class="kpi-content">
+            <h3 class="kpi-value">{{ dashboardData.overview.totalInquiries }}</h3>
+            <p class="kpi-label">Total Inquiries</p>
+            <span class="kpi-trend positive">All time</span>
+          </div>
+        </div>
+
+        <div class="kpi-card success">
+          <div class="kpi-header">
+            <div class="kpi-icon">🎯</div>
+            <div class="kpi-badge">{{ dashboardData.overview.conversionRate }}%</div>
+          </div>
+          <div class="kpi-content">
+            <h3 class="kpi-value">{{ dashboardData.overview.conversionRate }}%</h3>
+            <p class="kpi-label">Conversion Rate</p>
+            <span class="kpi-trend positive">Excellent</span>
+          </div>
+        </div>
+
+        <div class="kpi-card revenue">
+          <div class="kpi-header">
+            <div class="kpi-icon">💰</div>
+            <div class="kpi-badge">{{ dashboardData.overview.totalRevenue | currency:'TND':'symbol':'1.0-0' }}</div>
+          </div>
+          <div class="kpi-content">
+            <h3 class="kpi-value">{{ dashboardData.overview.totalRevenue | currency:'TND':'symbol':'1.0-0' }}</h3>
+            <p class="kpi-label">Total Revenue</p>
+            <span class="kpi-trend positive">Generated</span>
+          </div>
+        </div>
+
+        <div class="kpi-card info">
+          <div class="kpi-header">
+            <div class="kpi-icon">⏱️</div>
+            <div class="kpi-badge">{{ dashboardData.overview.averageResponseTime }}h</div>
+          </div>
+          <div class="kpi-content">
+            <h3 class="kpi-value">{{ dashboardData.overview.averageResponseTime }}h</h3>
+            <p class="kpi-label">Avg Response Time</p>
+            <span class="kpi-trend neutral">Target: 6h</span>
+          </div>
+        </div>
+
+        <div class="kpi-card accent">
+          <div class="kpi-header">
+            <div class="kpi-icon">🏠</div>
+            <div class="kpi-badge">{{ dashboardData.overview.activeProperties }}</div>
+          </div>
+          <div class="kpi-content">
+            <h3 class="kpi-value">{{ dashboardData.overview.activeProperties }}</h3>
+            <p class="kpi-label">Active Properties</p>
+            <span class="kpi-trend positive">Available</span>
+          </div>
+        </div>
+
+        <div class="kpi-card warning">
+          <div class="kpi-header">
+            <div class="kpi-icon">👁️</div>
+            <div class="kpi-badge">{{ dashboardData.overview.totalViews }}</div>
+          </div>
+          <div class="kpi-content">
+            <h3 class="kpi-value">{{ dashboardData.overview.totalViews }}</h3>
+            <p class="kpi-label">Total Views</p>
+            <span class="kpi-trend positive">This month</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Grid -->
+    <div class="charts-grid">
+      
+      <!-- Inquiry Trends Chart -->
+      <div class="chart-section large">
+        <div class="chart-header">
+          <h3 class="chart-title">
+            <i class="chart-icon">📈</i>
+            Inquiry Trends (Last 30 Days)
+          </h3>
+          <div class="chart-legend">
+            <span class="legend-item">
+              <span class="legend-color primary"></span>
+              New Inquiries
+            </span>
+            <span class="legend-item">
+              <span class="legend-color secondary"></span>
+              Responses Sent
+            </span>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas #inquiryTrendsCanvas></canvas>
+        </div>
+      </div>
+
+      <!-- Status Breakdown Chart -->
+      <div class="chart-section">
+        <div class="chart-header">
+          <h3 class="chart-title">
+            <i class="chart-icon">🍩</i>
+            Inquiry Status Breakdown
+          </h3>
+        </div>
+        <div class="chart-container">
+          <canvas #statusBreakdownCanvas></canvas>
+        </div>
+      </div>
+
+      <!-- Monthly Comparison Chart -->
+      <div class="chart-section">
+        <div class="chart-header">
+          <h3 class="chart-title">
+            <i class="chart-icon">📊</i>
+            Monthly Performance
+          </h3>
+        </div>
+        <div class="chart-container">
+          <canvas #monthlyComparisonCanvas></canvas>
+        </div>
+      </div>
+
+      <!-- Response Time Chart -->
+      <div class="chart-section">
+        <div class="chart-header">
+          <h3 class="chart-title">
+            <i class="chart-icon">⏱️</i>
+            Response Time Tracking
+          </h3>
+        </div>
+        <div class="chart-container">
+          <canvas #responseTimeCanvas></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Property Performance Table -->
+    <div class="performance-section">
+      <div class="section-header">
+        <h2 class="section-title">
+          <i class="section-icon">🏠</i>
+          Property Performance Analysis
+        </h2>
+      </div>
+      
+      <div class="performance-table-container">
+        <table class="performance-table">
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Inquiries</th>
+              <th>Conversions</th>
+              <th>Rate</th>
+              <th>Views</th>
+              <th>Revenue</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let property of dashboardData.propertyPerformance; trackBy: trackByPropertyId">
+              <td class="property-cell">
+                <div class="property-info">
+                  <div class="property-thumbnail">{{ property.title.charAt(0) }}</div>
+                  <div class="property-details">
+                    <span class="property-title">{{ property.title }}</span>
+                    <span class="property-id">ID: {{ property.propertyId }}</span>
+                  </div>
+                </div>
+              </td>
+              <td class="metric-cell">
+                <span class="metric-value">{{ property.inquiries }}</span>
+              </td>
+              <td class="metric-cell">
+                <span class="metric-value">{{ property.conversions }}</span>
+              </td>
+              <td class="metric-cell">
+                <span class="conversion-rate" [ngClass]="{
+                  'rate-high': property.conversionRate >= 30,
+                  'rate-medium': property.conversionRate >= 15 && property.conversionRate < 30,
+                  'rate-low': property.conversionRate < 15
+                }">
+                  {{ property.conversionRate }}%
+                </span>
+              </td>
+              <td class="metric-cell">
+                <span class="metric-value">{{ property.views }}</span>
+              </td>
+              <td class="metric-cell">
+                <span class="revenue-value">{{ property.revenue | currency:'TND':'symbol':'1.0-0' }}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Market Insights -->
+    <div class="insights-section">
+      <div class="section-header">
+        <h2 class="section-title">
+          <i class="section-icon">🔍</i>
+          Market Insights & Benchmarks
+        </h2>
+      </div>
+      
+      <div class="insights-grid">
+        <div class="insight-card" *ngFor="let insight of dashboardData.marketInsights">
+          <div class="insight-header">
+            <div class="insight-category">{{ insight.category }}</div>
+            <div class="insight-trend" [ngClass]="getTrendClass(insight.trend)">
+              <span class="trend-icon">{{ getTrendIcon(insight.trend) }}</span>
+              <span class="trend-percentage" *ngIf="insight.percentage !== 0">
+                {{ insight.percentage > 0 ? '+' : '' }}{{ insight.percentage }}%
+              </span>
+            </div>
+          </div>
+          <div class="insight-content">
+            <h4 class="insight-label">{{ insight.label }}</h4>
+            <div class="insight-value">{{ insight.value }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div> 

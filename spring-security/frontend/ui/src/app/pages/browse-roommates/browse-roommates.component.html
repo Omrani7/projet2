@@ -1,0 +1,399 @@
+<!-- Main Container -->
+<div class="browse-roommates-container">
+  
+  <!-- Header Section -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <span class="title-icon">🏠</span>
+        Find Your Perfect Roommate
+      </h1>
+      <p class="page-subtitle">AI-powered matching based on your academic profile and preferences</p>
+    </div>
+    
+    <!-- Recommendation Stats Card -->
+    <div class="stats-card" *ngIf="recommendationStats">
+      <div class="stat-item">
+        <span class="stat-value">{{ getCompatibilityDisplay(recommendationStats.averageCompatibility) }}%</span>
+        <span class="stat-label">Avg Compatibility</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">{{ recommendationStats.highQualityMatches || 0 }}</span>
+        <span class="stat-label">High-Quality Matches</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">{{ recommendationStats.totalRecommendations || 0 }}</span>
+        <span class="stat-label">Total Recommendations</span>
+      </div>
+    </div>
+    
+    <!-- Header Actions -->
+    <div class="header-actions">
+      <button class="preferences-btn primary-action" (click)="navigateToPreferences()">
+        <span class="btn-icon">🎯</span>
+        <span class="btn-text">
+          <span class="btn-title">Set Preferences</span>
+          <span class="btn-subtitle">Improve your matches</span>
+        </span>
+      </button>
+      <button class="post-announcement-btn secondary-action" (click)="navigateToPostAnnouncement()">
+        <span class="btn-icon">➕</span>
+        <span class="btn-text">Post Announcement</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Filter Tabs and Controls -->
+  <div class="filter-controls">
+    <div class="filter-tabs">
+      <button 
+        class="filter-tab" 
+        [class.active]="activeFilter === 'recommendations'"
+        (click)="switchFilter('recommendations')">
+        <span class="tab-icon">🎯</span>
+        <span class="tab-text">Personalized</span>
+        <span class="tab-count" *ngIf="personalizedRecommendations.length > 0">{{ personalizedRecommendations.length }}</span>
+      </button>
+      
+      <button 
+        class="filter-tab premium-tab" 
+        [class.active]="activeFilter === 'high-quality'"
+        (click)="switchFilter('high-quality')">
+        <span class="tab-icon">⭐</span>
+        <span class="tab-text">High Quality</span>
+        <span class="tab-count" *ngIf="highQualityMatches.length > 0">{{ highQualityMatches.length }}</span>
+        <span class="premium-badge">70%+</span>
+      </button>
+
+      <!-- NEW: Compatible Students Tab -->
+      <button 
+        class="filter-tab students-tab" 
+        [class.active]="activeFilter === 'compatible-students'"
+        (click)="switchFilter('compatible-students')">
+        <span class="tab-icon">👥</span>
+        <span class="tab-text">Compatible Students</span>
+        <span class="tab-count" *ngIf="compatibleStudents.length > 0">{{ compatibleStudents.length }}</span>
+        <span class="new-badge">NEW</span>
+      </button>
+      
+      <button 
+        class="filter-tab" 
+        [class.active]="activeFilter === 'all'"
+        (click)="switchFilter('all')">
+        <span class="tab-icon">📋</span>
+        <span class="tab-text">All Announcements</span>
+        <span class="tab-count" *ngIf="allAnnouncements.length > 0">{{ allAnnouncements.length }}</span>
+      </button>
+    </div>
+    
+    <div class="filter-actions">
+      <button class="filter-toggle-btn" (click)="toggleFilters()">
+        <span class="icon">🔧</span>
+        Filters
+      </button>
+      <button class="refresh-btn" (click)="refreshCurrentView()">
+        <span class="icon">🔄</span>
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Advanced Filters Panel -->
+  <div class="filters-panel" [class.show]="showFilters">
+    <form [formGroup]="filterForm" class="filter-form">
+      <div class="filter-row">
+        <div class="filter-group">
+          <label>Rent Range</label>
+          <div class="rent-inputs">
+            <input type="number" formControlName="minRent" placeholder="Min" class="filter-input">
+            <span class="separator">-</span>
+            <input type="number" formControlName="maxRent" placeholder="Max" class="filter-input">
+            <span class="currency">TND</span>
+          </div>
+        </div>
+        
+        <div class="filter-group">
+          <label>Location</label>
+          <input type="text" formControlName="location" placeholder="City or area" class="filter-input">
+        </div>
+        
+        <div class="filter-group">
+          <label>Property Type</label>
+          <select formControlName="roomType" class="filter-select">
+            <option value="">Any Type</option>
+            <option value="APARTMENT">Apartment</option>
+            <option value="HOUSE">House</option>
+            <option value="STUDIO">Studio</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="filter-row">
+        <div class="filter-group">
+          <label>Move-in Date</label>
+          <input type="date" formControlName="moveInDate" class="filter-input">
+        </div>
+        
+        <div class="filter-group" *ngIf="activeFilter === 'recommendations'">
+          <label>Min Compatibility</label>
+          <div class="compatibility-slider">
+            <input 
+              type="range" 
+              formControlName="compatibilityThreshold" 
+              min="0" 
+              max="100" 
+              class="slider">
+            <span class="slider-value">{{ filterForm.get('compatibilityThreshold')?.value }}%</span>
+          </div>
+        </div>
+        
+        <div class="filter-actions-group">
+          <button type="button" class="clear-filters-btn" (click)="clearFilters()">
+            Clear All
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Error Display -->
+  <div class="error-banner" *ngIf="error">
+    <span class="error-icon">⚠️</span>
+    <span class="error-message">{{ error }}</span>
+    <button class="error-close" (click)="error = null">×</button>
+  </div>
+
+  <!-- Content Area -->
+  <div class="content-area">
+    
+    <!-- Loading State -->
+    <div class="loading-state" *ngIf="isCurrentViewLoading()">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">
+        <span *ngIf="activeFilter === 'recommendations'">🧠 Finding your perfect matches...</span>
+        <span *ngIf="activeFilter === 'high-quality'">⭐ Loading high-quality matches...</span>
+        <span *ngIf="activeFilter === 'compatible-students'">👥 Discovering compatible students...</span>
+        <span *ngIf="activeFilter === 'all'">📋 Loading all announcements...</span>
+      </p>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!isCurrentViewLoading() && getCurrentDataSource().length === 0">
+      <div class="empty-icon">
+        <span *ngIf="activeFilter === 'recommendations'">🎯</span>
+        <span *ngIf="activeFilter === 'high-quality'">⭐</span>
+        <span *ngIf="activeFilter === 'compatible-students'">👥</span>
+        <span *ngIf="activeFilter === 'all'">📋</span>
+      </div>
+      <h3 class="empty-title">
+        <span *ngIf="activeFilter === 'recommendations'">No Personalized Recommendations</span>
+        <span *ngIf="activeFilter === 'high-quality'">No High-Quality Matches</span>
+        <span *ngIf="activeFilter === 'compatible-students'">No Compatible Students Found</span>
+        <span *ngIf="activeFilter === 'all'">No Announcements Available</span>
+      </h3>
+      <p class="empty-description">
+        <span *ngIf="activeFilter === 'recommendations'">
+          Complete your profile to get better recommendations, or try browsing all announcements.
+        </span>
+        <span *ngIf="activeFilter === 'high-quality'">
+          No matches with 70%+ compatibility found. Check personalized recommendations instead.
+        </span>
+        <span *ngIf="activeFilter === 'compatible-students'">
+          No compatible students found. Try updating your profile or check back later for new users.
+        </span>
+        <span *ngIf="activeFilter === 'all'">
+          No roommate announcements are currently available. Check back later!
+        </span>
+      </p>
+      <button class="empty-action" (click)="activeFilter === 'recommendations' ? switchFilter('all') : refreshCurrentView()">
+        <span *ngIf="activeFilter === 'recommendations'">Browse All Announcements</span>
+        <span *ngIf="activeFilter === 'compatible-students'">Try Different Tab</span>
+        <span *ngIf="activeFilter !== 'recommendations' && activeFilter !== 'compatible-students'">Refresh</span>
+      </button>
+    </div>
+
+    <!-- Announcements Grid (for announcement-based tabs) -->
+    <div class="announcements-grid" *ngIf="!isCurrentViewLoading() && isAnnouncementTab() && getCurrentAnnouncements().length > 0">
+      <div 
+        class="announcement-card" 
+        *ngFor="let item of getCurrentAnnouncements(); trackBy: trackByAnnouncementId"
+        [class.has-compatibility]="hasCompatibilityScore(item)">
+        
+        <!-- Compatibility Badge -->
+        <div class="compatibility-badge" *ngIf="hasCompatibilityScore(item)">
+          <span class="compatibility-emoji">{{ getCompatibilityEmoji(item) }}</span>
+          <span class="compatibility-score" [style.color]="getCompatibilityColor(item)">
+            {{ getCompatibilityPercentage(item) }}%
+          </span>
+          <span class="compatibility-level">{{ getCompatibilityLevel(item) }}</span>
+        </div>
+
+        <!-- Card Content -->
+        <div class="card-content">
+          <div class="card-header">
+            <h3 class="property-title">{{ getAnnouncement(item).propertyTitle }}</h3>
+            <div class="property-location">
+              <span class="location-icon">📍</span>
+              {{ getAnnouncement(item).propertyAddress }}
+            </div>
+          </div>
+
+          <div class="property-details">
+            <div class="detail-row">
+              <div class="detail-item">
+                <span class="detail-icon">🏠</span>
+                <span class="detail-text">{{ getAnnouncement(item).totalRooms }} rooms total</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-icon">👥</span>
+                <span class="detail-text">{{ getAnnouncement(item).availableRooms }} available</span>
+              </div>
+            </div>
+            
+            <div class="detail-row">
+              <div class="detail-item">
+                <span class="detail-icon">💰</span>
+                <span class="detail-text">{{ getAnnouncement(item).rentPerPerson }} TND/month</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-icon">📅</span>
+                <span class="detail-text">Move-in: {{ formatDate(getAnnouncement(item).moveInDate) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="property-description">
+            <p>{{ getAnnouncement(item).description }}</p>
+          </div>
+
+          <div class="poster-info">
+            <div class="poster-details">
+              <span class="poster-name">{{ getAnnouncement(item).poster.username }}</span>
+              <span class="poster-role">Looking for {{ getAnnouncement(item).maxRoommates }} roommates</span>
+            </div>
+            <div class="announcement-meta">
+              <span class="days-left">
+                {{ getDaysUntilMoveIn(getAnnouncement(item).moveInDate) }} days left
+              </span>
+              <span class="applications-count">
+                {{ getAnnouncement(item).applicationCount }} applications
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card Actions -->
+        <div class="card-actions">
+          <button class="view-details-btn" [routerLink]="['/roommates/announcement', getAnnouncement(item).id]">
+            <span class="btn-icon">👁️</span>
+            View Details
+          </button>
+          <button class="apply-btn" (click)="openApplicationModal(getAnnouncement(item))">
+            <span class="btn-icon">📝</span>
+            Apply Now
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- NEW: Compatible Students Grid -->
+    <div class="students-grid" *ngIf="!isCurrentViewLoading() && isStudentTab() && getCurrentStudents().length > 0">
+      <div 
+        class="student-card" 
+        *ngFor="let student of getCurrentStudents(); trackBy: trackByStudentId">
+        
+        <!-- Student Compatibility Badge -->
+        <div class="compatibility-badge">
+          <span class="compatibility-emoji">{{ getStudentCompatibilityEmoji(student) }}</span>
+          <span class="compatibility-score" [style.color]="getStudentCompatibilityColor(student)">
+            {{ student.compatibilityPercentage }}%
+          </span>
+          <span class="compatibility-level">{{ getStudentCompatibilityLevel(student) }}</span>
+          <span class="rank-badge" *ngIf="student.rank">#{{ student.rank }}</span>
+        </div>
+
+        <!-- Student Card Content -->
+        <div class="card-content">
+          <div class="card-header">
+            <h3 class="student-name">{{ student.user.username }}</h3>
+            <div class="student-institute">
+              <span class="institute-icon">🏫</span>
+              {{ student.user.institute || 'Unknown Institute' }}
+            </div>
+          </div>
+
+          <div class="student-details">
+            <div class="detail-item" *ngIf="student.user.fieldOfStudy">
+              <span class="detail-icon">📚</span>
+              <span class="detail-text">{{ student.user.fieldOfStudy }}</span>
+            </div>
+            <div class="detail-item" *ngIf="student.user.educationLevel">
+              <span class="detail-icon">🎓</span>
+              <span class="detail-text">{{ student.user.educationLevel }}</span>
+            </div>
+            <div class="detail-item" *ngIf="student.user.age">
+              <span class="detail-icon">🎂</span>
+              <span class="detail-text">{{ student.user.age }} years old</span>
+            </div>
+          </div>
+
+          <!-- Recommendation Reason -->
+          <div class="recommendation-reason" *ngIf="student.recommendationReason">
+            <span class="reason-icon">💡</span>
+            <span class="reason-text">{{ student.recommendationReason }}</span>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="card-actions">
+            <button class="action-btn primary-btn" (click)="connectWithStudent(student)">
+              <span class="btn-icon">💬</span>
+              Connect
+            </button>
+            <button class="action-btn secondary-btn" (click)="viewStudentProfile(student)">
+              <span class="btn-icon">👁️</span>
+              View Profile
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Application Modal -->
+<div class="modal-overlay" *ngIf="showApplicationModal" (click)="closeApplicationModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3 class="modal-title">Apply to Roommate Announcement</h3>
+      <button class="modal-close" (click)="closeApplicationModal()">×</button>
+    </div>
+    
+    <div class="modal-body" *ngIf="selectedAnnouncement">
+      <div class="announcement-summary">
+        <h4>{{ selectedAnnouncement.propertyTitle }}</h4>
+        <p>{{ selectedAnnouncement.propertyAddress }}</p>
+        <div class="summary-details">
+          <span>{{ selectedAnnouncement.rentPerPerson }} TND/month</span>
+          <span>•</span>
+          <span>{{ selectedAnnouncement.availableRooms }} rooms available</span>
+        </div>
+      </div>
+      
+      <form #applicationForm="ngForm" class="application-form">        <div class="form-group">          <label for="applicationMessage">Your Message</label>          <textarea             id="applicationMessage"            name="applicationMessage"            #messageField="ngModel"            [(ngModel)]="applicationMessage"            required            minlength="50"            maxlength="500"            rows="6"            placeholder="Introduce yourself and explain why you'd be a great roommate. Include information about your study habits, lifestyle, and what you're looking for in a shared living situation."            class="message-textarea"></textarea>          <div class="character-count">            {{ applicationMessage.length || 0 }}/500 characters          </div>          <div class="form-error" *ngIf="messageField.invalid && messageField.touched">            <span *ngIf="messageField.errors?.['required']">Please write a message about yourself.</span>            <span *ngIf="messageField.errors?.['minlength']">Message should be at least 50 characters.</span>          </div>        </div>      </form>
+    </div>
+    
+    <div class="modal-footer">
+      <button type="button" class="cancel-btn" (click)="closeApplicationModal()">
+        Cancel
+      </button>
+      <button 
+        type="button"
+        class="submit-btn"
+        [disabled]="!applicationMessage.trim() || applicationMessage.length < 50"
+        (click)="applyToAnnouncement(selectedAnnouncement!, applicationMessage)">
+        <span class="btn-icon">📝</span>
+        Send Application
+      </button>
+    </div>
+  </div>
+</div> 

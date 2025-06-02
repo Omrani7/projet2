@@ -1,0 +1,130 @@
+@startuml
+title "Sequence Diagram: Discovery and Browsing Announcements"
+
+!define USER_COLOR #E3F2FD
+!define FRONTEND_COLOR #F3E5F5
+!define BACKEND_COLOR #E8F5E9
+!define MAP_COLOR #FFF3E0
+
+actor "Student/User" as User
+participant "Angular Frontend\n(Discovery Page)" as Frontend
+participant "FilterBarComponent" as FilterBar
+participant "PropertyListComponent" as PropertyList
+participant "MapDisplayComponent" as MapComponent
+
+box "Backend Services"
+    participant "PropertyListingController" as Controller
+    participant "PropertyService" as Service
+    participant "InstituteService" as InstituteService
+    participant "Database" as DB
+end box
+
+== Initial Page Load ==
+
+ref over User, DB : Initial Page Load
+
+== Search and Filter Operations ==
+
+User -> FilterBar: 14. Enter search criteria:\n• Location: "Tunis"\n• Price range: 500-1000 TND\n• Property type: "Apartment"
+activate FilterBar
+
+FilterBar -> Frontend: 15. Emit filtersChanged event
+activate Frontend
+
+Frontend -> Controller: 16. GET /api/properties/search?genericQuery=Tunis&minPrice=500&maxPrice=1000&propertyType=apartment
+activate Controller
+
+Controller -> Service: 17. searchProperties(searchCriteria, pageable)
+activate Service
+
+Service -> DB: 18. Query with filters and geospatial search
+activate DB
+DB --> Service: 19. Filtered Page<PropertyListingDTO>
+deactivate DB
+
+Service --> Controller: 20. Filtered property results
+deactivate Service
+
+Controller --> Frontend: 21. 200 OK - Filtered properties
+deactivate Controller
+
+Frontend -> PropertyList: 22. Update list with filtered results
+activate PropertyList
+PropertyList --> User: 23. Display filtered property cards
+deactivate PropertyList
+
+Frontend -> MapComponent: 24. Update map with filtered properties
+activate MapComponent
+
+MapComponent -> MapComponent: 25. Clear existing pins
+MapComponent -> MapComponent: 26. Add new property pins
+MapComponent -> MapComponent: 27. Adjust map bounds to fit properties
+
+MapComponent --> User: 28. Updated map with filtered pins
+deactivate MapComponent
+
+deactivate FilterBar
+deactivate Frontend
+
+== Institute/Location Selection ==
+
+ref over User, DB : Institute Location Selection
+
+== Map Pin Click Interaction ==
+
+User -> MapComponent: 44. Click on property pin
+activate MapComponent
+
+MapComponent -> MapComponent: 45. Detect click event on property feature
+
+alt Single Property Pin
+    MapComponent -> MapComponent: 46a. Get property data from clicked feature
+    
+    MapComponent -> MapComponent: 47a. Create popup with property details:\n• Property image\n• Title and type\n• Price and address\n• "View Details" button
+    
+    MapComponent -> MapComponent: 48a. Position popup above/below pin
+    
+    MapComponent --> User: 49a. Show property popup with details
+    
+    MapComponent -> Frontend: 50a. Emit propertySelected(propertyId)
+    activate Frontend
+    
+    Frontend -> PropertyList: 51a. Scroll to selected property in list
+    activate PropertyList
+    PropertyList -> PropertyList: 52a. Highlight selected property card
+    PropertyList --> User: 53a. Property card highlighted and scrolled into view
+    deactivate PropertyList
+    
+    deactivate Frontend
+
+else Clustered Properties (Multiple)
+    MapComponent -> MapComponent: 46b. Get cluster features
+    
+    alt Small Cluster (2-5 properties)
+        MapComponent -> MapComponent: 47b. Create cluster popup showing:\n• Primary property details\n• List of other properties\n• "X properties at this location"
+        
+        MapComponent --> User: 48b. Show cluster popup with multiple properties
+        
+    else Large Cluster (6+ properties)
+        MapComponent -> MapComponent: 47c. Zoom into cluster area
+        MapComponent -> MapComponent: 48c. Separate clustered pins
+        
+        MapComponent --> User: 49c. Zoomed view with individual pins
+    end
+end
+
+deactivate MapComponent
+
+== Property Details Navigation ==
+
+ref over User, DB : Property Details Navigation
+
+== Property List Interaction ==
+
+ref over User, DB : Property List Interaction
+
+== Pagination and Scrolling ==
+
+ref over User, DB : Pagination and Scrolling
+
+@enduml 

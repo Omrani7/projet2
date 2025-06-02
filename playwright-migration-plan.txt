@@ -1,0 +1,175 @@
+# MIGRATION PLAN: Jsoup to Playwright
+
+## 1. Project Structure & Integration Approach
+
+### Direct Integration (Recommended)
+- Add Playwright dependencies to existing project
+- Keep the same package structure and interfaces
+- Replace implementation details while maintaining APIs
+- Benefits: Simplicity, easier testing, no inter-service communication needed
+
+## 2. Dependencies to Add
+
+Add these to your pom.xml:
+```xml
+<!-- Playwright for Java -->
+<dependency>
+  <groupId>com.microsoft.playwright</groupId>
+  <artifactId>playwright</artifactId>
+  <version>1.40.0</version>
+</dependency>
+```
+
+## 3. Implementation Plan
+
+### Phase 1: Setup & Infrastructure (1-2 days)
+1. Add Playwright dependencies
+2. Create browser management utility class
+3. Implement screenshots/error capture for debugging
+4. Setup configuration properties for scraper settings
+
+### Phase 2: Immobilier.com.tn Implementation (2-3 days)
+1. Create PlaywrightImmobilierScraper implementing Scraper interface
+2. Implement apartment listing extraction with price filtering
+3. Add detail page scraping with proper waiting
+4. Extract contact information by clicking "Show Number" buttons
+5. Test and validate against existing implementation
+
+### Phase 3: Tayara.tn Implementation (2-3 days)
+1. Create PlaywrightTayaraScraper implementing Scraper interface
+2. Implement category navigation and filtering
+3. Add pagination/infinite scroll handling
+4. Implement detail page scraping
+5. Extract contact information
+
+### Phase 4: Facebook Implementation (3-4 days)
+1. Create PlaywrightFacebookScraper implementing Scraper interface
+2. Implement authentication system
+3. Navigate to relevant housing groups
+4. Extract posts with housing listings
+5. Filter by criteria and extract details
+
+### Phase 5: Integration & Scheduler (1-2 days)
+1. Update ScraperService to use new implementations
+2. Enhance the scheduler to handle multiple sources
+3. Implement error handling and retry logic
+4. Add monitoring for scraper health
+
+## 4. Key Components to Create
+
+### 1. Browser Manager
+```java
+@Component
+public class BrowserManager {
+    private static Playwright playwright;
+    private static Browser browser;
+    
+    @PostConstruct
+    public void initialize() {
+        playwright = Playwright.create();
+        browser = playwright.chromium().launch(
+            new BrowserType.LaunchOptions()
+                .setHeadless(true)
+                .setSlowMo(50));
+    }
+    
+    public BrowserContext createContext() {
+        return browser.newContext(
+            new Browser.NewContextOptions()
+                .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+                .setViewportSize(1280, 720));
+    }
+    
+    @PreDestroy
+    public void cleanup() {
+        if (browser != null) browser.close();
+        if (playwright != null) playwright.close();
+    }
+}
+```
+
+### 2. Base Scraper Class
+```java
+public abstract class BasePlaywrightScraper<T> {
+    @Autowired
+    protected BrowserManager browserManager;
+    
+    protected void takeErrorScreenshot(Page page, String prefix) {
+        try {
+            String filename = prefix + "_" + System.currentTimeMillis() + ".png";
+            page.screenshot(new Page.ScreenshotOptions().setPath(Paths.get("./screenshots/" + filename)));
+        } catch (Exception e) {
+            // Log but don't fail
+        }
+    }
+    
+    // Common methods for all scrapers
+}
+```
+
+## 5. Website-Specific Considerations
+
+### Immobilier.com.tn
+- Uses standard web forms for filtering
+- Has pagination with "Next Page" links
+- Phone numbers behind "Show Number" buttons
+- Requires waiting for listing cards to load
+
+### Tayara.tn
+- Modern SPA with React or similar framework
+- Likely uses infinite scroll for listings
+- Complex filtering options that update dynamically 
+- May require waiting for content to stabilize
+
+### Facebook Groups
+- Requires authentication
+- Complex infinite scroll with dynamic content
+- Post formats vary greatly (unstructured data)
+- May need to use OCR for contact info in images
+- Subject to anti-scraping measures
+
+## 6. Advanced Features to Consider
+
+1. **Proxy Rotation**
+   - Add support for proxies to avoid IP blocks
+   - Especially important for Facebook
+
+2. **Captcha Handling**
+   - Implement detection for captchas
+   - Possibly integrate with 2captcha or similar service
+
+3. **Resilient Scheduling**
+   - Stagger scraping times to avoid patterns
+   - Backoff mechanisms for failed attempts
+
+4. **Content Extraction Enhancements**
+   - Use NLP for extracting details from unstructured text
+   - Consider integrating with GPT for complex posts
+
+## 7. Migration Strategy
+
+1. Start with parallel implementations
+2. Run both jsoup and Playwright versions for comparison
+3. Gradually replace jsoup with Playwright as confidence builds
+4. Monitor success rates and data quality
+
+## 8. Testing Strategy
+
+1. Create unit tests for extraction logic
+2. Implement integration tests with mock pages
+3. Add end-to-end tests for each website
+4. Compare results between implementations
+
+## 9. Timeline & Implementation Order
+
+1. **Week 1**: Setup & immobilier.com.tn migration
+2. **Week 2**: Tayara.tn implementation
+3. **Week 3**: Facebook implementation 
+4. **Week 4**: Integration, monitoring, and polish
+
+## 10. Success Metrics
+
+1. Coverage: percentage of listings successfully scraped
+2. Quality: completeness of extracted data fields
+3. Reliability: success rate of scraping attempts
+4. Performance: time to scrape standard dataset 

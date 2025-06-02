@@ -1,0 +1,50 @@
+@startuml
+title "Reference: All Announcements Tab"
+
+!define STUDENT_COLOR #E3F2FD
+!define BACKEND_COLOR #E8F5E9
+!define ALGO_COLOR #FFF3E0
+
+actor "Student" as Student
+participant "Angular Frontend" as Frontend
+
+box "Backend Services"
+    participant "RecommendationController" as Controller
+    participant "RecommendationService" as Service
+    participant "CompatibilityService" as Compatibility
+    participant "UserRoommatePreferencesService" as Preferences
+    participant "Database" as DB
+end box
+
+== Scenario 6: All Announcements Tab ==
+
+Student -> Frontend: 37. Click "All Announcements" tab
+activate Frontend
+
+Frontend -> Controller: 38. GET /api/v1/announcements/browse?page=0&size=20&sort=createdAt,desc
+activate Controller
+
+Controller -> Service: 39. browseAllAnnouncements(pageable, filters)
+activate Service
+
+note over Service
+    **Simple Browse:**
+    Basic filtering and pagination
+    No compatibility scoring
+end note
+
+Service -> DB: 40. Query all active announcements with pagination
+activate DB
+DB --> Service: 41. Page<RoommateAnnouncement>
+deactivate DB
+
+Service --> Controller: 42. All announcements (paginated, no scores)
+deactivate Service
+
+Controller --> Frontend: 43. 200 OK - Page<AnnouncementDTO>
+deactivate Controller
+
+Frontend --> Student: 44. Display all announcements:\n• Latest Announcement 1\n• Latest Announcement 2\n• Latest Announcement 3\n(No compatibility scores)
+deactivate Frontend
+
+@enduml 

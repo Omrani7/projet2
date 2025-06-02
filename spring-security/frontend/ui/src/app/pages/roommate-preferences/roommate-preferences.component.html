@@ -1,0 +1,204 @@
+<!-- Roommate Preferences Component Template -->
+<div class="roommate-preferences-container">
+  
+  <!-- Header Section -->
+  <div class="header-section">
+    <h1 class="page-title">
+      <i class="fas fa-cog"></i>
+      Roommate Preferences
+    </h1>
+    <p class="page-description">
+      Set your preferences to get better roommate recommendations powered by our AI matching system.
+      The more details you provide, the more accurate your matches will be.
+    </p>
+    
+    <!-- Status Indicators -->
+    <div class="status-indicators" *ngIf="!isLoading">
+      <div class="status-card" [ngClass]="isPreferencesComplete ? 'complete' : 'incomplete'">
+        <i class="fas" [ngClass]="isPreferencesComplete ? 'fa-check-circle' : 'fa-exclamation-triangle'"></i>
+        <span>{{ isPreferencesComplete ? 'Preferences Complete' : 'Preferences Incomplete' }}</span>
+      </div>
+      <div class="status-card" [ngClass]="hasExistingPreferences ? 'active' : 'inactive'">
+        <i class="fas" [ngClass]="hasExistingPreferences ? 'fa-user-check' : 'fa-user-plus'"></i>
+        <span>{{ hasExistingPreferences ? 'Profile Active' : 'New Profile' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <h3>Loading Your Preferences...</h3>
+    <p>Please wait while we fetch your current settings.</p>
+  </div>
+
+  <!-- Error Message -->
+  <div class="error-banner" *ngIf="errorMessage && !isLoading">
+    <i class="fas fa-exclamation-triangle"></i>
+    <span>{{ errorMessage }}</span>
+    <button class="close-btn" (click)="errorMessage = ''">×</button>
+  </div>
+
+  <!-- Success Message -->
+  <div class="success-banner" *ngIf="successMessage">
+    <i class="fas fa-check-circle"></i>
+    <span>{{ successMessage }}</span>
+    <button class="close-btn" (click)="successMessage = ''">×</button>
+  </div>
+
+  <!-- Preferences Form -->
+  <form [formGroup]="preferencesForm" (ngSubmit)="onSubmit()" class="preferences-form" *ngIf="!isLoading">
+    
+    <!-- Lifestyle Preferences Section -->
+    <div class="form-section">
+      <h2 class="section-title">
+        <i class="fas fa-heart"></i>
+        Lifestyle Preferences
+      </h2>
+      <p class="section-description">Tell us about your lifestyle to find compatible roommates</p>
+      
+      <!-- Lifestyle Tags -->
+      <div class="form-group">
+        <label class="form-label">Lifestyle Tags</label>
+        <p class="form-help">Select all that apply to your lifestyle</p>
+        <div class="tags-grid" formArrayName="lifestyleTags">
+          <div class="tag-item" *ngFor="let tag of availableLifestyleTags; let i = index">
+            <input type="checkbox" [id]="'lifestyle-' + i" [formControlName]="i" class="tag-checkbox">
+            <label [for]="'lifestyle-' + i" class="tag-label">
+              <span class="tag-icon">{{ getLifestyleIcon(tag) }}</span>
+              <span class="tag-text">{{ tag }}</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cleanliness Level -->
+      <div class="form-group">
+        <label class="form-label" for="cleanlinessLevel">Cleanliness Level</label>
+        <p class="form-help">How important is cleanliness to you? (1 = Very relaxed, 5 = Very strict)</p>
+        <div class="slider-container">
+          <input type="range" id="cleanlinessLevel" formControlName="cleanlinessLevel" 
+                 min="1" max="5" step="1" class="slider">
+          <div class="slider-labels">
+            <span>1</span>
+            <span>2</span>
+            <span>3</span>
+            <span>4</span>
+            <span>5</span>
+          </div>
+        </div>
+        <div class="slider-description" *ngIf="preferencesForm.get('cleanlinessLevel')?.value">
+          <strong>Level {{ preferencesForm.get('cleanlinessLevel')?.value }}:</strong>
+          {{ cleanlinessDescriptions[preferencesForm.get('cleanlinessLevel')?.value] }}
+        </div>
+      </div>
+
+      <!-- Social Level -->
+      <div class="form-group">
+        <label class="form-label" for="socialLevel">Social Level</label>
+        <p class="form-help">How social are you? (1 = Very introverted, 5 = Very extroverted)</p>
+        <div class="slider-container">
+          <input type="range" id="socialLevel" formControlName="socialLevel" 
+                 min="1" max="5" step="1" class="slider">
+          <div class="slider-labels">
+            <span>1</span>
+            <span>2</span>
+            <span>3</span>
+            <span>4</span>
+            <span>5</span>
+          </div>
+        </div>
+        <div class="slider-description" *ngIf="preferencesForm.get('socialLevel')?.value">
+          <strong>Level {{ preferencesForm.get('socialLevel')?.value }}:</strong>
+          {{ socialDescriptions[preferencesForm.get('socialLevel')?.value] }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Study Preferences Section -->
+    <div class="form-section">
+      <h2 class="section-title">
+        <i class="fas fa-book"></i>
+        Study Preferences
+      </h2>
+      <p class="section-description">Help us understand your study habits and preferences</p>
+      
+      <!-- Study Habits -->
+      <div class="form-group">
+        <label class="form-label">Study Habits</label>
+        <p class="form-help">Select your preferred study environments and habits</p>
+        <div class="tags-grid" formArrayName="studyHabits">
+          <div class="tag-item" *ngFor="let habit of availableStudyHabits; let i = index">
+            <input type="checkbox" [id]="'study-' + i" [formControlName]="i" class="tag-checkbox">
+            <label [for]="'study-' + i" class="tag-label">
+              <span class="tag-icon">{{ getStudyIcon(habit) }}</span>
+              <span class="tag-text">{{ habit }}</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Budget Preferences Section -->
+    <div class="form-section">
+      <h2 class="section-title">
+        <i class="fas fa-dollar-sign"></i>
+        Budget Preferences
+      </h2>
+      <p class="section-description">Set your budget range to find affordable roommate options</p>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="budgetMin">Minimum Budget (TND/month)</label>
+          <input type="number" id="budgetMin" formControlName="budgetMin" 
+                 placeholder="300" min="0" class="form-input">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="budgetMax">Maximum Budget (TND/month)</label>
+          <input type="number" id="budgetMax" formControlName="budgetMax" 
+                 placeholder="800" min="0" class="form-input">
+        </div>
+      </div>
+    </div>
+
+    <!-- Location preferences removed as requested by user -->
+
+    <!-- Additional Preferences Section -->
+    <div class="form-section">
+      <h2 class="section-title">
+        <i class="fas fa-comment"></i>
+        Additional Preferences
+      </h2>
+      <p class="section-description">Any other preferences or requirements you'd like to mention</p>
+      
+      <div class="form-group">
+        <label class="form-label" for="additionalPreferences">Additional Notes</label>
+        <textarea id="additionalPreferences" formControlName="additionalPreferences" 
+                  placeholder="e.g., I prefer quiet environments, I'm a night owl, I love cooking, etc."
+                  rows="4" maxlength="1000" class="form-textarea"></textarea>
+        <div class="character-count">
+          {{ preferencesForm.get('additionalPreferences')?.value?.length || 0 }}/1000 characters
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="navigateToRoommates()">
+        <i class="fas fa-arrow-left"></i>
+        Back to Browse
+      </button>
+      
+      <button type="button" class="btn btn-danger" *ngIf="hasExistingPreferences" (click)="onDelete()">
+        <i class="fas fa-trash"></i>
+        Delete Preferences
+      </button>
+      
+      <button type="submit" class="btn btn-primary" [disabled]="isSaving || preferencesForm.invalid">
+        <i class="fas fa-save" *ngIf="!isSaving"></i>
+        <i class="fas fa-spinner fa-spin" *ngIf="isSaving"></i>
+        {{ isSaving ? 'Saving...' : (hasExistingPreferences ? 'Update Preferences' : 'Save Preferences') }}
+      </button>
+    </div>
+  </form>
+</div> 

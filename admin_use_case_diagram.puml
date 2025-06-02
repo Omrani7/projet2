@@ -1,0 +1,79 @@
+@startuml Admin Use Case Diagram - UniNest Platform (Core Features)
+
+!theme plain
+skinparam backgroundColor white
+skinparam actorBackgroundColor #FFE8E8
+skinparam usecaseBackgroundColor #F8F9FA
+skinparam usecaseBorderColor #6C757D
+skinparam rectangleBackgroundColor #FFF8F8
+skinparam rectangleBorderColor #DC143C
+
+title "Administrator Core Use Cases - UniNest Platform"
+
+left to right direction
+
+actor "Administrator" as admin
+
+rectangle "UniNest System" {
+    ' Authentication (Core requirement for all actions)
+    usecase "Authentication" as authenticate
+    
+    ' Dashboard & Overview
+    usecase "Access Admin Dashboard" as accessDashboard
+    usecase "View System Analytics" as viewAnalytics
+    
+    ' User Management Core Features
+    usecase "Manage Users" as manageUsers
+    usecase "Moderate User Accounts" as moderateUsers
+    
+    ' Property Management Core Features
+    usecase "Manage Properties" as manageProperties
+    usecase "Moderate Property Listings" as moderateProperties
+    
+    ' Announcement Management Core Features
+    usecase "Manage Announcements" as manageAnnouncements
+    usecase "Property Announcement" as propertyAnnouncement
+    usecase "Roommate Announcement" as roommateAnnouncement
+    usecase "Edit" as editAnnouncement
+    usecase "Delete" as deleteAnnouncement
+    usecase "View Announcement Details" as viewAnnouncementDetails
+    
+    ' Data & Reports
+    usecase "Export System Reports" as exportReports
+    
+    ' Scraper Management
+    usecase "Manage Scrapers" as manageScrapers
+}
+
+' Primary relationships from admin to main use cases
+admin --> authenticate
+admin --> accessDashboard
+admin --> manageUsers
+admin --> manageProperties
+admin --> manageAnnouncements
+admin --> exportReports
+admin --> manageScrapers
+
+' Include relationships - Authentication required for all (positioned to avoid conflicts)
+accessDashboard .up.> authenticate : <<include>>
+manageUsers .up.> authenticate : <<include>>
+manageProperties .up.> authenticate : <<include>>
+manageAnnouncements .up.> authenticate : <<include>>
+exportReports .up.> authenticate : <<include>>
+manageScrapers .up.> authenticate : <<include>>
+
+' Extend relationships for detailed actions (reversed direction)
+viewAnalytics .down.> accessDashboard : <<extend>>
+moderateUsers .down.> manageUsers : <<extend>>
+moderateProperties .down.> manageProperties : <<extend>>
+
+' Inheritance relationships for announcement types
+propertyAnnouncement --|> manageAnnouncements
+roommateAnnouncement --|> manageAnnouncements
+
+' Extend relationships for announcement management (positioned to avoid conflicts)
+editAnnouncement .right.> manageAnnouncements : <<extend>>
+deleteAnnouncement .left.> manageAnnouncements : <<extend>>
+viewAnnouncementDetails .down.> manageAnnouncements : <<extend>>
+
+@enduml 

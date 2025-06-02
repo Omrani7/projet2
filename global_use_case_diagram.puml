@@ -1,0 +1,95 @@
+@startuml Global Use Case Diagram - UniNest Platform (Core Features)
+
+!theme plain
+skinparam backgroundColor white
+skinparam actorBackgroundColor #E8F4FD
+skinparam usecaseBackgroundColor #F8F9FA
+skinparam usecaseBorderColor #6C757D
+skinparam rectangleBackgroundColor #F0F8FF
+skinparam rectangleBorderColor #4169E1
+
+title "UniNest Platform - Core Use Cases Overview"
+
+left to right direction
+
+' ===== ACTORS =====
+actor "Student" as student
+actor "Property Owner" as owner
+actor "Administrator" as admin
+
+rectangle "UniNest Platform" {
+    ' ===== AUTHENTICATION =====
+    usecase "Register/Login" as authenticate
+    
+    ' ===== CORE PROPERTY FEATURES =====
+    usecase "Browse Properties" as browseProperties
+    usecase "Search Properties" as searchProperties
+    usecase "View Property Details" as viewPropertyDetails
+    usecase "Create Property Listing" as createListing
+    
+    ' ===== CORE INQUIRY FEATURES =====
+    usecase "Make Property Inquiry" as makeInquiry
+    usecase "Manage Inquiries" as manageInquiries
+    
+    ' ===== CORE ROOMMATE FEATURES =====
+    usecase "Post Roommate Announcement" as postAnnouncement
+    usecase "Browse Roommate Announcements" as browseAnnouncements
+    usecase "Apply for Roommate" as applyForRoommate
+    
+    ' ===== CORE MANAGEMENT FEATURES =====
+    usecase "Manage Profile" as manageProfile
+    usecase "View Dashboard" as viewDashboard
+    usecase "Admin Management" as adminManagement
+    
+    ' ===== CORE SYSTEM FEATURES =====
+    usecase "Send Messages" as sendMessages
+    usecase "Generate Reports" as generateReports
+}
+
+' ===== STUDENT RELATIONSHIPS =====
+student --> authenticate
+student --> browseProperties
+student --> searchProperties
+student --> makeInquiry
+student --> postAnnouncement
+student --> browseAnnouncements
+student --> applyForRoommate
+student --> manageProfile
+student --> sendMessages
+
+' ===== OWNER RELATIONSHIPS =====
+owner --> authenticate
+owner --> browseProperties
+owner --> createListing
+owner --> manageInquiries
+owner --> viewDashboard
+owner --> manageProfile
+
+' ===== ADMIN RELATIONSHIPS =====
+admin --> authenticate
+admin --> adminManagement
+admin --> viewDashboard
+admin --> generateReports
+
+' ===== INCLUDE RELATIONSHIPS - Authentication required (positioned to minimize conflicts) =====
+browseProperties ..> authenticate : <<include>>
+searchProperties ..> authenticate : <<include>>
+makeInquiry ..> authenticate : <<include>>
+postAnnouncement ..> authenticate : <<include>>
+browseAnnouncements ..> authenticate : <<include>>
+applyForRoommate ..> authenticate : <<include>>
+createListing ..> authenticate : <<include>>
+manageInquiries ..> authenticate : <<include>>
+manageProfile ..> authenticate : <<include>>
+viewDashboard ..> authenticate : <<include>>
+adminManagement ..> authenticate : <<include>>
+sendMessages ..> authenticate : <<include>>
+generateReports ..> authenticate : <<include>>
+
+' ===== EXTEND RELATIONSHIPS (positioned to avoid main flows) =====
+browseProperties ..> viewPropertyDetails : <<extend>>
+searchProperties ..> viewPropertyDetails : <<extend>>
+browseAnnouncements ..> applyForRoommate : <<extend>>
+viewDashboard ..> generateReports : <<extend>>
+
+@enduml 

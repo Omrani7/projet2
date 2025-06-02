@@ -1,0 +1,159 @@
+<!-- Header: Use ngClass to switch between absolute/transparent and fixed/white -->
+<nav [ngClass]="{
+  'absolute header-transparent': !isScrolled,
+  'fixed header-solid': isScrolled
+}"
+class="top-0 left-0 right-0 z-20 p-4 md:px-8 lg:px-16 transition-colors duration-300 ease-in-out">
+  <div class="container mx-auto flex justify-between items-center">
+    <!-- Brand/Logo -->
+    <a routerLink="/" class="text-2xl md:text-3xl font-bold logo">
+      UniNest
+    </a>
+
+    <!-- Right-side Links & Auth -->
+    <div class="flex items-center space-x-2 md:space-x-4">
+      <!-- Links with consistent SVG icons -->
+      <a href="#" class="nav-link-with-icon" [ngClass]="{'nav-link-light': !isScrolled}">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2v6.5M12 22v-6.5M4.93 10.93l4.24 4.24M14.83 8.83l4.24 4.24M2 12h6.5M22 12h-6.5M10.93 19.07l4.24-4.24M8.83 4.83l4.24 4.24"></path>
+        </svg>
+        <span>Download App</span>
+      </a>
+      
+      <a href="#" class="nav-link-with-icon" [ngClass]="{'nav-link-light': !isScrolled}">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+        <span>Support</span>
+      </a>
+      
+      <a href="#" class="nav-link-with-icon shortlist-link" [ngClass]="{'nav-link-light': !isScrolled}">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+        </svg>
+        <span>Shortlist</span>
+      </a>
+      
+      <!-- Roommate Matching Link (NEW FEATURE) -->
+      <a routerLink="/roommates/browse" class="nav-link-with-icon roommate-link" [ngClass]="{'nav-link-light': !isScrolled}">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="8.5" cy="7" r="4"></circle>
+          <path d="M20 8v6"></path>
+          <path d="M23 11h-6"></path>
+        </svg>
+        <span>Find Roommates</span>
+      </a>
+
+      <!-- Auth Section -->
+      <div class="auth-section">
+        <!-- Logged Out State -->
+        <ng-container *ngIf="!(isAuthenticated$ | async)">
+          <a (click)="navigateToLogin()" class="nav-link-with-icon login-link" [ngClass]="{'nav-link-light': !isScrolled}">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+              <polyline points="10 17 15 12 10 7"></polyline>
+              <line x1="15" y1="12" x2="3" y2="12"></line>
+            </svg>
+            <span>Login</span>
+          </a>
+          
+          <a routerLink="/auth/register" class="register-button">
+            Register
+          </a>
+        </ng-container>
+
+        <!-- Logged In State -->
+        <ng-container *ngIf="isAuthenticated$ | async">
+          <div class="relative">
+            <!-- Avatar Button -->
+            <button (click)="toggleDropdown()" class="avatar-button">
+              <span>{{ currentUserRole ? currentUserRole.charAt(0).toUpperCase() : 'U' }}</span>
+            </button>
+
+            <!-- Dropdown Menu -->
+            <div *ngIf="isDropdownOpen" class="dropdown-menu">
+              <a routerLink="/profile" (click)="toggleDropdown()" class="dropdown-item">
+                <span class="dropdown-icon">👤</span> Profile
+              </a>
+              
+              <!-- Student-specific navigation -->
+              <ng-container *ngIf="currentUserRole === 'STUDENT'">
+                <a routerLink="/student/dashboard" (click)="toggleDropdown()" class="dropdown-item">
+                  <span class="dropdown-icon">📊</span> Dashboard
+                </a>
+                <a routerLink="/my-inquiries" (click)="toggleDropdown()" class="dropdown-item">
+                  <span class="dropdown-icon">💬</span> My Inquiries
+                </a>
+                
+                <!-- Roommate Features (NEW) -->
+                <hr class="dropdown-divider">
+                <a routerLink="/roommates/browse" (click)="toggleDropdown()" class="dropdown-item">
+                  <span class="dropdown-icon">🏠</span> Find Roommates
+                </a>
+                <a routerLink="/roommates/connections" (click)="toggleDropdown()" class="dropdown-item">
+                  <span class="dropdown-icon">🤝</span> Connection Requests
+                  <span class="notification-badge" *ngIf="pendingConnectionRequests > 0">{{ pendingConnectionRequests }}</span>
+                </a>
+                <a routerLink="/messages" (click)="toggleDropdown()" class="dropdown-item">
+                  <span class="dropdown-icon">💬</span> Messages
+                  <span class="notification-badge" *ngIf="unreadMessageCount > 0">{{ unreadMessageCount }}</span>
+                </a>
+                <!-- Future roommate links (will be uncommented as components are created)
+                <a routerLink="/roommates/my-announcements" (click)="toggleDropdown()" class="dropdown-item">
+                  <span class="dropdown-icon">📋</span> My Announcements
+                </a>
+                <a routerLink="/roommates/my-applications" (click)="toggleDropdown()" class="dropdown-item">
+                  <span class="dropdown-icon">📝</span> My Applications
+                </a>
+                -->
+                
+                <hr class="dropdown-divider">
+                <a routerLink="/access-denied-owner" (click)="toggleDropdown()" class="dropdown-item">
+                  <span class="dropdown-icon">📄</span> List with Us
+                </a>
+              </ng-container>
+              <ng-container *ngIf="currentUserRole === 'OWNER'">
+                <a routerLink="/owner/dashboard" (click)="toggleDropdown()" class="dropdown-item">
+                  <span class="dropdown-icon">📊</span> Dashboard
+                </a>
+                <a routerLink="/owner/my-properties" (click)="toggleDropdown()" class="dropdown-item">
+                  <span class="dropdown-icon">🏠</span> My Properties
+                </a>
+                <a routerLink="/owner/inquiries" (click)="toggleDropdown()" class="dropdown-item">
+                  <span class="dropdown-icon">💬</span> Inquiries
+                </a>
+                <a routerLink="/owner/property/new" (click)="toggleDropdown()" class="dropdown-item">
+                  <span class="dropdown-icon">📄</span> List New Property
+                </a>
+              </ng-container>
+
+              <!-- Admin-specific navigation -->
+              <ng-container *ngIf="currentUserRole === 'ADMIN'">
+                <a routerLink="/admin/dashboard" (click)="toggleDropdown()" class="dropdown-item">
+                  <span class="dropdown-icon">⚡</span> Admin Dashboard
+                </a>
+                <a routerLink="/admin/users" (click)="toggleDropdown()" class="dropdown-item">
+                  <span class="dropdown-icon">👥</span> Manage Users
+                </a>
+                <a routerLink="/admin/properties" (click)="toggleDropdown()" class="dropdown-item">
+                  <span class="dropdown-icon">🏠</span> Manage Properties
+                </a>
+                <a routerLink="/admin/system" (click)="toggleDropdown()" class="dropdown-item">
+                  <span class="dropdown-icon">⚙️</span> System Settings
+                </a>
+              </ng-container>
+
+              <hr class="dropdown-divider">
+              <button (click)="logout(); toggleDropdown()" class="dropdown-item">
+                <span class="dropdown-icon">➔</span> Logout
+              </button>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</nav>

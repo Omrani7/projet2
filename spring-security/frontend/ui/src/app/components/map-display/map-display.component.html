@@ -1,0 +1,31 @@
+<div class="map-container">
+  <div [id]="mapId" class="ol-map"></div>
+
+  <!-- Popup container -->
+  <div #popupContainer class="popup-container" [style.display]="isPopupVisible ? 'block' : 'none'">
+    <a href="#" #popupCloser class="popup-closer" (click)="closePopup($event)">&times;</a>
+    <div #popupContent class="popup-content"></div>
+    
+    <!-- Image carousel navigation - will be dynamically controlled -->
+    <div class="popup-carousel-controls" [style.display]="activePopupImages.length > 1 ? 'block' : 'none'">
+      <button class="popup-nav-btn popup-prev-btn" (click)="prevPopupImage($event)" aria-label="Previous image">‹</button>
+      <button class="popup-nav-btn popup-next-btn" (click)="nextPopupImage($event)" aria-label="Next image">›</button>
+      
+      <!-- Image counter dots -->
+      <div class="popup-carousel-indicators">
+        <div class="popup-indicators-container">
+          <span *ngFor="let _ of activePopupImages; let i = index" 
+                class="popup-indicator-dot"
+                [class.active]="currentPopupImageIndex === i"></span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Property details link -->
+    <a *ngIf="activePopupPropertyId" 
+       [routerLink]="[activePopupPropertySourceType === 'owner' ? '/owner-property' : '/property', activePopupPropertyId]" 
+       class="property-details-link">
+      View Details
+    </a>
+  </div>
+</div>

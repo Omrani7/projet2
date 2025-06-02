@@ -1,0 +1,883 @@
+/* ============================================= */
+/*            STUDENT DASHBOARD STYLES          */
+/* ============================================= */
+
+/* Force Higher Specificity and Override Any Global Styles */
+.student-dashboard-container {
+  /* CSS Variables with fallbacks */
+  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+  --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
+  --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%) !important;
+  --glass-bg: rgba(255, 255, 255, 0.25) !important;
+  --glass-border: rgba(255, 255, 255, 0.18) !important;
+  --shadow-light: 0 8px 32px 0 rgba(31, 38, 135, 0.37) !important;
+  --shadow-medium: 0 4px 15px 0 rgba(31, 38, 135, 0.2) !important;
+  
+  /* Force Main Container Styles */
+  min-height: 100vh !important;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  background-attachment: fixed !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  overflow-x: hidden !important;
+  position: relative !important;
+  width: 100% !important;
+}
+
+/* Ensure body background is also set for fallback */
+body {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  min-height: 100vh !important;
+}
+
+/* Hero Section */
+.student-dashboard-container .hero-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  padding: 40px 20px 80px !important;
+  position: relative !important;
+  overflow: hidden !important;
+  width: 100% !important;
+  margin: 0 !important;
+}
+
+.student-dashboard-container .hero-section::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.05)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.03)"/><circle cx="50" cy="10" r="1" fill="rgba(255,255,255,0.04)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>') !important;
+  pointer-events: none !important;
+}
+
+.student-dashboard-container .hero-content {
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+/* Welcome Card */
+.student-dashboard-container .welcome-card {
+  background: rgba(255, 255, 255, 0.25) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border-radius: 24px !important;
+  padding: 40px !important;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37) !important;
+  display: grid !important;
+  grid-template-columns: auto 1fr auto !important;
+  gap: 40px !important;
+  align-items: center !important;
+  animation: slideUp 0.8s ease-out !important;
+  transition: all 0.3s ease !important;
+}
+
+.student-dashboard-container .welcome-card:hover {
+  transform: translateY(-5px) !important;
+  box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.5) !important;
+}
+
+/* Welcome Avatar */
+.student-dashboard-container .welcome-avatar {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 16px !important;
+  position: relative !important;
+}
+
+.student-dashboard-container .welcome-avatar .avatar-letter {
+  width: 100px !important;
+  height: 100px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 40px !important;
+  font-weight: 700 !important;
+  color: white !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+  box-shadow: 0 4px 15px 0 rgba(31, 38, 135, 0.2) !important;
+  transition: all 0.3s ease !important;
+}
+
+.student-dashboard-container .welcome-avatar .avatar-letter:hover {
+  transform: scale(1.05) !important;
+  box-shadow: 0 8px 25px 0 rgba(79, 172, 254, 0.4) !important;
+}
+
+.student-dashboard-container .avatar-status-indicator {
+  position: absolute !important;
+  bottom: 8px !important;
+  right: 8px !important;
+  width: 20px !important;
+  height: 20px !important;
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%) !important;
+  border-radius: 50% !important;
+  border: 3px solid white !important;
+  animation: pulse 2s infinite !important;
+}
+
+/* Welcome Info */
+.student-dashboard-container .welcome-info {
+  flex: 1 !important;
+}
+
+.student-dashboard-container .welcome-title {
+  font-size: 32px !important;
+  font-weight: 700 !important;
+  color: white !important;
+  margin: 0 0 12px 0 !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+.student-dashboard-container .welcome-subtitle {
+  font-size: 16px !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+  margin: 0 0 16px 0 !important;
+}
+
+.student-dashboard-container .welcome-date {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  color: rgba(255, 255, 255, 0.7) !important;
+  font-size: 14px !important;
+}
+
+.student-dashboard-container .welcome-date svg {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+/* Welcome Actions */
+.student-dashboard-container .btn-primary-action {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 16px 32px !important;
+  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 16px !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 15px 0 rgba(31, 38, 135, 0.2) !important;
+  text-decoration: none !important;
+}
+
+.student-dashboard-container .btn-primary-action:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 25px 0 rgba(250, 112, 154, 0.4) !important;
+}
+
+.student-dashboard-container .btn-primary-action svg {
+  width: 20px !important;
+  height: 20px !important;
+}
+
+/* Secondary Action Button for Testing */
+.student-dashboard-container .btn-secondary-action {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 16px 32px !important;
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 16px !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 15px 0 rgba(31, 38, 135, 0.2) !important;
+  text-decoration: none !important;
+  margin-left: 12px !important;
+}
+
+.student-dashboard-container .btn-secondary-action:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 25px 0 rgba(255, 107, 107, 0.4) !important;
+}
+
+.student-dashboard-container .btn-secondary-action svg {
+  width: 20px !important;
+  height: 20px !important;
+}
+
+.student-dashboard-container .welcome-actions {
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+}
+
+/* Loading State */
+.student-dashboard-container .loading-state {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 60px 20px !important;
+  background: rgba(255, 255, 255, 0.25) !important;
+  backdrop-filter: blur(20px) !important;
+  border-radius: 20px !important;
+  margin: 20px !important;
+  max-width: 400px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37) !important;
+}
+
+.student-dashboard-container .loading-spinner {
+  width: 50px !important;
+  height: 50px !important;
+  border: 4px solid rgba(255, 255, 255, 0.3) !important;
+  border-top: 4px solid white !important;
+  border-radius: 50% !important;
+  animation: spin 1s linear infinite !important;
+  margin-bottom: 20px !important;
+}
+
+.student-dashboard-container .loading-spinner.small {
+  width: 30px !important;
+  height: 30px !important;
+  border-width: 3px !important;
+  margin-bottom: 12px !important;
+}
+
+.student-dashboard-container .loading-state p {
+  color: white !important;
+  font-size: 16px !important;
+  margin: 0 !important;
+}
+
+/* Dashboard Content */
+.student-dashboard-container .dashboard-content {
+  max-width: 1200px !important;
+  margin: -40px auto 40px !important;
+  padding: 0 20px !important;
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+/* Section Titles */
+.student-dashboard-container .section-title {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  font-size: 24px !important;
+  font-weight: 700 !important;
+  color: white !important;
+  margin: 0 0 24px 0 !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+.student-dashboard-container .section-title svg {
+  width: 28px !important;
+  height: 28px !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Stats Section */
+.student-dashboard-container .stats-section {
+  margin-bottom: 40px !important;
+}
+
+.student-dashboard-container .stats-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+  gap: 20px !important;
+}
+
+.student-dashboard-container .stat-card {
+  background: rgba(255, 255, 255, 0.25) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border-radius: 20px !important;
+  padding: 24px !important;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37) !important;
+  transition: all 0.3s ease !important;
+  animation: slideUp 0.6s ease-out !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 16px !important;
+}
+
+.student-dashboard-container .stat-card:hover {
+  transform: translateY(-5px) !important;
+  box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.5) !important;
+}
+
+.student-dashboard-container .stat-icon {
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
+
+.student-dashboard-container .inquiries-stat .stat-icon {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
+}
+
+.student-dashboard-container .favorites-stat .stat-icon {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+}
+
+.student-dashboard-container .views-stat .stat-icon {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+.student-dashboard-container .deals-stat .stat-icon {
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%) !important;
+}
+
+.student-dashboard-container .response-stat .stat-icon {
+  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%) !important;
+}
+
+.student-dashboard-container .profile-stat .stat-icon {
+  background: linear-gradient(135deg, #a855f7 0%, #3b82f6 100%) !important;
+}
+
+.student-dashboard-container .stat-icon svg {
+  width: 24px !important;
+  height: 24px !important;
+  color: white !important;
+}
+
+.student-dashboard-container .stat-content h3 {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+  margin: 0 0 8px 0 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+}
+
+.student-dashboard-container .stat-number {
+  font-size: 28px !important;
+  font-weight: 800 !important;
+  color: white !important;
+  line-height: 1 !important;
+  margin-bottom: 8px !important;
+}
+
+.student-dashboard-container .stat-info {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.student-dashboard-container .stat-badge {
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+  padding: 4px 8px !important;
+  border-radius: 8px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+}
+
+.student-dashboard-container .stat-badge.active {
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%) !important;
+}
+
+.student-dashboard-container .stat-label {
+  font-size: 12px !important;
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Main Grid Layout */
+.student-dashboard-container .main-grid {
+  display: grid !important;
+  grid-template-columns: 1fr 400px !important;
+  gap: 40px !important;
+  margin-top: 40px !important;
+}
+
+/* Quick Actions Section */
+.student-dashboard-container .quick-actions-section {
+  margin-bottom: 40px !important;
+}
+
+.student-dashboard-container .quick-actions-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)) !important;
+  gap: 20px !important;
+}
+
+.student-dashboard-container .action-card {
+  background: rgba(255, 255, 255, 0.25) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border-radius: 16px !important;
+  padding: 24px !important;
+  cursor: pointer !important;
+  position: relative !important;
+  overflow: hidden !important;
+  transition: all 0.3s ease !important;
+  text-decoration: none !important;
+  color: inherit !important;
+  display: block !important;
+}
+
+.student-dashboard-container .action-card::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  background: linear-gradient(45deg, transparent 40%, rgba(255, 255, 255, 0.1) 50%, transparent 60%) !important;
+  transform: translateX(-100%) !important;
+  transition: transform 0.6s ease !important;
+}
+
+.student-dashboard-container .action-card:hover::before {
+  transform: translateX(100%) !important;
+}
+
+.student-dashboard-container .action-card:hover {
+  transform: translateY(-8px) scale(1.02) !important;
+  box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.5) !important;
+}
+
+.student-dashboard-container .action-content {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.student-dashboard-container .action-icon {
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 12px !important;
+  background: rgba(255, 255, 255, 0.2) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-bottom: 16px !important;
+}
+
+.student-dashboard-container .action-icon svg {
+  width: 24px !important;
+  height: 24px !important;
+  color: white !important;
+}
+
+.student-dashboard-container .action-content h3 {
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  color: white !important;
+  margin: 0 0 8px 0 !important;
+}
+
+.student-dashboard-container .action-content p {
+  font-size: 14px !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+  margin: 0 0 12px 0 !important;
+  line-height: 1.4 !important;
+}
+
+.student-dashboard-container .action-count {
+  position: absolute !important;
+  top: 16px !important;
+  right: 16px !important;
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+  padding: 4px 8px !important;
+  border-radius: 8px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+}
+
+.student-dashboard-container .action-arrow {
+  position: absolute !important;
+  bottom: 16px !important;
+  right: 16px !important;
+  font-size: 20px !important;
+  color: rgba(255, 255, 255, 0.6) !important;
+  transition: all 0.3s ease !important;
+}
+
+.student-dashboard-container .action-card:hover .action-arrow {
+  color: white !important;
+  transform: translateX(4px) !important;
+}
+
+/* Activity Section */
+.student-dashboard-container .activity-section {
+  background: rgba(255, 255, 255, 0.25) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border-radius: 20px !important;
+  padding: 32px !important;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37) !important;
+}
+
+.student-dashboard-container .activity-list {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 16px !important;
+}
+
+.student-dashboard-container .activity-item {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 16px !important;
+  padding: 16px !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+  transition: all 0.3s ease !important;
+}
+
+.student-dashboard-container .activity-item:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  transform: translateX(4px) !important;
+}
+
+.student-dashboard-container .activity-icon {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 10px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
+
+.student-dashboard-container .activity-icon svg {
+  width: 20px !important;
+  height: 20px !important;
+  color: white !important;
+}
+
+.student-dashboard-container .activity-content h4 {
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  color: white !important;
+  margin: 0 0 4px 0 !important;
+}
+
+.student-dashboard-container .activity-content p {
+  font-size: 14px !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+  margin: 0 0 8px 0 !important;
+  line-height: 1.4 !important;
+}
+
+.student-dashboard-container .activity-meta {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+.student-dashboard-container .activity-time {
+  font-size: 12px !important;
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.student-dashboard-container .activity-property {
+  font-size: 12px !important;
+  color: rgba(255, 255, 255, 0.7) !important;
+  font-weight: 500 !important;
+}
+
+/* Right Column Sections */
+.student-dashboard-container .profile-summary-section,
+.student-dashboard-container .recommendations-section {
+  background: rgba(255, 255, 255, 0.25) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border-radius: 20px !important;
+  padding: 32px !important;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37) !important;
+  margin-bottom: 24px !important;
+}
+
+/* Profile Summary */
+.student-dashboard-container .profile-summary-card {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 16px !important;
+}
+
+.student-dashboard-container .profile-detail {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 12px 0 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.student-dashboard-container .profile-detail:last-of-type {
+  border-bottom: none !important;
+}
+
+.student-dashboard-container .detail-label {
+  font-size: 14px !important;
+  color: rgba(255, 255, 255, 0.7) !important;
+  font-weight: 500 !important;
+}
+
+.student-dashboard-container .detail-value {
+  font-size: 14px !important;
+  color: white !important;
+  font-weight: 600 !important;
+  text-align: right !important;
+}
+
+.student-dashboard-container .profile-actions {
+  padding-top: 16px !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.student-dashboard-container .btn-edit-profile {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  width: 100% !important;
+  padding: 12px 16px !important;
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 12px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  text-decoration: none !important;
+  justify-content: center !important;
+}
+
+.student-dashboard-container .btn-edit-profile:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 25px 0 rgba(79, 172, 254, 0.4) !important;
+}
+
+.student-dashboard-container .btn-edit-profile svg {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+/* Recommendations */
+.student-dashboard-container .recommendations-loading,
+.student-dashboard-container .recommendations-empty {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 40px 20px !important;
+  text-align: center !important;
+}
+
+.student-dashboard-container .recommendations-empty svg {
+  width: 64px !important;
+  height: 64px !important;
+  color: rgba(255, 255, 255, 0.5) !important;
+  margin-bottom: 16px !important;
+}
+
+.student-dashboard-container .recommendations-empty h3 {
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  color: white !important;
+  margin: 0 0 8px 0 !important;
+}
+
+.student-dashboard-container .recommendations-empty p {
+  font-size: 14px !important;
+  color: rgba(255, 255, 255, 0.7) !important;
+  margin: 0 0 16px 0 !important;
+  line-height: 1.4 !important;
+}
+
+.student-dashboard-container .btn-browse {
+  padding: 10px 20px !important;
+  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 10px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  text-decoration: none !important;
+}
+
+.student-dashboard-container .btn-browse:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 25px 0 rgba(250, 112, 154, 0.4) !important;
+}
+
+.student-dashboard-container .recommendations-grid {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 16px !important;
+}
+
+.student-dashboard-container .recommendation-item {
+  transform: scale(0.95) !important;
+  transition: all 0.3s ease !important;
+}
+
+.student-dashboard-container .recommendation-item:hover {
+  transform: scale(1) !important;
+}
+
+.student-dashboard-container .recommendations-footer {
+  padding-top: 20px !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+  text-align: center !important;
+}
+
+.student-dashboard-container .btn-view-all {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 12px 24px !important;
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 12px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  text-decoration: none !important;
+}
+
+.student-dashboard-container .btn-view-all:hover {
+  background: rgba(255, 255, 255, 0.3) !important;
+  transform: translateY(-2px) !important;
+}
+
+.student-dashboard-container .btn-view-all svg {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+/* Animations */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .student-dashboard-container .main-grid {
+    grid-template-columns: 1fr !important;
+    gap: 30px !important;
+  }
+  
+  .student-dashboard-container .welcome-card {
+    grid-template-columns: 1fr !important;
+    text-align: center !important;
+    gap: 24px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .student-dashboard-container .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important;
+    gap: 16px !important;
+  }
+  
+  .student-dashboard-container .quick-actions-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .student-dashboard-container .welcome-card {
+    padding: 24px !important;
+  }
+  
+  .student-dashboard-container .dashboard-content {
+    padding: 0 15px !important;
+    margin-top: -30px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .student-dashboard-container .hero-section {
+    padding: 20px 15px 60px !important;
+  }
+  
+  .student-dashboard-container .welcome-title {
+    font-size: 24px !important;
+  }
+  
+  .student-dashboard-container .stats-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  
+  .student-dashboard-container .stat-card {
+    padding: 16px !important;
+  }
+  
+  .student-dashboard-container .section-title {
+    font-size: 20px !important;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .student-dashboard-container {
+    background: white !important;
+  }
+  
+  .student-dashboard-container .welcome-card,
+  .student-dashboard-container .stat-card,
+  .student-dashboard-container .activity-section,
+  .student-dashboard-container .profile-summary-section,
+  .student-dashboard-container .recommendations-section {
+    background: white !important;
+    border: 1px solid #e5e7eb !important;
+    box-shadow: none !important;
+  }
+  
+  .student-dashboard-container .welcome-title,
+  .student-dashboard-container .section-title,
+  .student-dashboard-container .stat-content h3 {
+    color: #1f2937 !important;
+  }
+} 

@@ -1,0 +1,55 @@
+@startuml Sprint_Overview_Revised
+
+!define RECTANGLE_COLOR #E8F4F8
+!define STUDENT_COLOR #4A90E2
+!define OWNER_COLOR #7B68EE
+
+left to right direction
+
+actor "Student" as Student #STUDENT_COLOR
+actor "Owner" as Owner #OWNER_COLOR
+
+rectangle "UniNest Platform - Sprint Features" as Platform #RECTANGLE_COLOR {
+  
+  package "Student Features" as StudentPkg {
+    usecase "Access Student Dashboard" as UC1
+    usecase "Search Properties\nwith Filters" as UC2  
+    usecase "Manage Property\nInquiries" as UC3
+    usecase "Manage Favorite\nProperties" as UC4
+  }
+  
+  package "Owner Features" as OwnerPkg {
+    usecase "Access Owner\nDashboard" as UC5
+    usecase "View Analytics &\nPerformance" as UC6
+    usecase "Manage Owner\nProfile" as UC7
+    usecase "Handle Student\nInquiries" as UC8
+  }
+  
+  package "Shared Features" as SharedPkg {
+    usecase "Authenticate &\nNavigate" as UC9
+  }
+}
+
+' Actor Relationships
+Student --> UC1
+Student --> UC2
+Student --> UC3
+Student --> UC4
+Student --> UC9
+
+Owner --> UC5
+Owner --> UC6
+Owner --> UC7
+Owner --> UC8
+Owner --> UC9
+
+' Layout hints for more square arrangement
+UC1 -[hidden]- UC2
+UC3 -[hidden]- UC4
+UC5 -[hidden]- UC6
+UC7 -[hidden]- UC8
+
+StudentPkg -[hidden]- OwnerPkg
+OwnerPkg -[hidden]- SharedPkg
+
+@enduml 

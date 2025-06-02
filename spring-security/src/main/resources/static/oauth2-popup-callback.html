@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Authenticating...</title>
+    <script>
+        (function() {
+            // Set this to match the Angular frontend's origin, NOT the backend origin
+            const allowedOpenerOrigin = 'http://localhost:4200'; 
+            // For production, this would be your deployed frontend URL
+            // e.g., 'https://yourfrontend.com'
+
+            try {
+                const params = new URLSearchParams(window.location.search);
+                const token = params.get('token');
+                const error = params.get('error');
+                const errorMessage = params.get('message'); // For errors passed from our backend
+
+                if (window.opener && !window.opener.closed) {
+                    if (token) {
+                        console.log('Popup: Found token, posting to opener.');
+                        window.opener.postMessage({ type: 'oauth_success', token: token }, allowedOpenerOrigin);
+                    } else if (error || errorMessage) {
+                        console.error('Popup: OAuth error, posting to opener. Error:', error, 'Message:', errorMessage);
+                        window.opener.postMessage({ type: 'oauth_error', error: error, message: errorMessage || 'Authentication failed via popup.' }, allowedOpenerOrigin);
+                    } else {
+                        console.warn('Popup: No token or error found in URL, cannot communicate with opener.');
+                        // Optionally, you could still post a generic error back
+                        // window.opener.postMessage({ type: 'oauth_error', message: 'Unknown error during OAuth popup flow.' }, allowedOpenerOrigin);
+                    }
+                } else {
+                    console.warn('Popup: window.opener is not available or closed. Cannot send token/error.');
+                    // This case might happen if the page is opened directly or opener is lost.
+                    // You could display a message to the user here if needed.
+                    document.body.innerHTML = '<h1>Authentication session issue. Please try logging in again from the main application.</h1>';
+                }
+            } catch (e) {
+                console.error('Popup: Error in callback script:', e);
+                if (window.opener && !window.opener.closed) {
+                    window.opener.postMessage({ type: 'oauth_error', message: 'Client-side error in popup: ' + e.message }, allowedOpenerOrigin);
+                }
+            } finally {
+                // Attempt to close the popup window, regardless of success or failure in posting message.
+                // Small delay to allow postMessage to be processed.
+                setTimeout(() => {
+                    console.log('Popup: Attempting to close window.');
+                    window.close();
+                }, 500); // Increased timeout to ensure message has time to be sent
+            }
+        })();
+    </script>
+</head>
+<body>
+    <p>Authenticating, please wait...</p>
+    <p>This window should close automatically.</p>
+    <!-- Added debugging info to help diagnose issues -->
+    <div id="debug" style="margin-top: 20px; color: #666; font-size: 12px;"></div>
+    <script>
+        // Add some debugging info to the page
+        document.getElementById('debug').innerHTML = 
+            'Current URL: ' + window.location.href + '<br>' +
+            'Opener exists: ' + (window.opener !== null) + '<br>' +
+            'Parent origin: ' + (window.opener ? 'Cannot display for security reasons' : 'N/A');
+    </script>
+</body>
+</html> 

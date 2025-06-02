@@ -1,0 +1,75 @@
+@startuml Owner Use Case Diagram - UniNest Platform (Core Features)
+
+!theme plain
+skinparam backgroundColor white
+skinparam actorBackgroundColor #E8F5E8
+skinparam usecaseBackgroundColor #F8F9FA
+skinparam usecaseBorderColor #6C757D
+skinparam rectangleBackgroundColor #F0FFF0
+skinparam rectangleBorderColor #228B22
+skinparam nodesep 20
+skinparam ranksep 30
+skinparam minClassWidth 60
+skinparam usecaseStereotypeFontSize 6
+skinparam defaultFontSize 9
+skinparam actorFontSize 9
+
+title "Property Owner Core Use Cases"
+
+left to right direction
+
+actor "Owner" as owner
+
+rectangle "UniNest System" {
+    ' Authentication (Core requirement for all actions)
+    usecase "Authentication" as authenticate
+    
+    ' Property Management Core Features
+    usecase "Create Listing" as createListing
+    usecase "Manage Properties" as manageProperties
+    usecase "Edit Details" as editProperty
+    usecase "Delete Listing" as deleteListing
+    
+    ' Inquiry Management Core Features
+    usecase "Manage Inquiries" as manageInquiries
+    usecase "Reply" as replyToInquiries
+    usecase "Close Deals" as closeDeals
+    
+    ' Analytics & Dashboard
+    usecase "Dashboard" as viewDashboard
+    usecase "Analytics" as viewAnalytics
+    
+    ' Profile Management
+    usecase "Profile" as manageProfile
+}
+
+' Primary relationships from owner to main use cases
+owner --> authenticate
+owner --> createListing
+owner --> manageProperties
+owner --> manageInquiries
+owner --> viewDashboard
+owner --> manageProfile
+
+' Include relationships - Authentication required for all (positioned to avoid conflicts)
+createListing ..> authenticate : <<include>>
+manageProperties ..> authenticate : <<include>>
+manageInquiries ..> authenticate : <<include>>
+viewDashboard ..> authenticate : <<include>>
+manageProfile ..> authenticate : <<include>>
+
+' Extend relationships for detailed actions (reversed direction)
+editProperty ..> manageProperties : <<extend>>
+deleteListing ..> manageProperties : <<extend>>
+replyToInquiries ..> manageInquiries : <<extend>>
+closeDeals ..> manageInquiries : <<extend>>
+viewAnalytics ..> viewDashboard : <<extend>>
+
+' Layout hints to make more square-shaped
+authenticate -[hidden]right-> createListing
+createListing -[hidden]right-> manageProperties
+manageProperties -[hidden]down-> manageInquiries
+manageInquiries -[hidden]right-> viewDashboard
+viewDashboard -[hidden]down-> manageProfile
+
+@enduml 

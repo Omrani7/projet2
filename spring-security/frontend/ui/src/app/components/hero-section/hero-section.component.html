@@ -1,0 +1,56 @@
+<div class="relative bg-cover bg-center h-[70vh] md:h-[80vh] flex flex-col items-center justify-center text-white"
+     style="background-image: url('assets/studentroom2.jpg');">
+  <!-- Reduce the overlay opacity to show more color -->
+  <div class="absolute inset-0 bg-black opacity-30"></div>
+  <!-- Rest of content -->
+
+  <!-- Content -->
+  <div class="relative z-10 flex flex-col items-center justify-center text-center p-4">
+    <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold mb-3">Home away from home</h1>
+    <p class="text-lg sm:text-xl md:text-2xl mb-6 max-w-3xl">
+      Book student accommodations near top universities and cities across the globe
+    </p>
+
+    <!-- Discover Properties Button -->
+    <div class="flex flex-col items-center space-y-4">
+      <button 
+        *ngIf="shouldShowDiscoveryButton()"
+        (click)="navigateToDiscovery()"
+        class="group relative bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold py-4 px-8 rounded-full text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-red-300"
+      >
+        <span class="flex items-center space-x-3">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+            <path d="M11.47 3.84a.75.75 0 011.06 0l8.69 8.69a.75.75 0 101.06-1.06l-8.689-8.69a2.25 2.25 0 00-3.182 0l-8.69 8.69a.75.75 0 001.061 1.06l8.69-8.69z"/>
+            <path d="m12 5.432 8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 01-.75-.75v-4.5a.75.75 0 00-.75-.75h-3a.75.75 0 00-.75.75V21a.75.75 0 01-.75.75H5.625a1.875 1.875 0 01-1.875-1.875v-6.198a2.29 2.29 0 00.091-.086L12 5.43z"/>
+          </svg>
+          <span>{{ getDiscoveryButtonText() }}</span>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300">
+            <path fill-rule="evenodd" d="M16.72 7.72a.75.75 0 011.06 0l3.75 3.75a.75.75 0 010 1.06l-3.75 3.75a.75.75 0 11-1.06-1.06L19.19 12l-2.47-2.47a.75.75 0 010-1.06zM1.25 12a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H2a.75.75 0 01-.75-.75z" clip-rule="evenodd"/>
+          </svg>
+      </span>
+      </button>
+      
+      <!-- Feature highlights -->
+      <div class="flex flex-wrap justify-center items-center space-x-6 text-sm opacity-90">
+        <span class="flex items-center space-x-2">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-green-400">
+            <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd"/>
+          </svg>
+          <span>Verified Properties</span>
+      </span>
+        <span class="flex items-center space-x-2">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-blue-400">
+            <path fill-rule="evenodd" d="M2 3.5A1.5 1.5 0 013.5 2h1.148a1.5 1.5 0 011.465 1.175l.716 3.223a1.5 1.5 0 01-1.052 1.767l-.933.267c-.41.117-.643.555-.48.95a11.542 11.542 0 006.254 6.254c.395.163.833-.07.95-.48l.267-.933a1.5 1.5 0 011.767-1.052l3.223.716A1.5 1.5 0 0118 15.352V16.5a1.5 1.5 0 01-1.5 1.5H15c-1.149 0-2.263-.15-3.326-.43A13.022 13.022 0 012.43 8.326 13.019 13.019 0 012 5V3.5z" clip-rule="evenodd"/>
+          </svg>
+          <span>24/7 Support</span>
+      </span>
+        <span class="flex items-center space-x-2">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-yellow-400">
+            <path d="M1 4.25a3.733 3.733 0 012.25-.75h13.5c.844 0 1.623.279 2.25.75A2.25 2.25 0 0016.75 2H3.25A2.25 2.25 0 001 4.25zM1 7.25a3.733 3.733 0 012.25-.75h13.5c.844 0 1.623.279 2.25.75v8.5A2.25 2.25 0 0116.75 18H3.25A2.25 2.25 0 011 15.75v-8.5z"/>
+          </svg>
+          <span>Best Prices</span>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>

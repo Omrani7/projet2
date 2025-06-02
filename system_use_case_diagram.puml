@@ -1,0 +1,107 @@
+@startuml System Use Case Diagram - UniNest Platform
+
+!theme plain
+skinparam backgroundColor white
+skinparam actorBackgroundColor #FFF3E0
+skinparam usecaseBackgroundColor #F8F9FA
+skinparam usecaseBorderColor #6C757D
+skinparam packageStyle rectangle
+
+title "System Automated Use Cases - UniNest Platform"
+
+left to right direction
+
+actor "System" as system
+
+package "Data Processing" {
+    usecase "Scrape Property Data" as scrapeData
+    usecase "Process Property Images" as processImages
+    usecase "Geocode Addresses" as geocodeAddresses
+    usecase "Generate Recommendations" as generateRecommendations
+    usecase "Calculate Compatibility Scores" as calculateScores
+}
+
+package "Communication System" {
+    usecase "Send Email Notifications" as sendEmails
+    usecase "Send Inquiry Notifications" as sendInquiryNotifications
+    usecase "Send Application Notifications" as sendAppNotifications
+    usecase "Send Connection Notifications" as sendConnectionNotifications
+}
+
+package "Data Management" {
+    usecase "Clean Expired Data" as cleanExpiredData
+    usecase "Remove Expired Tokens" as removeTokens
+    usecase "Archive Old Announcements" as archiveAnnouncements
+    usecase "Backup User Data" as backupData
+}
+
+package "Analytics & Reporting" {
+    usecase "Generate Analytics Reports" as generateReports
+    usecase "Calculate Platform Statistics" as calculateStats
+    usecase "Track User Engagement" as trackEngagement
+    usecase "Monitor Performance Metrics" as monitorMetrics
+}
+
+package "System Maintenance" {
+    usecase "Monitor System Performance" as monitorSystem
+    usecase "Check Database Health" as checkDatabase
+    usecase "Optimize Database Queries" as optimizeQueries
+    usecase "Update Search Indexes" as updateIndexes
+}
+
+' Data Processing relationships
+system --> scrapeData
+system --> processImages
+system --> geocodeAddresses
+system --> generateRecommendations
+system --> calculateScores
+
+' Include/Extend relationships for Data Processing
+scrapeData ..> processImages : <<include>>
+scrapeData ..> geocodeAddresses : <<include>>
+generateRecommendations ..> calculateScores : <<include>>
+
+' Communication System relationships
+system --> sendEmails
+system --> sendInquiryNotifications
+system --> sendAppNotifications
+system --> sendConnectionNotifications
+
+' Include/Extend relationships for Communication
+sendInquiryNotifications ..> sendEmails : <<include>>
+sendAppNotifications ..> sendEmails : <<include>>
+sendConnectionNotifications ..> sendEmails : <<include>>
+
+' Data Management relationships
+system --> cleanExpiredData
+system --> removeTokens
+system --> archiveAnnouncements
+system --> backupData
+
+' Include/Extend relationships for Data Management
+cleanExpiredData ..> removeTokens : <<include>>
+cleanExpiredData ..> archiveAnnouncements : <<include>>
+
+' Analytics & Reporting relationships
+system --> generateReports
+system --> calculateStats
+system --> trackEngagement
+system --> monitorMetrics
+
+' Include/Extend relationships for Analytics
+generateReports ..> calculateStats : <<include>>
+generateReports ..> trackEngagement : <<include>>
+monitorMetrics ..> calculateStats : <<extend>>
+
+' System Maintenance relationships
+system --> monitorSystem
+system --> checkDatabase
+system --> optimizeQueries
+system --> updateIndexes
+
+' Include/Extend relationships for System Maintenance
+monitorSystem ..> checkDatabase : <<include>>
+optimizeQueries ..> checkDatabase : <<extend>>
+updateIndexes ..> optimizeQueries : <<extend>>
+
+@enduml 

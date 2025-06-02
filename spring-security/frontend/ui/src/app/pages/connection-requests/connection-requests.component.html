@@ -1,0 +1,270 @@
+<div class="connection-requests-container">
+  <!-- Header -->
+  <div class="header">
+    <h1>🤝 Connection Requests</h1>
+    <p class="subtitle">Manage your student connections and roommate network</p>
+    <button class="refresh-btn" (click)="refresh()" [disabled]="isLoading">
+      <i class="fas fa-sync-alt" [class.spinning]="isLoading"></i>
+      Refresh
+    </button>
+  </div>
+
+  <!-- Tab Navigation -->
+  <div class="tab-navigation">
+    <button 
+      class="tab-btn" 
+      [class.active]="activeTab === 'received'"
+      (click)="switchTab('received')">
+      <span class="tab-icon">📥</span>
+      <span class="tab-text">Received</span>
+      <span class="tab-count" *ngIf="receivedRequests.length > 0">{{ receivedRequests.length }}</span>
+    </button>
+    
+    <button 
+      class="tab-btn" 
+      [class.active]="activeTab === 'sent'"
+      (click)="switchTab('sent')">
+      <span class="tab-icon">📤</span>
+      <span class="tab-text">Sent</span>
+      <span class="tab-count" *ngIf="sentRequests.length > 0">{{ sentRequests.length }}</span>
+    </button>
+    
+    <button 
+      class="tab-btn" 
+      [class.active]="activeTab === 'connections'"
+      (click)="switchTab('connections')">
+      <span class="tab-icon">🌐</span>
+      <span class="tab-text">My Network</span>
+      <span class="tab-count" *ngIf="acceptedConnections.length > 0">{{ acceptedConnections.length }}</span>
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="loading-spinner"></div>
+    <p>Loading connection requests...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !isLoading" class="error-container">
+    <i class="fas fa-exclamation-triangle"></i>
+    <p>{{ error }}</p>
+    <button class="retry-btn" (click)="refresh()">Try Again</button>
+  </div>
+
+  <!-- Connection Requests List -->
+  <div *ngIf="!isLoading && !error" class="requests-container">
+    
+    <!-- Empty State -->
+    <div *ngIf="getCurrentData().length === 0" class="empty-state">
+      <div class="empty-icon">
+        <span *ngIf="activeTab === 'received'">📥</span>
+        <span *ngIf="activeTab === 'sent'">📤</span>
+        <span *ngIf="activeTab === 'connections'">🌐</span>
+      </div>
+      <h3>
+        <span *ngIf="activeTab === 'received'">No Received Requests</span>
+        <span *ngIf="activeTab === 'sent'">No Sent Requests</span>
+        <span *ngIf="activeTab === 'connections'">No Connections Yet</span>
+      </h3>
+      <p>
+        <span *ngIf="activeTab === 'received'">You haven't received any connection requests yet. Make sure your profile is complete to attract potential roommates!</span>
+        <span *ngIf="activeTab === 'sent'">You haven't sent any connection requests yet. Browse compatible students to start connecting!</span>
+        <span *ngIf="activeTab === 'connections'">You don't have any accepted connections yet. Send connection requests to build your roommate network!</span>
+      </p>
+      <button 
+        *ngIf="activeTab !== 'received'" 
+        class="browse-btn" 
+        routerLink="/browse-roommates">
+        Browse Students
+      </button>
+    </div>
+
+    <!-- Requests Grid -->
+    <div *ngIf="getCurrentData().length > 0" class="requests-grid">
+      <div 
+        *ngFor="let request of getCurrentData(); trackBy: trackByRequestId" 
+        class="request-card">
+        
+        <!-- Status Badge -->
+        <div class="status-badge" [ngClass]="getStatusBadgeClass(request.status)">
+          <span class="status-icon">{{ getStatusIcon(request.status) }}</span>
+          <span class="status-text">{{ request.statusDisplayText }}</span>
+        </div>
+
+        <!-- User Info -->
+        <div class="user-info">
+          <div class="user-header">
+            <h3 class="username">{{ request.otherUser?.username || 'Unknown User' }}</h3>
+            <div class="user-details">
+              <div class="detail-item" *ngIf="request.otherUser?.institute">
+                <i class="fas fa-university"></i>
+                <span>{{ request.otherUser?.institute }}</span>
+              </div>
+              <div class="detail-item" *ngIf="request.otherUser?.fieldOfStudy">
+                <i class="fas fa-graduation-cap"></i>
+                <span>{{ request.otherUser?.fieldOfStudy }}</span>
+              </div>
+              <div class="detail-item" *ngIf="request.otherUser?.educationLevel">
+                <i class="fas fa-level-up-alt"></i>
+                <span>{{ request.otherUser?.educationLevel }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Request Message -->
+        <div class="request-message" *ngIf="request.message">
+          <h4>Message:</h4>
+          <p>{{ request.message }}</p>
+        </div>
+
+        <!-- Response Message -->
+        <div class="response-message" *ngIf="request.responseMessage">
+          <h4>Response:</h4>
+          <p>{{ request.responseMessage }}</p>
+        </div>
+
+        <!-- Timestamps -->
+        <div class="timestamps">
+          <div class="timestamp-item">
+            <i class="fas fa-clock"></i>
+            <span>{{ request.timeAgo }}</span>
+          </div>
+          <div class="timestamp-item" *ngIf="request.respondedAt">
+            <i class="fas fa-check-circle"></i>
+            <span>Responded {{ request.respondedAt | date:'short' }}</span>
+          </div>
+        </div>
+
+        <!-- Debug Info (temporary) -->
+        <div class="debug-info" style="background: #f0f9ff; padding: 10px; margin: 10px 0; border-radius: 8px; font-size: 0.8rem;">
+          <strong>Debug:</strong> Status: {{ request.status }} | isAccepted: {{ request.isAccepted }} | Tab: {{ activeTab }}
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+          <!-- For received pending requests -->
+          <div *ngIf="activeTab === 'received' && (request.isPending || request.status === 'PENDING')" class="response-actions">
+            <button class="btn btn-accept" (click)="openResponseModal(request)">
+              <i class="fas fa-check"></i>
+              Accept
+            </button>
+            <button class="btn btn-reject" (click)="openResponseModal(request)">
+              <i class="fas fa-times"></i>
+              Decline
+            </button>
+          </div>
+
+          <!-- For accepted connections -->
+          <div *ngIf="request.isAccepted || request.status === 'ACCEPTED'" class="connection-actions">
+            <button class="btn btn-message" (click)="startConversation(request)">
+              <i class="fas fa-comment"></i>
+              Message
+            </button>
+          </div>
+
+          <!-- For sent requests -->
+          <div *ngIf="activeTab === 'sent'" class="sent-actions">
+            <span class="status-info">{{ request.statusDisplayText }}</span>
+          </div>
+
+          <!-- Always show message button for accepted connections (fallback) -->
+          <div *ngIf="activeTab === 'connections' && (request.status === 'ACCEPTED' || request.isAccepted)" class="connection-actions">
+            <button class="btn btn-message" (click)="startConversation(request)">
+              <i class="fas fa-comment"></i>
+              💬 Start Chat
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div *ngIf="totalPages > 1" class="pagination">
+      <button 
+        class="page-btn" 
+        [disabled]="currentPage === 0"
+        (click)="goToPage(currentPage - 1)">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      
+      <button 
+        *ngFor="let page of getPaginationArray()" 
+        class="page-btn" 
+        [class.active]="page === currentPage"
+        (click)="goToPage(page)">
+        {{ page + 1 }}
+      </button>
+      
+      <button 
+        class="page-btn" 
+        [disabled]="currentPage === totalPages - 1"
+        (click)="goToPage(currentPage + 1)">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Response Modal -->
+<div class="modal-overlay" *ngIf="showResponseModal" (click)="closeResponseModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3 class="modal-title">Respond to Connection Request</h3>
+      <button class="modal-close" (click)="closeResponseModal()">×</button>
+    </div>
+    
+    <div class="modal-body" *ngIf="selectedRequest">
+      <div class="request-summary">
+        <h4>{{ selectedRequest.sender.username }}</h4>
+        <p class="request-time">Sent {{ selectedRequest.timeAgo }}</p>
+        
+        <div class="user-info-modal">
+          <div class="info-item" *ngIf="selectedRequest.sender.institute">
+            <i class="fas fa-university"></i>
+            <span>{{ selectedRequest.sender.institute }}</span>
+          </div>
+          <div class="info-item" *ngIf="selectedRequest.sender.fieldOfStudy">
+            <i class="fas fa-graduation-cap"></i>
+            <span>{{ selectedRequest.sender.fieldOfStudy }}</span>
+          </div>
+        </div>
+        
+        <div class="original-message" *ngIf="selectedRequest.message">
+          <h5>Their Message:</h5>
+          <p>{{ selectedRequest.message }}</p>
+        </div>
+      </div>
+      
+      <form [formGroup]="responseForm" class="response-form">
+        <div class="form-group">
+          <label for="responseMessage">Your Response (Optional)</label>
+          <textarea 
+            id="responseMessage"
+            formControlName="responseMessage"
+            rows="4"
+            placeholder="Add a personal message to your response..."
+            class="response-textarea"></textarea>
+          <div class="char-count">
+            {{ responseForm.get('responseMessage')?.value?.length || 0 }}/500
+          </div>
+        </div>
+      </form>
+    </div>
+    
+    <div class="modal-footer">
+      <button type="button" class="btn btn-cancel" (click)="closeResponseModal()">
+        Cancel
+      </button>
+      <button type="button" class="btn btn-accept" (click)="acceptRequest(selectedRequest!)">
+        <i class="fas fa-check"></i>
+        Accept Connection
+      </button>
+      <button type="button" class="btn btn-reject" (click)="rejectRequest(selectedRequest!)">
+        <i class="fas fa-times"></i>
+        Decline Request
+      </button>
+    </div>
+  </div>
+</div> 

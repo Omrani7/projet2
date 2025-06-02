@@ -1,0 +1,76 @@
+@startuml
+title "Reference: Pagination and Scrolling"
+
+!define USER_COLOR #E3F2FD
+!define FRONTEND_COLOR #F3E5F5
+!define BACKEND_COLOR #E8F5E9
+!define MAP_COLOR #FFF3E0
+
+actor "Student/User" as User
+participant "Angular Frontend\n(Discovery Page)" as Frontend
+participant "FilterBarComponent" as FilterBar
+participant "PropertyListComponent" as PropertyList
+participant "MapDisplayComponent" as MapComponent
+
+box "Backend Services"
+    participant "PropertyListingController" as Controller
+    participant "PropertyService" as Service
+    participant "InstituteService" as InstituteService
+    participant "Database" as DB
+end box
+
+== Pagination and Scrolling ==
+
+User -> PropertyList: 66. Scroll through property list
+activate PropertyList
+
+PropertyList -> Frontend: 67. Track visible properties in viewport
+activate Frontend
+
+Frontend -> MapComponent: 68. Update visiblePropertyIds
+activate MapComponent
+
+MapComponent -> MapComponent: 69. Highlight visible property pins
+MapComponent --> User: 70. Pins highlighted based on visible list items
+deactivate MapComponent
+
+deactivate Frontend
+deactivate PropertyList
+
+User -> PropertyList: 71. Click "Load More" or pagination
+activate PropertyList
+
+PropertyList -> Frontend: 72. Emit pageChanged event
+activate Frontend
+
+Frontend -> Controller: 73. GET /api/properties/search?page=1&size=50
+activate Controller
+
+Controller -> Service: 74. searchProperties(criteria, nextPage)
+activate Service
+
+Service -> DB: 75. Query next page of properties
+activate DB
+DB --> Service: 76. Next page results
+deactivate DB
+
+Service --> Controller: 77. Additional properties
+deactivate Service
+
+Controller --> Frontend: 78. 200 OK - More properties
+deactivate Controller
+
+Frontend -> PropertyList: 79. Append new properties to list
+activate PropertyList
+PropertyList --> User: 80. Display additional property cards
+deactivate PropertyList
+
+Frontend -> MapComponent: 81. Add new property pins to map
+activate MapComponent
+MapComponent --> User: 82. Additional pins appear on map
+deactivate MapComponent
+
+deactivate PropertyList
+deactivate Frontend
+
+@enduml 

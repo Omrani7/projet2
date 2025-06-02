@@ -1,0 +1,209 @@
+package com.example.spring_security.controller;
+
+import com.example.spring_security.model.UserPrincipal;
+import com.example.spring_security.dto.ConnectionRequestCreateDTO;
+import com.example.spring_security.dto.ConnectionRequestDTO;
+import com.example.spring_security.dto.ConnectionRequestResponseDTO;
+import com.example.spring_security.service.ConnectionRequestService;
+import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * REST Controller for managing connection requests between students
+ * Provides endpoints for sending, receiving, and responding to connection requests
+ */
+@RestController
+@RequestMapping("/api/v1/connections")
+public class ConnectionRequestController {
+    
+    private static final Logger logger = LoggerFactory.getLogger(ConnectionRequestController.class);
+    
+    private final ConnectionRequestService connectionRequestService;
+    
+    @Autowired
+    public ConnectionRequestController(ConnectionRequestService connectionRequestService) {
+        this.connectionRequestService = connectionRequestService;
+    }
+    
+    /**
+     * Send a connection request to another student
+     * POST /api/v1/connections/request
+     */
+    @PostMapping("/request")
+    @PreAuthorize("hasRole('STUDENT')")
+    public ResponseEntity<ConnectionRequestDTO> sendConnectionRequest(
+            @Valid @RequestBody ConnectionRequestCreateDTO createDTO,
+            @AuthenticationPrincipal UserPrincipal currentUser) {
+        
+        logger.info("User {} sending connection request to user {}", 
+                   currentUser.getId(), createDTO.getReceiverId());
+        
+        ConnectionRequestDTO connectionRequest = connectionRequestService
+                .sendConnectionRequest(createDTO, currentUser);
+        
+        URI location = URI.create(String.format("/api/v1/connections/%s", connectionRequest.getId()));
+        return ResponseEntity.created(location).body(connectionRequest);
+    }
+    
+    /**
+     * Get connection requests sent by the current user
+     * GET /api/v1/connections/sent
+     */
+    @GetMapping("/sent")
+    @PreAuthorize("hasRole('STUDENT')")
+    public ResponseEntity<Page<ConnectionRequestDTO>> getSentRequests(
+            @AuthenticationPrincipal UserPrincipal currentUser,
+            Pageable pageable) {
+        
+        logger.info("Getting sent connection requests for user {}", currentUser.getId());
+        
+        Page<ConnectionRequestDTO> sentRequests = connectionRequestService
+                .getSentRequests(currentUser, pageable);
+        
+        return ResponseEntity.ok(sentRequests);
+    }
+    
+    /**
+     * Get connection requests received by the current user
+     * GET /api/v1/connections/received
+     */
+    @GetMapping("/received")
+    @PreAuthorize("hasRole('STUDENT')")
+    public ResponseEntity<Page<ConnectionRequestDTO>> getReceivedRequests(
+            @AuthenticationPrincipal UserPrincipal currentUser,
+            Pageable pageable) {
+        
+        logger.info("Getting received connection requests for user {}", currentUser.getId());
+        
+        Page<ConnectionRequestDTO> receivedRequests = connectionRequestService
+                .getReceivedRequests(currentUser, pageable);
+        
+        return ResponseEntity.ok(receivedRequests);
+    }
+    
+    /**
+     * Get pending connection requests received by the current user
+     * GET /api/v1/connections/pending
+     */
+    @GetMapping("/pending")
+    @PreAuthorize("hasRole('STUDENT')")
+    public ResponseEntity<Page<ConnectionRequestDTO>> getPendingReceivedRequests(
+            @AuthenticationPrincipal UserPrincipal currentUser,
+            Pageable pageable) {
+        
+        logger.info("Getting pending received connection requests for user {}", currentUser.getId());
+        
+        Page<ConnectionRequestDTO> pendingRequests = connectionRequestService
+                .getPendingReceivedRequests(currentUser, pageable);
+        
+        return ResponseEntity.ok(pendingRequests);
+    }
+    
+    /**
+     * Respond to a connection request (accept or reject)
+     * PUT /api/v1/connections/{id}/respond
+     */
+    @PutMapping("/{id}/respond")
+    @PreAuthorize("hasRole('STUDENT')")
+    public ResponseEntity<ConnectionRequestDTO> respondToConnectionRequest(
+            @PathVariable Long id,
+            @Valid @RequestBody ConnectionRequestResponseDTO responseDTO,
+            @AuthenticationPrincipal UserPrincipal currentUser) {
+        
+        logger.info("User {} responding to connection request {} with status {}", 
+                   currentUser.getId(), id, responseDTO.getStatus());
+        
+        ConnectionRequestDTO updatedRequest = connectionRequestService
+                .respondToConnectionRequest(id, responseDTO, currentUser);
+        
+        return ResponseEntity.ok(updatedRequest);
+    }
+    
+    /**
+     * Get a specific connection request by ID
+     * GET /api/v1/connections/{id}
+     */
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('STUDENT')")
+    public ResponseEntity<ConnectionRequestDTO> getConnectionRequestById(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserPrincipal currentUser) {
+        
+        logger.info("Getting connection request {} for user {}", id, currentUser.getId());
+        
+        ConnectionRequestDTO connectionRequest = connectionRequestService
+                .getConnectionRequestById(id, currentUser);
+        
+        return ResponseEntity.ok(connectionRequest);
+    }
+    
+    /**
+     * Get count of pending connection requests received by user
+     * GET /api/v1/connections/pending/count
+     */
+    @GetMapping("/pending/count")
+    @PreAuthorize("hasRole('STUDENT')")
+    public ResponseEntity<Map<String, Long>> getPendingRequestsCount(
+            @AuthenticationPrincipal UserPrincipal currentUser) {
+        
+        logger.debug("Getting pending requests count for user {}", currentUser.getId());
+        
+        long count = connectionRequestService.getPendingRequestsCount(currentUser);
+        
+        Map<String, Long> response = new HashMap<>();
+        response.put("pendingCount", count);
+        
+        return ResponseEntity.ok(response);
+    }
+    
+    /**
+     * Check if a connection exists between current user and another user
+     * GET /api/v1/connections/exists/{userId}
+     */
+    @GetMapping("/exists/{userId}")
+    @PreAuthorize("hasRole('STUDENT')")
+    public ResponseEntity<Map<String, Boolean>> checkConnectionExists(
+            @PathVariable Integer userId,
+            @AuthenticationPrincipal UserPrincipal currentUser) {
+        
+        logger.debug("Checking if connection exists between user {} and user {}", 
+                    currentUser.getId(), userId);
+        
+        boolean exists = connectionRequestService.hasConnectionWith(userId, currentUser);
+        
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("connectionExists", exists);
+        
+        return ResponseEntity.ok(response);
+    }
+    
+    /**
+     * Get accepted connections for a user (their network)
+     * GET /api/v1/connections/network
+     */
+    @GetMapping("/network")
+    @PreAuthorize("hasRole('STUDENT')")
+    public ResponseEntity<Page<ConnectionRequestDTO>> getAcceptedConnections(
+            @AuthenticationPrincipal UserPrincipal currentUser,
+            Pageable pageable) {
+        
+        logger.info("Getting accepted connections (network) for user {}", currentUser.getId());
+        
+        Page<ConnectionRequestDTO> connections = connectionRequestService
+                .getAcceptedConnections(currentUser, pageable);
+        
+        return ResponseEntity.ok(connections);
+    }
+} 

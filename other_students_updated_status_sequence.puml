@@ -1,0 +1,33 @@
+@startuml
+title "Reference: Other Students See Updated Status"
+
+!theme plain
+
+' Main Actors and Systems
+actor "Student" as Student
+participant "Frontend\nApp" as Frontend
+participant "Inquiry\nService" as InquiryService
+participant "Notification\nService" as NotificationService
+participant "Database" as DB
+actor "Owner" as Owner
+participant "Student B" as StudentB
+participant "Student C" as StudentC
+
+== 5. OTHER STUDENTS SEE UPDATED STATUS ==
+
+StudentB -> Frontend: Check "My Inquiries"
+Frontend -> InquiryService: GET /api/v1/inquiries/student/{studentB-id}
+InquiryService -> DB: Fetch Student B inquiries
+DB --> InquiryService: Inquiry list with updated status
+InquiryService --> Frontend: Show "PROPERTY_NO_LONGER_AVAILABLE"
+Frontend --> StudentB: Display updated status with explanation
+
+StudentC -> Frontend: Check "My Inquiries"
+Frontend --> StudentC: Same updated status shown
+
+note over StudentB, StudentC
+  **System can suggest similar properties
+  to Students B & C as alternative options**
+end note
+
+@enduml 

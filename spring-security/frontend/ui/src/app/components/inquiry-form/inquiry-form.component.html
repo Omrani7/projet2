@@ -1,0 +1,98 @@
+<!-- Inquiry Button -->
+<div class="inquiry-button-container">
+  <button 
+    class="inquiry-btn"
+    [class.disabled]="!canMakeInquiry()"
+    [disabled]="!canMakeInquiry()"
+    (click)="openInquiryForm()"
+    type="button">
+    {{ getInquiryButtonMessage() }}
+  </button>
+</div>
+
+<!-- Inquiry Form Modal/Overlay -->
+<div class="inquiry-modal" *ngIf="showForm" (click)="closeInquiryForm()">
+  <div class="inquiry-form-container" (click)="$event.stopPropagation()">
+    <div class="form-header">
+      <h3>Send Inquiry</h3>
+      <button class="close-btn" (click)="closeInquiryForm()" type="button">&times;</button>
+    </div>
+
+    <div class="property-info">
+      <p><strong>Property:</strong> {{ propertyTitle }}</p>
+    </div>
+
+    <!-- Success Message -->
+    <div class="success-message" *ngIf="submitSuccess">
+      <p>✅ Your inquiry has been sent successfully!</p>
+    </div>
+
+    <!-- Error Message -->
+    <div class="error-message" *ngIf="submitError">
+      <p>❌ {{ submitError }}</p>
+    </div>
+
+    <!-- Inquiry Form -->
+    <form [formGroup]="inquiryForm" (ngSubmit)="onSubmit()" *ngIf="!submitSuccess">
+      <div class="form-group">
+        <label for="message">Your Message *</label>
+        <textarea 
+          id="message"
+          formControlName="message"
+          class="form-control"
+          [class.error]="messageControl?.invalid && messageControl?.touched"
+          rows="3"
+          placeholder="Hi, I'm interested in this property. Could you provide more details about..."
+          maxlength="500">
+        </textarea>
+        
+        <!-- Character count -->
+        <div class="char-count">
+          {{ messageControl?.value?.length || 0 }}/500
+        </div>
+
+        <!-- Validation errors -->
+        <div class="field-errors" *ngIf="messageControl?.invalid && messageControl?.touched">
+          <small *ngIf="messageControl?.errors?.['required']">Message is required</small>
+          <small *ngIf="messageControl?.errors?.['minlength']">Message must be at least 10 characters</small>
+          <small *ngIf="messageControl?.errors?.['maxlength']">Message cannot exceed 500 characters</small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="phoneNumber">Your Phone Number *</label>
+        <input 
+          id="phoneNumber"
+          formControlName="phoneNumber"
+          type="tel"
+          class="form-control"
+          [class.error]="phoneNumberControl?.invalid && phoneNumberControl?.touched"
+          placeholder="+216 XX XXX XXX or 12345678"
+          maxlength="15">
+        
+        <!-- Validation errors -->
+        <div class="field-errors" *ngIf="phoneNumberControl?.invalid && phoneNumberControl?.touched">
+          <small *ngIf="phoneNumberControl?.errors?.['required']">Phone number is required</small>
+          <small *ngIf="phoneNumberControl?.errors?.['pattern']">Please enter a valid phone number</small>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button 
+          type="button" 
+          class="btn btn-secondary"
+          (click)="closeInquiryForm()"
+          [disabled]="isSubmitting">
+          Cancel
+        </button>
+        <button 
+          type="submit" 
+          class="btn btn-primary"
+          [disabled]="inquiryForm.invalid || isSubmitting">
+          <span *ngIf="isSubmitting">Sending...</span>
+          <span *ngIf="!isSubmitting">Send Inquiry</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div> 

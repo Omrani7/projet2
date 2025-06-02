@@ -1,0 +1,170 @@
+:root {
+  --header-h: 80px;    /* Header height */
+  --filter-bar-h: 65px; /* Explicit height for filter bar */
+  --map-min-height: 500px; /* Taller map */
+  /* Calculate map height relative to viewport */
+  --map-viewport-height: calc(100vh - var(--filter-bar-h) - 20px);
+  --map-final-height: calc(max(var(--map-min-height), var(--map-viewport-height)));
+}
+
+/* Main page container - allow scroll for additional content */
+.discovery-page {
+  height: 100vh;         /* exactly one screenful */
+  overflow: visible;     /* Changed from 'hidden' to 'visible' to allow dropdown menus to appear */
+  display: flex;
+  flex-direction: column;
+  width: 100%; /* ensure it takes full width */
+  background-color: #f8f9fa; /* maintain background */
+}
+
+/* Sticky filter bar */
+.filter-bar-area {
+  height: var(--filter-bar-h);
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background-color: #f8f9fa; /* maintain background */
+  border-bottom: 1px solid #e9ecef; /* maintain border */
+}
+
+/* Main content grid - fixed height viewport */
+.main-content-area {
+  height: calc(100vh - var(--filter-bar-h));
+  display: grid;
+  grid-template-columns: 45% 55%;
+  gap: 20px;
+  padding: 0 20px;
+  overflow: hidden;      /* important—no accidental overflow */
+  width: 100%; /* ensure it takes full width */
+  box-sizing: border-box; /* maintain box sizing */
+}
+
+/* Property list column - only this scrolls */
+.property-list-area {
+  height: 100%;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+/* Map container - truly sticky within grid */
+.map-container-wrapper {
+  position: sticky;
+  top: var(--filter-bar-h);
+  height: 100%;
+  align-self: start;
+  z-index: 20;
+}
+
+/* Map area styling */
+.map-area {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  display: flex; /* maintain flex for inner map */
+  flex-direction: column; /* maintain flex-direction */
+}
+
+/* Force OpenLayers map components to fill available space */
+.map-area ::ng-deep .map-container,
+.map-area ::ng-deep .ol-viewport,
+.map-area ::ng-deep .ol-map {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  flex-grow: 1;
+  position: relative;
+  display: block;
+}
+
+/* Additional content styling */
+.additional-content {
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin: 0 20px 20px 20px;
+  position: relative; /* Ensure it's in normal flow */
+  z-index: 10; /* Below the map but above other content */
+}
+
+/* For small screens, stack the layout */
+@media (max-width: 992px) {
+  .main-content-area {
+    grid-template-columns: 1fr;
+    padding: 0 10px 10px;
+  }
+  .map-container-wrapper {
+    position: relative;
+    top: auto;
+    height: 450px;
+    min-height: 300px;
+    max-height: 450px;
+  }
+   .property-list-area {
+    order: 2;
+  }
+  .map-container-wrapper {
+    order: 1;
+  }
+}
+
+/* View toggle is no longer needed */
+.view-toggle {
+  display: none;
+}
+
+.location-info {
+  margin: 0 0 15px 0;
+  padding: 10px 15px;
+  background-color: #fff;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  color: #333;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+}
+
+.location-info strong {
+  font-weight: 600;
+  color: #ff385c;
+  margin-left: 5px;
+}
+
+/* Improved styling for property list items */
+::ng-deep .property-items-grid {
+  padding: 0;
+}
+
+::ng-deep .property-item-card {
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-bottom: 20px;
+}
+
+::ng-deep .property-item-card .card {
+  border: none;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+::ng-deep .property-item-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Adding some animation effects */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+::ng-deep .property-item-card {
+  animation: fadeIn 0.3s ease-out;
+  animation-fill-mode: both;
+}
+
+::ng-deep .property-item-card:nth-child(2) { animation-delay: 0.05s; }
+::ng-deep .property-item-card:nth-child(3) { animation-delay: 0.1s; }
+::ng-deep .property-item-card:nth-child(4) { animation-delay: 0.15s; }
+::ng-deep .property-item-card:nth-child(5) { animation-delay: 0.2s; }

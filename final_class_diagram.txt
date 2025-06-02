@@ -1,0 +1,357 @@
+@startuml Class Diagram - Spring Security Authentication System
+
+' Main entities
+class User {
+  -id: int
+  -email: String
+  -username: String
+  -password: String
+  -phoneNumber: String
+  -provider: AuthProvider
+  -providerId: String
+  -enabled: boolean
+  -role: UserRole
+  +getProvider(): AuthProvider
+  +setProvider(AuthProvider): void
+  +getProviderId(): String
+  +setProviderId(String): void
+}
+
+class UserProfile {
+  -id: int
+  -fullName: String
+  -dateOfBirth: LocalDate
+  -fieldOfStudy: String
+  -university: String
+  -userType: UserType
+  -user: User
+}
+
+class PasswordResetToken {
+  -id: Long
+  -token: String
+  -user: User
+  -expiryDate: Date
+  +PasswordResetToken(User user)
+  +PasswordResetToken(User user, String token)
+  -calculateExpiryDate(int expiryTimeInMinutes): Date
+  +isExpired(): boolean
+}
+
+' Enumerations
+enum AuthProvider {
+  LOCAL
+  GOOGLE
+  GITHUB
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum UserType {
+  OWNER
+  STUDENT
+}
+
+' DTOs
+class SignupRequest {
+  -email: String
+  -username: String
+  -password: String
+  -phoneNumber: String
+  -profileDetails: ProfileDetails
+}
+
+class ProfileDetails {
+  -fullName: String
+  -fieldOfStudy: String
+  -university: String
+  -userType: String
+}
+
+class LoginRequest {
+  -email: String
+  -password: String
+}
+
+class ForgotPasswordRequest {
+  -email: String
+}
+
+class PasswordResetRequest {
+  -token: String
+  -password: String
+  -confirmPassword: String
+}
+
+class AuthResponse {
+  -token: String
+  -userId: int
+  -email: String
+  -username: String
+  -role: UserRole
+}
+
+' Services
+class UserService {
+  -userRepo: UserRepo
+  -userProfileRepo: UserProfileRepo
+  -passwordResetTokenRepository: PasswordResetTokenRepository
+  -emailService: EmailService
+  -encoder: BCryptPasswordEncoder
+  +saveUser(User user): User
+  +registerUser(SignupRequest request): User
+  +createPasswordResetTokenForUser(User user): PasswordResetToken
+  +validatePasswordResetToken(String token): boolean
+  +resetPassword(String token, String newPassword): boolean
+  +sendPasswordResetEmail(String email): void
+  +cleanExpiredPasswordResetTokens(): void
+  +createOrUpdateOAuth2User(String email, String name, String providerId, AuthProvider provider): User
+  +findByEmail(String email): User
+  +findByUsername(String username): User
+}
+
+class UserDetailsServiceImpl {
+  -userRepo: UserRepo
+  +loadUserByUsername(String username): UserDetails
+}
+
+class EmailService {
+  -mailSender: JavaMailSender
+  -frontendUrl: String
+  -fromEmail: String
+  +sendPasswordResetEmail(String to, String token): void
+  +logPasswordResetLink(String to, String token): void
+}
+
+class TokenService {
+  -secretKey: String
+  -expirationTime: Long
+  +generateToken(User user): String
+  +validateToken(String token): boolean
+  +getUsernameFromToken(String token): String
+}
+
+' Controllers
+class AuthController {
+  -userService: UserService
+  -tokenService: TokenService
+  -authenticationManager: AuthenticationManager
+  +register(SignupRequest request): ResponseEntity<?>
+  +login(LoginRequest request): ResponseEntity<?>
+}
+
+class PasswordController {
+  -userService: UserService
+  +forgotPassword(ForgotPasswordRequest request): ResponseEntity<?>
+  +resetPassword(PasswordResetRequest request): ResponseEntity<?>
+  +validateToken(String token): ResponseEntity<?>
+}
+
+class OAuth2Controller {
+  -userService: UserService
+  -tokenService: TokenService
+  +handleOAuth2Success(HttpServletResponse response): void
+}
+
+' Repository interfaces
+interface UserRepo {
+  +findUserByUsername(String username): User
+  +findByEmail(String email): User
+  +existsByEmail(String email): boolean
+}
+
+interface UserProfileRepo {
+  +findByUserId(int userId): UserProfile
+}
+
+interface PasswordResetTokenRepository {
+  +findByToken(String token): Optional<PasswordResetToken>
+  +findByUser(User user): Optional<PasswordResetToken>
+  +deleteAllExpiredTokens(Date now): void
+}
+
+' Security configuration
+class SecurityConfig {
+  -userDetailsService: UserDetailsService
+  -jwtFilter: JwtFilter
+  -oAuth2SuccessHandler: OAuth2SuccessHandler
+  -oAuth2FailureHandler: OAuth2FailureHandler
+  -authorizationRequestRepository: StatelessOAuth2AuthorizationRequestRepository
+  +securityFilterChain(HttpSecurity http): SecurityFilterChain
+  +corsConfigurationSource(): CorsConfigurationSource
+  +authenticationManager(AuthenticationConfiguration): AuthenticationManager
+  +passwordEncoder(): BCryptPasswordEncoder
+  +authProvider(): AuthenticationProvider
+}
+
+class JwtFilter {
+  -userDetailsService: UserDetailsService
+  -tokenService: TokenService
+  +doFilterInternal(request, response, chain): void
+}
+
+class OAuth2SuccessHandler {
+  -userService: UserService
+  -tokenService: TokenService
+  -authorizationRequestRepository: StatelessOAuth2AuthorizationRequestRepository
+  +onAuthenticationSuccess(request, response, authentication): void
+}
+
+class OAuth2FailureHandler {
+  -authorizationRequestRepository: StatelessOAuth2AuthorizationRequestRepository
+  +onAuthenticationFailure(request, response, exception): void
+}
+
+class StatelessOAuth2AuthorizationRequestRepository {
+  -cookieName: String
+  -cookieExpireSeconds: int
+  +saveAuthorizationRequest(): void
+  +removeAuthorizationRequest(): void
+  +loadAuthorizationRequest(): OAuth2AuthorizationRequest
+}
+
+class UserPrincipal {
+  -user: User
+  +getAuthorities(): Collection<GrantedAuthority>
+  +getPassword(): String
+  +getUsername(): String
+  +getEmail(): String
+  +getId(): int
+  +getRole(): UserRole
+  +isAccountNonExpired(): boolean
+  +isAccountNonLocked(): boolean
+  +isCredentialsNonExpired(): boolean
+  +isEnabled(): boolean
+}
+
+' Angular components
+class LoginComponent {
+  -email: String
+  -password: String
+  -isPasswordVisible: boolean
+  -errorMessage: String
+  +continueWithEmail(): void
+  +loginWithGoogle(): void
+  +closeModal(): void
+}
+
+class ForgotPasswordComponent {
+  -email: String
+  -errorMessage: String
+  -successMessage: String
+  -isSubmitting: boolean
+  +submitForgotPassword(): void
+  +goToLogin(): void
+  +closeModal(): void
+}
+
+class ResetPasswordComponent {
+  -token: String
+  -password: String
+  -confirmPassword: String
+  -errorMessage: String
+  -successMessage: String
+  -isSubmitting: boolean
+  -isValidToken: boolean
+  -isLoading: boolean
+  +ngOnInit(): void
+  +validateToken(): void
+  +resetPassword(): void
+  +goToLogin(): void
+}
+
+' Angular services
+class AuthService {
+  -apiUrl: String
+  -tokenKey: String
+  -http: HttpClient
+  -router: Router
+  +login(email, password): Observable<any>
+  +register(userData): Observable<any>
+  +forgotPassword(email): Observable<any>
+  +validateResetToken(token): Observable<any>
+  +resetPassword(token, password, confirmPassword): Observable<any>
+  +oauthLogin(provider): void
+  +logout(): void
+  +isLoggedIn(): boolean
+  +getToken(): String
+  +saveToken(token): void
+  +handleOAuth2Callback(): Observable<any>
+}
+
+' Relationships with proper UML notation
+
+' Entity relationships
+User "1" *---> "1" UserProfile : contains
+User "1" *---> "0..*" PasswordResetToken : contains
+User ..> AuthProvider : uses
+User ..> UserRole : uses
+UserProfile ..> UserType : uses
+SignupRequest *---> ProfileDetails : contains
+
+' Service dependencies 
+UserService ..> User : creates/manipulates
+UserService ..> UserProfile : creates/manipulates
+UserService ..> PasswordResetToken : creates/manages
+UserService ..> SignupRequest : processes
+UserService --> UserRepo : uses
+UserService --> UserProfileRepo : uses
+UserService --> PasswordResetTokenRepository : uses
+UserService --> EmailService : uses
+UserService --> BCryptPasswordEncoder : uses for password hashing
+
+EmailService ..> PasswordResetToken : uses token info
+
+TokenService ..> User : creates token for
+
+UserDetailsServiceImpl --> UserRepo : uses
+UserDetailsServiceImpl ..> UserPrincipal : creates
+UserPrincipal ..> User : wraps
+
+' Controller dependencies
+AuthController --> UserService : uses
+AuthController --> TokenService : uses
+AuthController --> AuthenticationManager : uses
+AuthController ..> SignupRequest : processes
+AuthController ..> LoginRequest : processes
+AuthController ..> AuthResponse : creates
+
+PasswordController --> UserService : uses
+PasswordController ..> ForgotPasswordRequest : processes
+PasswordController ..> PasswordResetRequest : processes
+
+OAuth2Controller --> UserService : uses
+OAuth2Controller --> TokenService : uses
+
+' Security component dependencies
+SecurityConfig --> UserDetailsService : uses
+SecurityConfig --> JwtFilter : uses
+SecurityConfig --> OAuth2SuccessHandler : uses
+SecurityConfig --> OAuth2FailureHandler : uses
+SecurityConfig --> StatelessOAuth2AuthorizationRequestRepository : uses
+
+JwtFilter --> UserDetailsService : uses
+JwtFilter --> TokenService : uses
+
+OAuth2SuccessHandler --> UserService : uses
+OAuth2SuccessHandler --> TokenService : uses
+OAuth2SuccessHandler --> StatelessOAuth2AuthorizationRequestRepository : uses
+
+OAuth2FailureHandler --> StatelessOAuth2AuthorizationRequestRepository : uses
+
+' Angular component dependencies
+LoginComponent ..> AuthService : uses
+ForgotPasswordComponent ..> AuthService : uses
+ResetPasswordComponent ..> AuthService : uses
+
+' DTO relationships
+SignupRequest ..> User : maps to
+LoginRequest ..> User : refers to
+ForgotPasswordRequest ..> User : refers to email
+PasswordResetRequest ..> PasswordResetToken : refers to
+AuthResponse ..> User : derived from
+
+@enduml 

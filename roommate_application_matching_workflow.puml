@@ -1,0 +1,257 @@
+@startuml
+title "Roommate Application & Matching Workflow"\n"Sprint 4 - Scenario 7: Two-Party Application Process"
+
+!define APPLICANT_COLOR #E3F2FD
+!define POSTER_COLOR #F3E5F5
+!define BACKEND_COLOR #E8F5E9
+
+actor "Student A\n(Applicant)" as Applicant
+actor "Student B\n(Poster)" as Poster
+participant "Angular Frontend\n(Applicant)" as FrontendA
+participant "Angular Frontend\n(Poster)" as FrontendB
+
+box "Backend Services"
+    participant "RoommateController" as Controller
+    participant "RoommateService" as Service
+    participant "CompatibilityService" as Compatibility
+    participant "NotificationService" as Notification
+    participant "Database" as DB
+end box
+
+== Browse & Apply to Announcement ==
+
+Applicant -> FrontendA: 1. Browse roommate announcements
+activate FrontendA
+
+FrontendA -> Controller: 2. GET /api/announcements/search?filters=...
+activate Controller
+
+Controller -> Service: 3. searchAnnouncements(filters)
+activate Service
+
+Service -> DB: 4. Query announcements with filters
+activate DB
+DB --> Service: 5. List of matching announcements
+deactivate DB
+
+Service --> Controller: 6. AnnouncementDTO list
+deactivate Service
+
+Controller --> FrontendA: 7. 200 OK - Announcements
+deactivate Controller
+
+FrontendA --> Applicant: 8. Display announcements with compatibility scores
+deactivate FrontendA
+
+Applicant -> FrontendA: 9. Click "Apply" on Student B's announcement
+activate FrontendA
+
+FrontendA -> FrontendA: 10. Open application modal
+FrontendA --> Applicant: 11. Show application form
+
+Applicant -> FrontendA: 12. Fill application:\n"Hi! I'm interested in sharing.\nI'm clean, quiet, and responsible."
+activate FrontendA
+
+FrontendA -> Controller: 13. POST /api/applications\n{announcementId, message, applicantId}
+activate Controller
+
+Controller -> Service: 14. submitApplication(applicationDTO)
+activate Service
+
+Service -> Compatibility: 15. calculateCompatibility(applicant, announcement)
+activate Compatibility
+Compatibility --> Service: 16. Compatibility score (e.g., 0.78)
+deactivate Compatibility
+
+Service -> DB: 17. Save RoommateApplication\n(status: PENDING, score: 0.78)
+activate DB
+DB --> Service: 18. Application saved
+deactivate DB
+
+Service -> Notification: 19. notifyNewApplication(posterId, applicationData)
+activate Notification
+
+Notification -> FrontendB: 20. WebSocket notification\n{type: "NEW_APPLICATION"}
+activate FrontendB
+FrontendB --> Poster: 21. 🔔 "New application from Student A (78% match)"
+deactivate FrontendB
+
+deactivate Notification
+
+Service --> Controller: 22. ApplicationDTO with score
+deactivate Service
+
+Controller --> FrontendA: 23. 201 Created - Application submitted
+deactivate Controller
+
+FrontendA --> Applicant: 24. ✅ "Application sent successfully!"
+deactivate FrontendA
+
+== Poster Reviews Applications ==
+
+Poster -> FrontendB: 25. Navigate to "My Announcements"
+activate FrontendB
+
+FrontendB -> Controller: 26. GET /api/announcements/my-announcements
+activate Controller
+
+Controller -> Service: 27. getMyAnnouncements(posterId)
+activate Service
+
+Service -> DB: 28. Query poster's announcements with application counts
+activate DB
+DB --> Service: 29. Announcements with application stats
+deactivate DB
+
+Service --> Controller: 30. AnnouncementDTO list with stats
+deactivate Service
+
+Controller --> FrontendB: 31. 200 OK - My announcements
+deactivate Controller
+
+FrontendB --> Poster: 32. Show announcements\n(Announcement X: 3 applications)
+deactivate FrontendB
+
+Poster -> FrontendB: 33. Click "View Applications" on announcement
+activate FrontendB
+
+FrontendB -> Controller: 34. GET /api/announcements/{id}/applications
+activate Controller
+
+Controller -> Service: 35. getApplicationsForAnnouncement(announcementId)
+activate Service
+
+Service -> DB: 36. Query applications with applicant details
+activate DB
+DB --> Service: 37. Applications with user profiles
+deactivate DB
+
+Service -> Compatibility: 38. calculateCompatibility for each applicant
+activate Compatibility
+Compatibility --> Service: 39. Updated compatibility scores
+deactivate Compatibility
+
+Service --> Controller: 40. ApplicationDTO list with scores
+deactivate Service
+
+Controller --> FrontendB: 41. 200 OK - Applications
+deactivate Controller
+
+FrontendB --> Poster: 42. Show applications ranked by compatibility\n(Student A: 78%, Student C: 65%, Student D: 45%)
+deactivate FrontendB
+
+== Application Decision Process ==
+
+Poster -> FrontendB: 43. Review Student A's application (78% match)
+activate FrontendB
+
+FrontendB --> Poster: 44. Show detailed profile & application message
+deactivate FrontendB
+
+alt Accept Application
+    Poster -> FrontendB: 45a. Click "Accept Application"
+    activate FrontendB
+    
+    FrontendB -> Controller: 46a. PUT /api/applications/{id}/respond\n{status: "ACCEPTED", message: "Welcome!"}
+    activate Controller
+    
+    Controller -> Service: 47a. respondToApplication(ACCEPTED)
+    activate Service
+    
+    Service -> DB: 48a. Update application status to ACCEPTED
+    activate DB
+    DB --> Service: 49a. Application updated
+    deactivate DB
+    
+    Service -> Notification: 50a. notifyApplicationResponse(applicantId, ACCEPTED)
+    activate Notification
+    
+    Notification -> FrontendA: 51a. WebSocket: Application Accepted
+    activate FrontendA
+    FrontendA --> Applicant: 52a. 🎉 "Your application was accepted!"
+    deactivate FrontendA
+    
+    deactivate Notification
+    
+    Service --> Controller: 53a. Success response
+    deactivate Service
+    
+    Controller --> FrontendB: 54a. 200 OK - Application accepted
+    deactivate Controller
+    
+    FrontendB --> Poster: 55a. ✅ "Application accepted successfully"
+    deactivate FrontendB
+
+else Reject Application
+    Poster -> FrontendB: 45b. Click "Reject Application"
+    activate FrontendB
+    
+    FrontendB -> Controller: 46b. PUT /api/applications/{id}/respond\n{status: "REJECTED", message: "Thanks for applying"}
+    activate Controller
+    
+    Controller -> Service: 47b. respondToApplication(REJECTED)
+    activate Service
+    
+    Service -> DB: 48b. Update application status to REJECTED
+    activate DB
+    DB --> Service: 49b. Application updated
+    deactivate DB
+    
+    Service -> Notification: 50b. notifyApplicationResponse(applicantId, REJECTED)
+    activate Notification
+    
+    Notification -> FrontendA: 51b. WebSocket: Application Rejected
+    activate FrontendA
+    FrontendA --> Applicant: 52b. ❌ "Application was not accepted"
+    deactivate FrontendA
+    
+    deactivate Notification
+    
+    Service --> Controller: 53b. Success response
+    deactivate Service
+    
+    Controller --> FrontendB: 54b. 200 OK - Application rejected
+    deactivate Controller
+    
+    FrontendB --> Poster: 55b. ❌ "Application rejected"
+    deactivate FrontendB
+end
+
+== Follow-up Actions ==
+
+Applicant -> FrontendA: 56. Check application status
+activate FrontendA
+
+FrontendA -> Controller: 57. GET /api/applications/my-applications
+activate Controller
+
+Controller -> Service: 58. getMyApplications(applicantId)
+activate Service
+
+Service -> DB: 59. Query applicant's applications
+activate DB
+DB --> Service: 60. Applications with status updates
+deactivate DB
+
+Service --> Controller: 61. ApplicationDTO list
+deactivate Service
+
+Controller --> FrontendA: 62. 200 OK - My applications
+deactivate Controller
+
+FrontendA --> Applicant: 63. Show application status:\n"Student B's Announcement: ✅ ACCEPTED"
+deactivate FrontendA
+
+note over Applicant, Poster
+    **Roommate Application & Matching Complete**
+    
+    ✅ Students can browse and apply to announcements
+    ✅ ML compatibility scoring for applications
+    ✅ Real-time notifications for all parties
+    ✅ Accept/reject workflow with feedback
+    ✅ Status tracking for applicants and posters
+    
+    **Next: Students need to manually connect via connection requests to start messaging**
+end note
+
+@enduml 

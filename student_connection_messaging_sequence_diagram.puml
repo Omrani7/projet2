@@ -1,0 +1,186 @@
+    @startuml
+    title "Student Social Networking & Connection Request System"\n"Sprint 3 - Connection Request & Response Flow"
+
+    !define STUDENT1_COLOR #E3F2FD
+    !define STUDENT2_COLOR #F3E5F5
+    !define BACKEND_COLOR #E8F5E9
+    !define WEBSOCKET_COLOR #FFF3E0
+
+    actor "Student A\n(Requester)" as StudentA #STUDENT1_COLOR
+    actor "Student B\n(Receiver)" as StudentB #STUDENT2_COLOR
+
+    participant "Angular Frontend\n(Student A)" as FrontendA #STUDENT1_COLOR
+    participant "Angular Frontend\n(Student B)" as FrontendB #STUDENT2_COLOR
+
+    box "Backend Services" #BACKEND_COLOR
+        participant "ConnectionRequestController" as Controller
+        participant "ConnectionRequestService" as Service
+        participant "WebSocketService" as WS
+        participant "Database" as DB
+    end box
+
+    == Connection Request Flow ==
+
+    StudentA -> FrontendA: 1. Browse compatible students
+    activate FrontendA
+
+    FrontendA -> Controller: 2. GET /api/students/compatible
+    activate Controller
+
+    Controller -> Service: 3. getCompatibleStudents()
+    activate Service
+
+    Service -> DB: 4. Query database
+    activate DB
+    DB --> Service: 5. Return results
+    deactivate DB
+
+    Service --> Controller: 6. DTO list
+    deactivate Service
+
+    Controller --> FrontendA: 7. 200 OK
+    deactivate Controller
+
+    FrontendA --> StudentA: 8. Display matches
+    deactivate FrontendA
+
+    StudentA -> FrontendA: 9. Select Student B
+    activate FrontendA
+
+    FrontendA -> Controller: 10. POST /api/requests
+    activate Controller
+
+    Controller -> Service: 11. createRequest()
+    activate Service
+
+    Service -> DB: 12. Save request
+    activate DB
+    DB --> Service: 13. Confirmation
+    deactivate DB
+
+    Service -> WS: 14. notifyUser(StudentB)
+    activate WS
+
+    WS -> FrontendB: 15. WebSocket notification
+    activate FrontendB
+    FrontendB --> StudentB: 16. New request notification
+    deactivate FrontendB
+
+    deactivate WS
+
+    Service --> Controller: 17. Success
+    deactivate Service
+
+    Controller --> FrontendA: 18. 201 Created
+    deactivate Controller
+
+    FrontendA --> StudentA: 19. Request sent
+    deactivate FrontendA
+
+    == Request Response Flow ==
+
+    StudentB -> FrontendB: 20. View pending requests
+    activate FrontendB
+
+    FrontendB -> Controller: 21. GET /api/requests/pending
+    activate Controller
+
+    Controller -> Service: 22. getPendingRequests()
+    activate Service
+
+    Service -> DB: 23. Query requests
+    activate DB
+    DB --> Service: 24. Results
+    deactivate DB
+
+    Service --> Controller: 25. DTO list
+    deactivate Service
+
+    Controller --> FrontendB: 26. 200 OK
+    deactivate Controller
+
+    FrontendB --> StudentB: 27. Show requests with Accept/Reject options
+    deactivate FrontendB
+
+    alt Accept Request
+        StudentB -> FrontendB: 28a. Click Accept
+        activate FrontendB
+        
+        FrontendB -> Controller: 29a. PUT /api/requests/{id}/respond\n{status: "ACCEPTED", message: "..."}
+        activate Controller
+        
+        Controller -> Service: 30a. respondToRequest(ACCEPTED)
+        activate Service
+        
+        Service -> DB: 31a. Update status to ACCEPTED
+        activate DB
+        DB --> Service: 32a. Updated
+        deactivate DB
+        
+        Service -> WS: 33a. notifyResponse(StudentA, ACCEPTED)
+        activate WS
+        
+        WS -> FrontendA: 34a. WebSocket: Request Accepted
+        activate FrontendA
+        FrontendA --> StudentA: 35a. ✅ "Student B accepted your request!"
+        deactivate FrontendA
+        
+        deactivate WS
+        
+        Service --> Controller: 36a. Success
+        deactivate Service
+        
+        Controller --> FrontendB: 37a. 200 OK
+        deactivate Controller
+        
+        FrontendB --> StudentB: 38a. ✅ "Request accepted successfully"
+        deactivate FrontendB
+
+    else Reject Request
+        StudentB -> FrontendB: 28b. Click Reject
+        activate FrontendB
+        
+        FrontendB -> Controller: 29b. PUT /api/requests/{id}/respond\n{status: "REJECTED", message: "..."}
+        activate Controller
+        
+        Controller -> Service: 30b. respondToRequest(REJECTED)
+        activate Service
+        
+        Service -> DB: 31b. Update status to REJECTED
+        activate DB
+        DB --> Service: 32b. Updated
+        deactivate DB
+        
+        Service -> WS: 33b. notifyResponse(StudentA, REJECTED)
+        activate WS
+        
+        WS -> FrontendA: 34b. WebSocket: Request Rejected
+        activate FrontendA
+        FrontendA --> StudentA: 35b. ❌ "Student B declined your request"
+        deactivate FrontendA
+        
+        deactivate WS
+        
+        Service --> Controller: 36b. Success
+        deactivate Service
+        
+        Controller --> FrontendB: 37b. 200 OK
+        deactivate Controller
+        
+        FrontendB --> StudentB: 38b. ❌ "Request rejected"
+        deactivate FrontendB
+    end
+
+    note over StudentA, StudentB
+        **Connection Request System Complete**
+        
+        ✅ Students can discover compatible peers
+        ✅ Send connection requests with messages
+        ✅ Receive real-time notifications
+        ✅ Accept or reject requests with optional messages
+        ✅ Real-time status updates for both parties
+        
+        **Next: Messaging system for connected students**
+    end note
+
+    @enduml 

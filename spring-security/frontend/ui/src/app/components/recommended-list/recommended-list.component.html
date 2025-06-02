@@ -1,0 +1,33 @@
+<div class="container mx-auto px-4 py-8 md:py-12">
+  <h2 class="text-2xl md:text-3xl font-semibold mb-6">Recommanded for you</h2>
+
+  <!-- Horizontal Scroll Container -->
+  <div class="relative">
+    <div class="flex space-x-4 md:space-x-6 overflow-x-auto pb-4 scrollbar-hide">
+      <!-- Property Cards -->
+      <div *ngFor="let prop of recommendedProperties" class="flex-shrink-0 w-72 md:w-80">
+        <app-property-card [property]="prop"></app-property-card>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="recommendedProperties.length === 0" class="flex-shrink-0 w-full text-center py-10">
+        <p class="text-gray-500">No recommendations available right now.</p>
+      </div>
+    </div>
+
+    <!-- Optional: Add scroll buttons if desired, positioned absolutely -->
+    <!-- Example Button (Requires TS logic to function) -->
+    <!--
+    <button class="absolute top-1/2 left-0 transform -translate-y-1/2 -translate-x-4 bg-white rounded-full shadow-md p-2 z-10 hover:bg-gray-100 focus:outline-none">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-gray-700">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+      </svg>
+    </button>
+    <button class="absolute top-1/2 right-0 transform -translate-y-1/2 translate-x-4 bg-white rounded-full shadow-md p-2 z-10 hover:bg-gray-100 focus:outline-none">
+       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-gray-700">
+        <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+      </svg>
+    </button>
+    -->
+  </div>
+</div>

@@ -1,0 +1,404 @@
+<!-- Main Container -->
+<div class="announcement-details-container">
+  
+  <!-- Back Navigation -->
+  <div class="back-navigation">
+    <button class="back-btn" (click)="navigateBack()">
+      <span class="back-icon">←</span>
+      <span>Back to Browse</span>
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="loading-spinner"></div>
+    <p class="loading-text">Loading announcement details...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-banner" *ngIf="error && !isLoading">
+    <span class="error-icon">⚠️</span>
+    <span class="error-message">{{ error }}</span>
+    <button class="error-close" (click)="clearMessages()">×</button>
+  </div>
+
+  <!-- Success Message -->
+  <div class="success-banner" *ngIf="successMessage">
+    <span class="success-icon">✅</span>
+    <span class="success-message">{{ successMessage }}</span>
+    <button class="success-close" (click)="clearMessages()">×</button>
+  </div>
+
+  <!-- Announcement Details -->
+  <div class="announcement-content" *ngIf="announcement && !isLoading">
+    
+    <!-- Main Announcement Card -->
+    <div class="announcement-card">
+      
+      <!-- Header with Compatibility Badge -->
+      <div class="announcement-header">
+        <div class="header-info">
+          <h1 class="property-title">{{ announcement.propertyTitle }}</h1>
+          <div class="property-location">
+            <span class="location-icon">📍</span>
+            {{ announcement.propertyAddress }}
+          </div>
+        </div>
+        
+        <!-- Compatibility Badge (for non-owners) -->
+        <div class="compatibility-badge" *ngIf="!isOwnAnnouncement && getCompatibilityScore()">
+          <div class="compatibility-content">
+            <span class="compatibility-emoji">{{ getCompatibilityEmoji() }}</span>
+            <div class="compatibility-details">
+              <span class="compatibility-score" [style.color]="getCompatibilityColor()">
+                {{ getCompatibilityPercentage() }}%
+              </span>
+              <span class="compatibility-level">{{ getCompatibilityLevel() }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Property Details Grid -->
+      <div class="property-details-grid">
+        <div class="detail-card">
+          <span class="detail-icon">🏠</span>
+          <div class="detail-content">
+            <span class="detail-label">Total Rooms</span>
+            <span class="detail-value">{{ announcement.totalRooms }}</span>
+          </div>
+        </div>
+        
+        <div class="detail-card">
+          <span class="detail-icon">👥</span>
+          <div class="detail-content">
+            <span class="detail-label">Available Rooms</span>
+            <span class="detail-value">{{ announcement.availableRooms }}</span>
+          </div>
+        </div>
+        
+        <div class="detail-card">
+          <span class="detail-icon">💰</span>
+          <div class="detail-content">
+            <span class="detail-label">Rent per Person</span>
+            <span class="detail-value">{{ announcement.rentPerPerson }} TND/month</span>
+          </div>
+        </div>
+        
+        <div class="detail-card">
+          <span class="detail-icon">🛡️</span>
+          <div class="detail-content">
+            <span class="detail-label">Security Deposit</span>
+            <span class="detail-value">{{ announcement.securityDeposit }} TND</span>
+          </div>
+        </div>
+        
+        <div class="detail-card">
+          <span class="detail-icon">📅</span>
+          <div class="detail-content">
+            <span class="detail-label">Move-in Date</span>
+            <span class="detail-value">{{ formatDate(announcement.moveInDate) }}</span>
+          </div>
+        </div>
+        
+        <div class="detail-card">
+          <span class="detail-icon">📆</span>
+          <div class="detail-content">
+            <span class="detail-label">Lease Duration</span>
+            <span class="detail-value">{{ announcement.leaseDurationMonths }} months</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="description-section">
+        <h3 class="section-title">Description</h3>
+        <p class="description-text">{{ announcement.description }}</p>
+      </div>
+
+      <!-- Poster Information -->
+      <div class="poster-section">
+        <h3 class="section-title">Posted by</h3>
+        <div class="poster-info">
+          <div class="poster-avatar">
+            {{ announcement.poster.username.charAt(0).toUpperCase() }}
+          </div>
+          <div class="poster-details">
+            <span class="poster-name">{{ announcement.poster.username }}</span>
+            <span class="poster-meta">Looking for {{ announcement.maxRoommates }} roommates</span>
+            <span class="posting-date">Posted {{ formatDate(announcement.createdAt) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Urgency Indicator -->
+      <div class="urgency-indicator" [class.urgent]="getDaysUntilMoveIn() <= 7">
+        <span class="urgency-icon">
+          {{ getDaysUntilMoveIn() <= 7 ? '🔥' : '📅' }}
+        </span>
+        <span class="urgency-text">
+          {{ getDaysUntilMoveIn() }} days until move-in
+        </span>
+      </div>
+
+      <!-- Application Status (for non-owners) -->
+      <div class="application-status" *ngIf="!isOwnAnnouncement && hasAlreadyApplied">
+        <div class="status-card" [ngClass]="getApplicationStatusClass(userApplication!.status)">
+          <span class="status-icon">{{ getApplicationStatusIcon(userApplication!.status) }}</span>
+          <div class="status-content">
+            <span class="status-label">Your Application</span>
+            <span class="status-value">{{ userApplication!.status | titlecase }}</span>
+            <span class="status-date">Applied {{ formatDate(userApplication!.appliedAt) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-section" *ngIf="!isOwnAnnouncement">
+        <button 
+          class="apply-btn" 
+          *ngIf="!hasAlreadyApplied"
+          (click)="showApplicationModal()"
+          [disabled]="getDaysUntilMoveIn() < 0">
+          <span class="btn-icon">📝</span>
+          Apply to Join
+        </button>
+        
+        <div class="applied-message" *ngIf="hasAlreadyApplied">
+          <span class="applied-icon">✅</span>
+          <span>Application submitted</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Applications Section (for announcement owners) -->
+    <div class="applications-section" *ngIf="isOwnAnnouncement">
+      <div class="section-header">
+        <h2 class="section-title">Applications</h2>
+        <span class="applications-count">{{ applications.length }} applications</span>
+      </div>
+      
+      <!-- Loading Applications -->
+      <div class="loading-state small" *ngIf="isApplicationsLoading">
+        <div class="loading-spinner small"></div>
+        <span>Loading applications...</span>
+      </div>
+      
+      <!-- Applications List -->
+      <div class="applications-list" *ngIf="!isApplicationsLoading">
+        <div 
+          class="application-card" 
+          *ngFor="let application of applications; trackBy: trackByApplicationId">
+          
+          <div class="application-header">
+            <div class="applicant-info">
+              <div class="applicant-avatar">
+                {{ application.applicant.username.charAt(0).toUpperCase() }}
+              </div>
+              <div class="applicant-details">
+                <span class="applicant-name">{{ application.applicant.username }}</span>
+                <span class="application-date">Applied {{ formatDate(application.appliedAt) }}</span>
+              </div>
+            </div>
+            
+            <!-- Compatibility Score -->
+            <div class="compatibility-mini-badge">
+              <span class="mini-score">{{ Math.round(application.compatibilityScore * 100) }}%</span>
+              <span class="mini-label">match</span>
+            </div>
+          </div>
+          
+          <div class="application-message">
+            <p>{{ application.message }}</p>
+          </div>
+          
+          <div class="application-actions" *ngIf="application.status === 'PENDING'">
+            <button 
+              class="accept-btn" 
+              (click)="showResponseModalForApplication(application)">
+              <span class="btn-icon">✅</span>
+              Respond
+            </button>
+          </div>
+          
+          <div class="application-status-badge" *ngIf="application.status !== 'PENDING'">
+            <span class="status-icon">{{ getApplicationStatusIcon(application.status) }}</span>
+            <span>{{ application.status | titlecase }}</span>
+            <span class="response-date" *ngIf="application.respondedAt">
+              {{ formatDate(application.respondedAt) }}
+            </span>
+          </div>
+        </div>
+        
+        <!-- No Applications -->
+        <div class="no-applications" *ngIf="applications.length === 0">
+          <span class="no-apps-icon">📭</span>
+          <p>No applications yet</p>
+          <small>Your announcement will be visible to compatible students</small>
+        </div>
+      </div>
+
+      <!-- Compatible Applicants Section -->
+      <div class="compatible-applicants-section" *ngIf="!isLoadingCompatibleApplicants && compatibleApplicants.length > 0">
+        <h3 class="subsection-title">
+          <span class="title-icon">⭐</span>
+          Potentially Compatible Students
+        </h3>
+        <div class="compatible-applicants-grid">
+          <div 
+            class="compatible-applicant-card" 
+            *ngFor="let applicant of compatibleApplicants; trackBy: trackByUserId">
+            
+            <div class="applicant-info">
+              <div class="applicant-avatar">
+                {{ applicant.user.username.charAt(0).toUpperCase() }}
+              </div>
+              <div class="applicant-details">
+                <span class="applicant-name">{{ applicant.user.username }}</span>
+                <span class="compatibility-score" [style.color]="getCompatibilityColorForScore(applicant.compatibilityScore)">
+                  {{ Math.round(applicant.compatibilityScore * 100) }}% compatible
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Application Modal -->
+<div class="modal-overlay" *ngIf="showApplicationForm" (click)="hideApplicationModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3 class="modal-title">Apply to Join</h3>
+      <button class="modal-close" (click)="hideApplicationModal()">×</button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="announcement-summary">
+        <h4>{{ announcement?.propertyTitle }}</h4>
+        <p>{{ announcement?.propertyAddress }}</p>
+        <div class="summary-details">
+          <span>{{ announcement?.rentPerPerson }} TND/month</span>
+          <span>•</span>
+          <span>{{ announcement?.availableRooms }} rooms available</span>
+        </div>
+      </div>
+      
+      <form [formGroup]="applicationForm" class="application-form">
+        <div class="form-group">
+          <label for="applicationMessage">Your Message *</label>
+          <textarea
+            id="applicationMessage"
+            formControlName="message"
+            rows="6"
+            placeholder="Introduce yourself and explain why you'd be a great roommate. Include information about your study habits, lifestyle, and what you're looking for in a shared living situation."
+            class="message-textarea"
+            [class.error]="applicationForm.get('message')?.invalid && applicationForm.get('message')?.touched">
+          </textarea>
+          <div class="character-count">
+            {{ applicationForm.get('message')?.value?.length || 0 }}/500 characters
+          </div>
+          <div class="form-error" *ngIf="applicationForm.get('message')?.invalid && applicationForm.get('message')?.touched">
+            <span *ngIf="applicationForm.get('message')?.errors?.['required']">Please write a message about yourself.</span>
+            <span *ngIf="applicationForm.get('message')?.errors?.['minlength']">Message should be at least 50 characters.</span>
+            <span *ngIf="applicationForm.get('message')?.errors?.['maxlength']">Message cannot exceed 500 characters.</span>
+          </div>
+        </div>
+      </form>
+    </div>
+    
+    <div class="modal-footer">
+      <button type="button" class="cancel-btn" (click)="hideApplicationModal()">
+        Cancel
+      </button>
+      <button 
+        type="button" 
+        class="submit-btn" 
+        [disabled]="applicationForm.invalid || isSubmittingApplication"
+        (click)="submitApplication()">
+        <span *ngIf="isSubmittingApplication" class="loading-spinner small"></span>
+        <span class="btn-icon" *ngIf="!isSubmittingApplication">📝</span>
+        <span>{{ isSubmittingApplication ? 'Sending...' : 'Send Application' }}</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Response Modal -->
+<div class="modal-overlay" *ngIf="showResponseModal" (click)="hideResponseModalAction()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3 class="modal-title">Respond to Application</h3>
+      <button class="modal-close" (click)="hideResponseModalAction()">×</button>
+    </div>
+    
+    <div class="modal-body" *ngIf="selectedApplication">
+      <div class="applicant-summary">
+        <div class="applicant-info">
+          <div class="applicant-avatar">
+            {{ selectedApplication.applicant.username.charAt(0).toUpperCase() }}
+          </div>
+          <div class="applicant-details">
+            <h4>{{ selectedApplication.applicant.username }}</h4>
+            <span class="compatibility-score">
+              {{ Math.round(selectedApplication.compatibilityScore * 100) }}% compatible
+            </span>
+          </div>
+        </div>
+        
+        <div class="application-message-preview">
+          <p>"{{ selectedApplication.message }}"</p>
+        </div>
+      </div>
+      
+      <form [formGroup]="responseForm" class="response-form">
+        <div class="form-group">
+          <label>Response *</label>
+          <div class="response-options">
+            <label class="radio-option">
+              <input type="radio" formControlName="status" value="ACCEPTED">
+              <span class="radio-label accept">✅ Accept</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" formControlName="status" value="REJECTED">
+              <span class="radio-label reject">❌ Decline</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="responseMessage">Message *</label>
+          <textarea
+            id="responseMessage"
+            formControlName="responseMessage"
+            rows="4"
+            placeholder="Write a response to the applicant..."
+            class="message-textarea"
+            [class.error]="responseForm.get('responseMessage')?.invalid && responseForm.get('responseMessage')?.touched">
+          </textarea>
+          <div class="form-error" *ngIf="responseForm.get('responseMessage')?.invalid && responseForm.get('responseMessage')?.touched">
+            <span *ngIf="responseForm.get('responseMessage')?.errors?.['required']">Please write a response message.</span>
+            <span *ngIf="responseForm.get('responseMessage')?.errors?.['minlength']">Message should be at least 20 characters.</span>
+          </div>
+        </div>
+      </form>
+    </div>
+    
+    <div class="modal-footer">
+      <button type="button" class="cancel-btn" (click)="hideResponseModalAction()">
+        Cancel
+      </button>
+      <button 
+        type="button" 
+        class="submit-btn" 
+        [disabled]="responseForm.invalid || isSubmittingResponse"
+        (click)="submitResponse()">
+        <span *ngIf="isSubmittingResponse" class="loading-spinner small"></span>
+        <span class="btn-icon" *ngIf="!isSubmittingResponse">📨</span>
+        <span>{{ isSubmittingResponse ? 'Sending...' : 'Send Response' }}</span>
+      </button>
+    </div>
+  </div>
+</div> 

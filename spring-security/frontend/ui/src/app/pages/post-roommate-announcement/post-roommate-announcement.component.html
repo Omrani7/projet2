@@ -1,0 +1,451 @@
+<div class="post-announcement-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <i class="fas fa-home title-icon"></i>
+        Post Roommate Announcement
+      </h1>
+      <p class="page-subtitle">Find compatible roommates for your property or shared living arrangement</p>
+    </div>
+  </div>
+
+  <!-- Announcement Type Selector -->
+  <div class="type-selector-card" *ngIf="!isLoadingDeals">
+    <h2 class="section-title">Choose Your Announcement Type</h2>
+    
+    <div class="type-options">
+      <!-- Type A: Based on Closed Deal -->
+      <div class="type-option" 
+           [class.active]="announcementType === 'TYPE_A'"
+           [class.disabled]="closedDeals.length === 0"
+           (click)="closedDeals.length > 0 && switchAnnouncementType('TYPE_A')">
+        <div class="type-header">
+          <i class="fas fa-handshake type-icon"></i>
+          <h3>From Closed Deal</h3>
+          <span class="type-badge type-a">Recommended</span>
+        </div>
+        <p class="type-description">
+          Use a property you've already secured through UniNest to find roommates
+        </p>
+        <div class="type-features">
+          <div class="feature-item">
+            <i class="fas fa-check"></i>
+            Property details auto-filled
+          </div>
+          <div class="feature-item">
+            <i class="fas fa-check"></i>
+            Verified property information
+          </div>
+          <div class="feature-item">
+            <i class="fas fa-check"></i>
+            Higher success rate
+          </div>
+        </div>
+        <p class="deals-count" *ngIf="closedDeals.length > 0">
+          <i class="fas fa-info-circle"></i>
+          {{ closedDeals.length }} closed deal{{ closedDeals.length > 1 ? 's' : '' }} available
+        </p>
+        <p class="no-deals" *ngIf="closedDeals.length === 0">
+          <i class="fas fa-info-circle"></i>
+          No closed deals available. Complete a property inquiry first.
+        </p>
+      </div>
+
+      <!-- Type B: Manual Property Entry -->
+      <div class="type-option" 
+           [class.active]="announcementType === 'TYPE_B'"
+           (click)="switchAnnouncementType('TYPE_B')">
+        <div class="type-header">
+          <i class="fas fa-edit type-icon"></i>
+          <h3>Manual Entry</h3>
+          <span class="type-badge type-b">Flexible</span>
+        </div>
+        <p class="type-description">
+          Enter property details manually for any living arrangement
+        </p>
+        <div class="type-features">
+          <div class="feature-item">
+            <i class="fas fa-check"></i>
+            Complete flexibility
+          </div>
+          <div class="feature-item">
+            <i class="fas fa-check"></i>
+            Any property type
+          </div>
+          <div class="feature-item">
+            <i class="fas fa-check"></i>
+            Full customization
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoadingDeals">
+    <div class="loading-spinner"></div>
+    <p>Loading your closed deals...</p>
+  </div>
+
+  <!-- Closed Deals Selection (Type A) -->
+  <div class="deals-selection-card" *ngIf="announcementType === 'TYPE_A' && closedDeals.length > 0 && !isLoadingDeals">
+    <h2 class="section-title">Select a Closed Deal</h2>
+    
+    <div class="deals-grid">
+      <div class="deal-card" 
+           *ngFor="let deal of closedDeals"
+           [class.selected]="selectedDeal?.id === deal.id"
+           (click)="selectClosedDeal(deal)">
+                <div class="deal-header">          <h3 class="deal-title">{{ deal.property.title }}</h3>          <span class="deal-price">{{ deal.agreedPrice | currency:'TND':'symbol':'1.0-0' }}/month</span>        </div>        <p class="deal-address">          <i class="fas fa-map-marker-alt"></i>          {{ deal.property.address }}        </p>        <div class="deal-details">          <div class="detail-item">            <i class="fas fa-bed"></i>            {{ deal.property.rooms }} Rooms          </div>          <div class="detail-item">            <i class="fas fa-home"></i>            {{ deal.property.type }}          </div>          <div class="detail-item">            <i class="fas fa-calendar"></i>            Closed {{ deal.timestamp | date:'MMM d, y' }}          </div>        </div>
+        <div class="selection-indicator" *ngIf="selectedDeal?.id === deal.id">
+          <i class="fas fa-check-circle"></i>
+          Selected
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Announcement Form -->
+  <form [formGroup]="announcementForm" (ngSubmit)="onSubmit()" class="announcement-form" 
+        *ngIf="announcementType === 'TYPE_B' || selectedDeal">
+    
+    <!-- Property Details Section -->
+    <div class="form-section">
+      <h2 class="section-title">
+        <i class="fas fa-home"></i>
+        Property Details
+        <span class="auto-filled-badge" *ngIf="announcementType === 'TYPE_A'">Auto-filled</span>
+      </h2>
+      
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="propertyTitle">Property Title *</label>
+          <input type="text" id="propertyTitle" formControlName="propertyTitle" 
+                 [class.error]="hasFieldError('propertyTitle')"
+                 placeholder="e.g., Modern 3-Bedroom Apartment">
+          <div class="error-message" *ngIf="hasFieldError('propertyTitle')">
+            {{ getFieldError('propertyTitle') }}
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label for="propertyAddress">Address *</label>
+          <textarea id="propertyAddress" formControlName="propertyAddress" 
+                   [class.error]="hasFieldError('propertyAddress')"
+                   placeholder="Complete address including city and postal code"
+                   rows="3"></textarea>
+          <div class="error-message" *ngIf="hasFieldError('propertyAddress')">
+            {{ getFieldError('propertyAddress') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="totalRent">Total Monthly Rent (TND) *</label>
+          <input type="number" id="totalRent" formControlName="totalRent" 
+                 [class.error]="hasFieldError('totalRent')"
+                 placeholder="1200">
+          <div class="error-message" *ngIf="hasFieldError('totalRent')">
+            {{ getFieldError('totalRent') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="rentPerPerson">Rent Per Person (TND) *</label>
+          <input type="number" id="rentPerPerson" formControlName="rentPerPerson" 
+                 [class.error]="hasFieldError('rentPerPerson')"
+                 placeholder="Auto-calculated">
+          <div class="helper-text">Automatically calculated based on total rent and max roommates</div>
+          <div class="error-message" *ngIf="hasFieldError('rentPerPerson')">
+            {{ getFieldError('rentPerPerson') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="totalRooms">Total Rooms *</label>
+          <select id="totalRooms" formControlName="totalRooms" 
+                  [class.error]="hasFieldError('totalRooms')">
+            <option value="">Select rooms</option>
+            <option [value]="i" *ngFor="let i of [1,2,3,4,5,6,7,8]">{{ i }} Room{{ i > 1 ? 's' : '' }}</option>
+          </select>
+          <div class="error-message" *ngIf="hasFieldError('totalRooms')">
+            {{ getFieldError('totalRooms') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="availableRooms">Available Rooms *</label>
+          <select id="availableRooms" formControlName="availableRooms" 
+                  [class.error]="hasFieldError('availableRooms')">
+            <option value="">Select available</option>
+            <option [value]="i" *ngFor="let i of [1,2,3,4,5,6,7]">{{ i }} Room{{ i > 1 ? 's' : '' }}</option>
+          </select>
+          <div class="error-message" *ngIf="hasFieldError('availableRooms')">
+            {{ getFieldError('availableRooms') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="propertyType">Property Type *</label>
+          <select id="propertyType" formControlName="propertyType" 
+                  [class.error]="hasFieldError('propertyType')">
+            <option value="APARTMENT">Apartment</option>
+            <option value="HOUSE">House</option>
+            <option value="STUDIO">Studio</option>
+          </select>
+          <div class="error-message" *ngIf="hasFieldError('propertyType')">
+            {{ getFieldError('propertyType') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="securityDeposit">Security Deposit (TND)</label>
+          <input type="number" id="securityDeposit" formControlName="securityDeposit" 
+                 placeholder="500">
+          <div class="helper-text">Optional security deposit amount</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Roommate Preferences Section -->
+    <div class="form-section">
+      <h2 class="section-title">
+        <i class="fas fa-users"></i>
+        Roommate Preferences
+      </h2>
+      
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="maxRoommates">Maximum Roommates *</label>
+          <select id="maxRoommates" formControlName="maxRoommates" 
+                  [class.error]="hasFieldError('maxRoommates')">
+            <option [value]="i" *ngFor="let i of [1,2,3,4,5,6]">{{ i }} Roommate{{ i > 1 ? 's' : '' }}</option>
+          </select>
+          <div class="helper-text">Including yourself</div>
+          <div class="error-message" *ngIf="hasFieldError('maxRoommates')">
+            {{ getFieldError('maxRoommates') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="genderPreference">Gender Preference *</label>
+          <select id="genderPreference" formControlName="genderPreference" 
+                  [class.error]="hasFieldError('genderPreference')">
+            <option value="NO_PREFERENCE">No Preference</option>
+            <option value="MALE">Male Only</option>
+            <option value="FEMALE">Female Only</option>
+            <option value="MIXED">Mixed Gender</option>
+          </select>
+          <div class="error-message" *ngIf="hasFieldError('genderPreference')">
+            {{ getFieldError('genderPreference') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="ageMin">Minimum Age *</label>
+          <input type="number" id="ageMin" formControlName="ageMin" 
+                 [class.error]="hasFieldError('ageMin')"
+                 min="18" max="65" placeholder="18">
+          <div class="error-message" *ngIf="hasFieldError('ageMin')">
+            {{ getFieldError('ageMin') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="ageMax">Maximum Age *</label>
+          <input type="number" id="ageMax" formControlName="ageMax" 
+                 [class.error]="hasFieldError('ageMax')"
+                 min="18" max="65" placeholder="35">
+          <div class="error-message" *ngIf="hasFieldError('ageMax')">
+            {{ getFieldError('ageMax') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="cleanlinessLevel">Cleanliness Level *</label>
+          <select id="cleanlinessLevel" formControlName="cleanlinessLevel" 
+                  [class.error]="hasFieldError('cleanlinessLevel')">
+            <option value="1">1 - Very Relaxed</option>
+            <option value="2">2 - Casual</option>
+            <option value="3">3 - Moderate</option>
+            <option value="4">4 - Clean</option>
+            <option value="5">5 - Very Clean</option>
+          </select>
+          <div class="error-message" *ngIf="hasFieldError('cleanlinessLevel')">
+            {{ getFieldError('cleanlinessLevel') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="utilitiesSplit">Utilities Split</label>
+          <select id="utilitiesSplit" formControlName="utilitiesSplit">
+            <option value="EQUAL">Equal Split</option>
+            <option value="USAGE_BASED">Usage-Based</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Lifestyle Tags -->
+      <div class="lifestyle-section">
+        <label class="section-label">Lifestyle Preferences</label>
+        <div class="lifestyle-tags">
+          <button type="button" 
+                  class="lifestyle-tag" 
+                  [class.active]="hasLifestyleTag('QUIET')"
+                  (click)="toggleLifestyleTag('QUIET')">
+            <i class="fas fa-volume-mute"></i> Quiet
+          </button>
+          <button type="button" 
+                  class="lifestyle-tag" 
+                  [class.active]="hasLifestyleTag('SOCIAL')"
+                  (click)="toggleLifestyleTag('SOCIAL')">
+            <i class="fas fa-users"></i> Social
+          </button>
+          <button type="button" 
+                  class="lifestyle-tag" 
+                  [class.active]="hasLifestyleTag('STUDIOUS')"
+                  (click)="toggleLifestyleTag('STUDIOUS')">
+            <i class="fas fa-book"></i> Studious
+          </button>
+          <button type="button" 
+                  class="lifestyle-tag" 
+                  [class.active]="hasLifestyleTag('ACTIVE')"
+                  (click)="toggleLifestyleTag('ACTIVE')">
+            <i class="fas fa-dumbbell"></i> Active
+          </button>
+          <button type="button" 
+                  class="lifestyle-tag" 
+                  [class.active]="hasLifestyleTag('CREATIVE')"
+                  (click)="toggleLifestyleTag('CREATIVE')">
+            <i class="fas fa-palette"></i> Creative
+          </button>
+          <button type="button" 
+                  class="lifestyle-tag" 
+                  [class.active]="hasLifestyleTag('TECH')"
+                  (click)="toggleLifestyleTag('TECH')">
+            <i class="fas fa-laptop"></i> Tech
+          </button>
+        </div>
+      </div>
+
+      <!-- Preferences Checkboxes -->
+      <div class="preferences-grid">
+        <div class="preference-item">
+          <input type="checkbox" id="smokingAllowed" formControlName="smokingAllowed">
+          <label for="smokingAllowed">
+            <i class="fas fa-smoking"></i>
+            Smoking Allowed
+          </label>
+        </div>
+        <div class="preference-item">
+          <input type="checkbox" id="petsAllowed" formControlName="petsAllowed">
+          <label for="petsAllowed">
+            <i class="fas fa-paw"></i>
+            Pets Allowed
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Financial Details Section -->
+    <div class="form-section">
+      <h2 class="section-title">
+        <i class="fas fa-dollar-sign"></i>
+        Financial Details
+      </h2>
+      
+      <div class="form-grid">
+        <div class="form-group full-width">
+          <label for="additionalCosts">Additional Costs</label>
+          <textarea id="additionalCosts" formControlName="additionalCosts" 
+                   placeholder="e.g., Internet, cleaning service, parking fees"
+                   rows="3"></textarea>
+          <div class="helper-text">Optional: Describe any additional monthly costs</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Posting Details Section -->
+    <div class="form-section">
+      <h2 class="section-title">
+        <i class="fas fa-info-circle"></i>
+        Posting Details
+      </h2>
+      
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="moveInDate">Move-in Date *</label>
+          <input type="date" id="moveInDate" formControlName="moveInDate" 
+                 [class.error]="hasFieldError('moveInDate')">
+          <div class="error-message" *ngIf="hasFieldError('moveInDate')">
+            {{ getFieldError('moveInDate') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="leaseDurationMonths">Lease Duration (Months) *</label>
+          <select id="leaseDurationMonths" formControlName="leaseDurationMonths" 
+                  [class.error]="hasFieldError('leaseDurationMonths')">
+            <option value="6">6 Months</option>
+            <option value="9">9 Months</option>
+            <option value="12">12 Months</option>
+            <option value="18">18 Months</option>
+            <option value="24">24 Months</option>
+          </select>
+          <div class="error-message" *ngIf="hasFieldError('leaseDurationMonths')">
+            {{ getFieldError('leaseDurationMonths') }}
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label for="description">Description *</label>
+          <textarea id="description" formControlName="description" 
+                   [class.error]="hasFieldError('description')"
+                   placeholder="Describe your ideal roommate, property features, house rules, etc."
+                   rows="5"></textarea>
+          <div class="character-count">
+            {{ announcementForm.get('description')?.value?.length || 0 }}/1000 characters
+          </div>
+          <div class="error-message" *ngIf="hasFieldError('description')">
+            {{ getFieldError('description') }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="cancel()" [disabled]="isSubmitting">
+        <i class="fas fa-times"></i>
+        Cancel
+      </button>
+      
+      <button type="submit" class="btn btn-primary" [disabled]="announcementForm.invalid || isSubmitting">
+        <i class="fas fa-spinner fa-spin" *ngIf="isSubmitting"></i>
+        <i class="fas fa-plus" *ngIf="!isSubmitting"></i>
+        {{ isSubmitting ? 'Posting...' : 'Post Announcement' }}
+      </button>
+    </div>
+  </form>
+
+  <!-- Success Message -->
+  <div class="success-message" *ngIf="successMessage">
+    <div class="success-content">
+      <i class="fas fa-check-circle"></i>
+      <h3>Announcement Posted Successfully!</h3>
+      <p>{{ successMessage }}</p>
+      <p>You'll be redirected to your announcement shortly...</p>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div class="error-message-banner" *ngIf="error">
+    <div class="error-content">
+      <i class="fas fa-exclamation-triangle"></i>
+      <p>{{ error }}</p>
+      <button class="close-error" (click)="error = null">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  </div>
+</div> 

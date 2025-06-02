@@ -1,0 +1,62 @@
+/* Custom scrollbar for the thumbnail gallery */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+/* Image gallery transitions */
+img {
+  transition: transform 0.3s ease;
+}
+
+/* Animation for ratings stars */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.text-yellow-500:hover {
+  animation: pulse 0.5s ease;
+}
+
+/* Responsive tweaks */
+@media (max-width: 640px) {
+  .aspect-video {
+    aspect-ratio: 4/3; /* Slightly taller on mobile */
+  }
+}
+
+/* Add shadow to active thumbnail */
+button.ring-2 img {
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+  transform: scale(1.05);
+}
+
+/* Custom styling for the map container */
+.h-\[300px\] {
+  min-height: 300px;
+}
+
+/* Amenities grid responsiveness */
+@media (max-width: 768px) {
+  .grid-cols-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .grid-cols-2 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+}
+
+/* Button hover effects */
+button.bg-blue-600:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}

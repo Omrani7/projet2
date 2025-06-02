@@ -1,0 +1,89 @@
+@startuml "OAuth2 Authentication Sequence with Reactive State"
+
+!theme plain
+skinparam backgroundColor white
+skinparam SequenceMessageAlignment center
+
+actor User as user
+participant "LoginComponent" as login
+participant "HomeComponent" as home
+participant "AuthService" as authSvc
+participant "AuthStatusComponent" as authStatus
+participant "OAuth2CallbackComponent" as callback
+participant "Backend OAuth2 Endpoints" as backend
+participant "Google OAuth" as google
+
+== Application Initialization ==
+home -> authSvc: constructor()
+authSvc -> authSvc: checkTokenValidity()
+authSvc -> authSvc: authStateSubject.next(hasValidToken())
+authSvc --> home: authState$.subscribe()
+home -> home: set isUserLoggedIn
+
+authStatus -> authSvc: isLoggedIn()
+authStatus -> authSvc: authState$.subscribe()
+
+== OAuth2 Login with Google ==
+user -> home: clicks "Login"
+home -> home: isLoginModalOpen = true
+home -> login: display modal
+user -> login: clicks "Login with Google"
+login -> login: isGoogleLoginInProgress = true
+login -> login: update UI (show spinner)
+login -> authSvc: oauthLogin("google")
+login -> login: store login_modal_open = true
+authSvc -> backend: redirect to /oauth2/authorization/google
+backend -> google: redirect for authentication
+
+google --> user: display Google login form
+user -> google: enter credentials & consent
+google -> backend: redirect to /login/oauth2/code/google with code
+backend -> backend: process OAuth2 code
+backend -> backend: create/update user
+backend -> backend: generate JWT token
+backend -> callback: redirect to /auth/oauth2-callback?token=jwt
+
+callback -> callback: extract token from URL
+callback -> authSvc: saveToken(token)
+authSvc -> authSvc: localStorage.setItem(tokenKey, token)
+authSvc -> authSvc: authStateSubject.next(true)
+authSvc --> home: authState$ (true)
+authSvc --> authStatus: authState$ (true)
+home -> home: isUserLoggedIn = true
+home -> home: check if modal open & close
+authStatus -> authStatus: isAuthenticated = true
+authStatus -> authStatus: update UI
+
+callback -> callback: check login_modal_open
+callback -> callback: clear login_modal_open
+callback -> callback: get redirect URL
+callback -> callback: navigate to URL (home)
+
+== Failed OAuth2 Login ==
+google --> backend: error or denied consent
+backend -> callback: redirect with error param
+callback -> callback: show error message
+callback -> callback: clear login_modal_open
+callback -> login: "Try Again" button
+user -> login: clicks "Try Again"
+login -> home: navigate to /auth/login
+
+== Logout Flow ==
+user -> home: clicks "Logout"
+home -> home: logoutInProgress = true
+home -> home: update UI (show spinner)
+home -> authSvc: logout()
+authSvc -> backend: POST /auth/logout
+backend -> backend: invalidate token
+backend --> authSvc: success response
+authSvc -> authSvc: localStorage.removeItem(tokenKey)
+authSvc -> authSvc: authStateSubject.next(false)
+authSvc --> home: authState$ (false)
+authSvc --> authStatus: authState$ (false)
+home -> home: isUserLoggedIn = false
+home -> home: logoutInProgress = false
+home -> home: update UI
+authStatus -> authStatus: isAuthenticated = false
+authStatus -> authStatus: update UI
+
+@enduml 
