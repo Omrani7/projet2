@@ -25,7 +25,7 @@ By integrating intelligent recommendation systems, real-time communication tools
 - **Notifications**: WebSocket for real-time communication
 
 ### Frontend
-- **Framework**: Angular 17+
+- **Framework**: Angular 18+
 - **Styling**: CSS3 with modern responsive design
 - **Maps**: Interactive map integration for geospatial search
 - **UI Components**: Custom component library
@@ -66,11 +66,11 @@ By integrating intelligent recommendation systems, real-time communication tools
 - **Real-time Updates**: Automated property availability and status management
 - **Academic Proximity**: Institute-based location search with radius filtering
 
-![Property Search Interface](./assets/screenshots/property-search-placeholder.png)
-*[Add Property Search Interface Screenshot]*
+![Property Discovery](./assets/screenshots/discovery.png)
+*Property Discovery Interface*
 
-![Map View](./assets/screenshots/map-view-placeholder.png)
-*[Add Interactive Map Screenshot]*
+![Landing Page](./assets/screenshots/landing.png)
+*Landing Page with Property Listings*
 
 ### 🤝 Intelligent Roommate Matching System
 - **Compatibility Scoring**: Advanced algorithms based on academic background and lifestyle
@@ -79,11 +79,14 @@ By integrating intelligent recommendation systems, real-time communication tools
 - **Connection Requests**: Student-to-student compatibility assessment
 - **Automated Management**: Application workflows with acceptance/rejection systems
 
-![Roommate Matching](./assets/screenshots/roommate-matching-placeholder.png)
-*[Add Roommate Matching Interface Screenshot]*
+![Recommendation Portal](./assets/screenshots/recom.png)
+*Roommate Recommendation Portal*
 
-![Compatibility Dashboard](./assets/screenshots/compatibility-dashboard-placeholder.png)
-*[Add Compatibility Dashboard Screenshot]*
+![High Quality Recommendations](./assets/screenshots/hrecom.png)
+*High Quality Recommendations*
+
+![Connection Requests](./assets/screenshots/cnrequest.png)
+*Connection Requests Management*
 
 ### 💬 Communication & Inquiry Management
 - **Streamlined Inquiries**: Efficient system between students and property owners
@@ -92,11 +95,11 @@ By integrating intelligent recommendation systems, real-time communication tools
 - **Multi-student Handling**: Deal closure and automatic status management
 - **Email Integration**: Critical communication milestone notifications
 
-![Messaging Interface](./assets/screenshots/messaging-placeholder.png)
-*[Add Messaging Interface Screenshot]*
+![Messaging Interface](./assets/screenshots/messages.png)
+*Real-time Messaging System*
 
-![Inquiry Management](./assets/screenshots/inquiry-management-placeholder.png)
-*[Add Inquiry Management Screenshot]*
+![Inquiry Management](./assets/screenshots/Capture%20d'écran%202025-05-26%20065329.png)
+*Inquiry Management Dashboard*
 
 ### 🔐 User Management & Authentication
 - **Secure Authentication**: Role-based access (Student, Owner, Admin)
@@ -104,18 +107,18 @@ By integrating intelligent recommendation systems, real-time communication tools
 - **OAuth2 Integration**: Seamless social login capabilities
 - **Admin Dashboard**: User moderation and system oversight tools
 
-![Login Interface](./assets/screenshots/login-placeholder.png)
-*[Add Login Interface Screenshot]*
+![Login Interface](./assets/screenshots/login.png)
+*Secure Login Interface*
 
-![User Profile](./assets/screenshots/profile-placeholder.png)
-*[Add User Profile Screenshot]*
+![User Profile](./assets/screenshots/Capture%20d'écran%202025-05-27%20041016.png)
+*User Profile Management*
+
+![Profile Settings](./assets/screenshots/Capture%20d'écran%202025-05-27%20041036.png)
+*Profile Settings and Preferences*
 
 ## 🎯 Feature Highlights by User Type
 
 ### 🎓 Student Features
-![Student Dashboard](./assets/screenshots/student-dashboard-placeholder.png)
-*[Add Student Dashboard Screenshot]*
-
 - Property search and filtering
 - Roommate compatibility matching
 - Inquiry management
@@ -123,8 +126,12 @@ By integrating intelligent recommendation systems, real-time communication tools
 - Messaging and notifications
 
 ### 🏠 Owner Features
-![Owner Dashboard](./assets/screenshots/owner-dashboard-placeholder.png)
-*[Add Owner Dashboard Screenshot]*
+
+![Owner Dashboard](./assets/screenshots/oadashbord.png)
+*Owner Dashboard Overview*
+
+![Owner Analytics](./assets/screenshots/odashbord.png)
+*Owner Property Analytics*
 
 - Property listing management
 - Inquiry response system
@@ -133,8 +140,15 @@ By integrating intelligent recommendation systems, real-time communication tools
 - Availability status updates
 
 ### 👨‍💼 Admin Features
-![Admin Dashboard](./assets/screenshots/admin-dashboard-placeholder.png)
-*[Add Admin Dashboard Screenshot]*
+
+![Admin Dashboard](./assets/screenshots/adash.png)
+*Admin Dashboard Overview*
+
+![Admin Quick Actions](./assets/screenshots/aquickactions.png)
+*Admin Quick Actions Panel*
+
+![Admin Management](./assets/screenshots/Capture%20d'écran%202025-05-27%20044854%20(2).png)
+*Admin System Management*
 
 - User account management
 - Listing moderation
@@ -171,71 +185,22 @@ By integrating intelligent recommendation systems, real-time communication tools
 ## 📋 System Architecture
 
 ### 🌐 Global Use Case Diagram
-![Global Use Case Diagram](./assets/diagrams/global-use-case-placeholder.png)
-*[Add Global Use Case Diagram Here]*
+
+![Global Use Case Diagram](./assets/diagrams/global%20use%20case.jpg)
+*Global Use Case Diagram*
 
 The global use case diagram offers a bird's-eye view of the UniNest platform, showing how each actor—Student, Owner, and Administrator—engages with core system functions.
 
 ### 🏗️ Global Class Diagram
-![Global Class Diagram](./assets/diagrams/global-class-diagram-placeholder.png)
-*[Add Global Class Diagram Here]*
+
+![Global Class Diagram](./assets/diagrams/updated%20diagram%20class.jpg)
+*Global Class Diagram*
 
 The comprehensive class diagram illustrates the relationships between all system entities and their interactions within the UniNest ecosystem.
 
-## 🚀 Getting Started
-
-### Prerequisites
-- Java 17 or higher
-- Node.js 18+ and npm
-- PostgreSQL 13+
-- Maven 3.8+
-
-### Backend Setup
-```bash
-cd spring-security
-mvn clean install
-mvn spring-boot:run
-```
-
-### Frontend Setup
-```bash
-cd spring-security/frontend/ui
-npm install
-ng serve
-```
-
-### Scraping Module Setup
-```bash
-cd scraping_module
-mvn clean install
-mvn spring-boot:run
-```
-
-## 📱 Application Screenshots
-
-### 🏠 Landing Page
-![Landing Page](./assets/screenshots/landing-page-placeholder.png)
-*[Add Landing Page Screenshot]*
-
-### 🔍 Property Listings
-![Property Listings](./assets/screenshots/property-listings-placeholder.png)
-*[Add Property Listings Screenshot]*
-
-### 📱 Mobile Responsive
-![Mobile View](./assets/screenshots/mobile-view-placeholder.png)
-*[Add Mobile Responsive Screenshots]*
-
 ## 🤝 Contributing
 
-This project was developed as part of a final year project (PFE) at the Faculty of Sciences of Monastir. 
-
-## 📄 License
-
-This project is developed for academic purposes as part of the Software Engineering & Information Systems program.
-
-## 📞 Contact
-
-For any questions or inquiries about this project, please contact the development team through the Faculty of Sciences of Monastir.
+This project was developed as part of my internship in the faculty
 
 ---
 
