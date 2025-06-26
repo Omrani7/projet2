@@ -203,42 +203,12 @@ The comprehensive class diagram illustrates the relationships between all system
 
 
 
-## 🚀 Getting Started
 
-### Prerequisites
-- Java 17 or higher
-- Node.js 18+ and npm
-- PostgreSQL 13+
-- Maven 3.8+
-
-### Backend Setup
-```bash
-cd spring-security
-mvn clean install
-mvn spring-boot:run
-```
-
-### Frontend Setup
-```bash
-cd spring-security/frontend/ui
-npm install
-ng serve
-```
-
-### Scraping Module Setup
-```bash
-cd scraping_module
-mvn clean install
-mvn spring-boot:run
-```
 
 ## 🤝 Contributing
 
 This project was developed as part of my internship in the faculty.
 
-## 📄 License
-
-This project is developed for academic purposes as part of the Software Engineering & Information Systems program.
 
 ## 📞 Contact
 
