@@ -66,19 +66,54 @@
 }
 
 .period-select {
-  background: rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.1) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.4);
   color: white;
   padding: 0.75rem 2rem 0.75rem 1rem;
   border-radius: 12px;
   font-weight: 500;
   cursor: pointer;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(15px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   appearance: none;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
   background-position: right 0.5rem center;
   background-repeat: no-repeat;
   background-size: 1.5em 1.5em;
+  transition: all 0.3s ease;
+}
+
+.period-select option {
+  background: #ffffff !important;
+  color: #1a202c !important;
+  padding: 0.75rem !important;
+  font-weight: 500 !important;
+  border: none !important;
+}
+
+.period-select option:hover {
+  background: #f7fafc !important;
+  color: #2d3748 !important;
+}
+
+.period-select option:checked,
+.period-select option:selected {
+  background: #667eea !important;
+  color: #ffffff !important;
+}
+
+.period-select:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.2) 100%);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.period-select:focus {
+  outline: none;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.2) 100%);
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
 }
 
 .action-btn {

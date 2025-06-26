@@ -83,6 +83,9 @@ export class BrowseRoommatesComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    // Check access permissions for roommate functionality
+    this.checkRoommateAccessPermissions();
+    
     this.loadInitialData();
     this.setupWebSocketNotifications();
     this.setupFilterWatcher();
@@ -718,5 +721,81 @@ export class BrowseRoommatesComponent implements OnInit, OnDestroy {
                        `Rank: #${student.rank || 'N/A'}`;
     
     alert(profileInfo);
+  }
+
+  /**
+   * Check if user has access to roommate functionality
+   * Only STUDENT users are allowed, OWNER and ADMIN are restricted
+   */
+  private checkRoommateAccessPermissions(): void {
+    if (this.authService.isLoggedIn()) {
+      const userRole = this.authService.getUserRole();
+      
+      // If user is OWNER or ADMIN, show toast and redirect
+      if (userRole === 'OWNER' || userRole === 'ADMIN') {
+        this.showRoommateAccessDeniedToast(userRole);
+        this.redirectBasedOnRole(userRole);
+        return;
+      }
+      
+      // Students are allowed to access roommate functionality
+      if (userRole === 'STUDENT') {
+        return; // Allow access
+      }
+    }
+    
+    // If not authenticated, redirect to login
+    if (!this.authService.isLoggedIn()) {
+      this.router.navigate(['/auth/login']);
+    }
+  }
+
+  private showRoommateAccessDeniedToast(userRole: string): void {
+    // Create a toast notification
+    const toast = document.createElement('div');
+    toast.className = 'fixed top-4 right-4 z-50 bg-red-600 text-white px-6 py-4 rounded-lg shadow-lg max-w-sm animate-slide-in';
+    toast.innerHTML = `
+      <div class="flex items-center">
+        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+        </svg>
+        <div>
+          <div class="font-medium">Access Restricted</div>
+          <div class="text-sm opacity-90">The roommate feature is reserved for students only</div>
+        </div>
+        <button onclick="this.parentElement.parentElement.remove()" 
+                class="ml-4 text-red-200 hover:text-white">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+      if (toast.parentElement) {
+        toast.remove();
+      }
+    }, 5000);
+  }
+
+  private redirectBasedOnRole(userRole: string): void {
+    // Small delay to let the toast show before redirecting
+    setTimeout(() => {
+      switch (userRole) {
+        case 'OWNER':
+          this.router.navigate(['/owner/dashboard']);
+          break;
+        case 'ADMIN':
+          this.router.navigate(['/admin/dashboard']);
+          break;
+        default:
+          this.router.navigate(['/']);
+          break;
+      }
+    }, 1500);
   }
 } 

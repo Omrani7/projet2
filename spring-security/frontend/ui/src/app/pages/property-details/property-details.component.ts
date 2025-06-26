@@ -103,17 +103,31 @@ export class PropertyDetailsComponent implements OnInit {
 
   // Safe accessor method for contact phone
   getContactPhone(): string | null {
+    // Handle both string contactInfo (phone) and object structure
+    if (typeof this.property?.contactInfo === 'string') {
+      return this.property.contactInfo;
+    }
     return this.property?.contactInfo?.phone || null;
   }
 
   // Safe accessor method for contact name
   getContactName(): string | null {
-    return this.property?.contactInfo?.name || null;
+    // For owner properties, we might not have a separate name field
+    // Check if contactInfo is an object with name property
+    if (typeof this.property?.contactInfo === 'object' && this.property?.contactInfo?.name) {
+      return this.property.contactInfo.name;
+    }
+    return null;
   }
 
   // Safe accessor method for contact email
   getContactEmail(): string | null {
-    return this.property?.contactInfo?.email || null;
+    // For owner properties, we might not have email in contactInfo
+    // Check if contactInfo is an object with email property
+    if (typeof this.property?.contactInfo === 'object' && this.property?.contactInfo?.email) {
+      return this.property.contactInfo.email;
+    }
+    return null;
   }
 
   loadSimilarProperties(): void {

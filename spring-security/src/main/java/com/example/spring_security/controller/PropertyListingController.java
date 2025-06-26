@@ -50,25 +50,7 @@ public class PropertyListingController {
         this.userService = userService;
     }
     
-    /**
-     * Searches for property listings based on various criteria.
-     *
-     * Example: GET /api/v1/properties/search?propertyType=APARTMENT&minPrice=500&maxPrice=1000&instituteId=1&radiusKm=5&bedrooms=2&minArea=50&maxArea=100&page=0&size=10&sort=price,asc
-     *
-     * @param genericQuery Optional generic query for general search terms
-     * @param instituteId Optional ID of the institute for proximity search.
-     * @param propertyType Optional type of the property.
-     * @param minPrice Optional minimum price.
-     * @param maxPrice Optional maximum price.
-     * @param radiusKm Optional search radius in kilometers (used with instituteId or lat/lon).
-     * @param bedrooms Optional exact number of bedrooms.
-     * @param minArea Optional minimum area (e.g., square meters).
-     * @param maxArea Optional maximum area (e.g., square meters).
-     * @param mine Optional filter to include only properties owned by the authenticated user
-     * @param userPrincipal The principal of the authenticated user
-     * @param pageable Pagination and sorting information (e.g., page, size, sort).
-     * @return A page of matching property listings as DTOs.
-     */
+
     @GetMapping("/search")
     public ResponseEntity<Page<PropertyListingDTO>> searchProperties(
             @RequestParam(required = false) String genericQuery,
@@ -84,25 +66,21 @@ public class PropertyListingController {
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             Pageable pageable) {
         
-        // Extract sort direction for distance if it exists
         String distanceSortDirection = null;
         Pageable modifiedPageable = pageable;
         
         if (pageable.getSort().isSorted()) {
             for (org.springframework.data.domain.Sort.Order order : pageable.getSort()) {
                 if ("distance".equals(order.getProperty())) {
-                    // Store the sort direction for distance
                     distanceSortDirection = order.getDirection().toString();
                     
-                    // Create a new pageable without the distance sort
-                    List<org.springframework.data.domain.Sort.Order> filteredOrders = 
+                    List<org.springframework.data.domain.Sort.Order> filteredOrders =
                         pageable.getSort().stream()
                             .filter(o -> !"distance".equals(o.getProperty()))
                             .collect(Collectors.toList());
                     
                     org.springframework.data.domain.Sort newSort;
                     if (filteredOrders.isEmpty()) {
-                        // If no other sort properties remain, default to listingDate DESC
                         newSort = org.springframework.data.domain.Sort.by(
                             org.springframework.data.domain.Sort.Direction.DESC, "listingDate"
                         );
@@ -120,23 +98,19 @@ public class PropertyListingController {
             }
         }
         
-        // Create search criteria
         PropertySearchCriteria criteria = new PropertySearchCriteria(
                 instituteId, propertyType, minPrice, maxPrice, radiusKm,
                 bedrooms, minArea, maxArea
         );
         
-        // If 'mine' is true, add the owner ID to the search criteria
         if (Boolean.TRUE.equals(mine) && userPrincipal != null) {
             criteria.setOwnerId(Long.valueOf(userPrincipal.getId()));
         }
         
-        // Call service with the modified pageable and distance sort direction
         Page<PropertyListingDTO> results = propertyListingService.searchPropertiesWithDistanceSort(
             criteria, modifiedPageable, distanceSortDirection
         );
         
-        // Add debug logging to track source types
         long ownerCount = results.getContent().stream()
             .filter(p -> "OWNER".equals(p.getSourceType()))
             .count();
@@ -148,12 +122,7 @@ public class PropertyListingController {
         
         return ResponseEntity.ok(results);
     }
-    
-    /**
-     * Gets a specific property listing by its ID.
-     * @param id The ID of the property listing.
-     * @return The property listing DTO if found, otherwise 404 Not Found.
-     */
+
     @GetMapping("/{id}")
     public ResponseEntity<PropertyListingDTO> getPropertyById(@PathVariable Long id) {
         return propertyListingService.getPropertyById(id)
@@ -161,13 +130,7 @@ public class PropertyListingController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    /**
-     * Creates a new property listing.
-     * Requires the user to be authenticated.
-     * @param createDto The DTO containing information for the new property.
-     * @param userPrincipal The principal of the authenticated user.
-     * @return The created property listing DTO with HTTP status 201 (Created).
-     */
+
     @PostMapping("/scraped")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<PropertyListingDTO> createProperty(
@@ -188,14 +151,7 @@ public class PropertyListingController {
         return ResponseEntity.created(location).body(createdProperty);
     }
 
-    /**
-     * Updates an existing property listing.
-     * Requires the user to be authenticated. Authorization (owner or admin) is handled in the service layer.
-     * @param id The ID of the property to update.
-     * @param updateDto The DTO containing updated information for the property.
-     * @param userPrincipal The principal of the authenticated user.
-     * @return The updated property listing DTO.
-     */
+
     @PutMapping("/{id}")
     @PreAuthorize("isAuthenticated()") // Ensures only authenticated users can attempt to update
     public ResponseEntity<PropertyListingDTO> updateProperty(
@@ -214,21 +170,14 @@ public class PropertyListingController {
         return ResponseEntity.ok(updatedProperty);
     }
 
-    /**
-     * Deletes a property listing by its ID.
-     * Requires the user to be authenticated. Authorization (owner or admin) is handled in the service layer.
-     * @param id The ID of the property to delete.
-     * @param userPrincipal The principal of the authenticated user.
-     * @return HTTP status 204 (No Content) if successful.
-     */
+
     @DeleteMapping("/{id}")
-    @PreAuthorize("isAuthenticated()") // Ensures only authenticated users can attempt to delete
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> deleteProperty(
             @PathVariable Long id,
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         if (userPrincipal == null) {
-            // Should be caught by @PreAuthorize, but as a safeguard
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
@@ -237,17 +186,10 @@ public class PropertyListingController {
         
         propertyListingService.deleteProperty(id, currentUser);
         
-        return ResponseEntity.noContent().build(); // HTTP 204 No Content
+        return ResponseEntity.noContent().build();
     }
     
-    /**
-     * Uploads images for a specific property listing.
-     * Requires the user to be authenticated and be the owner of the property or an admin.
-     * @param id The ID of the property to upload images for.
-     * @param images The list of image files to upload.
-     * @param userPrincipal The principal of the authenticated user.
-     * @return The updated property listing DTO with new image URLs.
-     */
+
     @PostMapping("/scraped/{id}/images")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<PropertyListingDTO> uploadPropertyImages(
@@ -262,14 +204,13 @@ public class PropertyListingController {
                 .orElseThrow(() -> new RuntimeException("Authenticated user not found in database"));
 
         if (images == null || images.isEmpty() || images.stream().allMatch(MultipartFile::isEmpty)) {
-            return ResponseEntity.badRequest().build(); // Or handle as no-op success
+            return ResponseEntity.badRequest().build();
         }
 
         PropertyListingDTO updatedProperty = propertyListingService.addImagesToProperty(id, images, currentUser);
         return ResponseEntity.ok(updatedProperty);
     }
 
-    // Endpoint to get owner-specific listings for their profile
     @GetMapping("/mine")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<PropertyListingDTO>> getMyProperties(@AuthenticationPrincipal UserPrincipal userPrincipal) {
@@ -283,7 +224,6 @@ public class PropertyListingController {
         return ResponseEntity.ok(properties);
     }
 
-    // New endpoint for owner property creation
     @PostMapping
     @PreAuthorize("hasRole('OWNER')")
     public ResponseEntity<PropertyListingDTO> createProperty(
@@ -293,7 +233,6 @@ public class PropertyListingController {
         return new ResponseEntity<>(createdProperty, HttpStatus.CREATED);
     }
     
-    // Update property endpoint
     @PutMapping("/owner/{id}")
     @PreAuthorize("hasRole('OWNER')")
     public ResponseEntity<PropertyListingDTO> updateProperty(
@@ -304,7 +243,6 @@ public class PropertyListingController {
         return ResponseEntity.ok(updatedProperty);
     }
     
-    // Delete property endpoint
     @DeleteMapping("/owner/{id}")
     @PreAuthorize("hasRole('OWNER')")
     public ResponseEntity<Void> deleteProperty(
@@ -314,16 +252,13 @@ public class PropertyListingController {
         return ResponseEntity.noContent().build();
     }
     
-    // Get owner properties endpoint
     @GetMapping("/owner")
-    // Temporarily remove PreAuthorize for testing
-    // @PreAuthorize("hasRole('OWNER')")
+
     public ResponseEntity<List<PropertyListingDTO>> getOwnerProperties(Authentication authentication) {
         List<PropertyListingDTO> properties = propertyListingService.getPropertiesByOwner(authentication);
         return ResponseEntity.ok(properties);
     }
 
-    // Endpoint for owner property creation WITH images (multipart form data)
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('OWNER')")
     public ResponseEntity<PropertyListingDTO> createPropertyWithImages(
@@ -332,7 +267,6 @@ public class PropertyListingController {
             Authentication authentication) {
         
         try {
-            // Configure ObjectMapper for proper date handling
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.registerModule(new JavaTimeModule());
             objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
@@ -340,10 +274,8 @@ public class PropertyListingController {
             
             PropertyListingCreateDTO propertyListingDTO = objectMapper.readValue(propertyListingJsonString, PropertyListingCreateDTO.class);
             
-            // Create property first
             PropertyListingDTO createdProperty = propertyListingService.createPropertyByOwner(propertyListingDTO, authentication);
             
-            // Then add images if provided
             if (images != null && !images.isEmpty()) {
                 createdProperty = propertyListingService.addImagesToProperty(createdProperty.getId(), images, authentication);
             }
@@ -354,7 +286,6 @@ public class PropertyListingController {
         }
     }
 
-    // Endpoint for owner property update WITH images (multipart form data)
     @PutMapping(path = "/owner/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('OWNER')")
     public ResponseEntity<PropertyListingDTO> updatePropertyWithImages(
@@ -364,7 +295,6 @@ public class PropertyListingController {
             Authentication authentication) {
         
         try {
-            // Configure ObjectMapper for proper date handling
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.registerModule(new JavaTimeModule());
             objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
@@ -372,10 +302,8 @@ public class PropertyListingController {
             
             PropertyListingCreateDTO propertyListingDTO = objectMapper.readValue(propertyListingJsonString, PropertyListingCreateDTO.class);
             
-            // Update property first
             PropertyListingDTO updatedProperty = propertyListingService.updatePropertyByOwner(id, propertyListingDTO, authentication);
             
-            // Then add images if provided
             if (images != null && !images.isEmpty()) {
                 updatedProperty = propertyListingService.addImagesToProperty(id, images, authentication);
             }
@@ -386,13 +314,7 @@ public class PropertyListingController {
         }
     }
     
-    /**
-     * Gets the latest properties posted by owners, sorted by listing date.
-     * This endpoint is public and doesn't require authentication.
-     * 
-     * @param limit Optional parameter to limit the number of results (default is 6)
-     * @return List of the latest owner property listings
-     */
+
     @GetMapping("/latest-owner")
     public ResponseEntity<List<PropertyListingDTO>> getLatestOwnerProperties(
             @RequestParam(required = false, defaultValue = "6") int limit) {
@@ -406,14 +328,7 @@ public class PropertyListingController {
         return ResponseEntity.ok(latestProperties);
     }
 
-    /**
-     * Gets properties for a specific city.
-     * This endpoint returns properties based on the city name, with case-insensitive matching.
-     * 
-     * @param city The name of the city to filter by
-     * @param limit The maximum number of properties to return (default: 10)
-     * @return A list of property listings in the specified city
-     */
+
     @GetMapping("/by-city")
     public ResponseEntity<List<PropertyListingDTO>> getPropertiesByCity(
             @RequestParam String city,
@@ -425,12 +340,7 @@ public class PropertyListingController {
         return ResponseEntity.ok(cityProperties);
     }
 
-    /**
-     * Archive a property listing (mark as inactive)
-     * @param propertyId the ID of the property to archive
-     * @param userPrincipal the authenticated user principal
-     * @return the updated property listing DTO
-     */
+
     @PutMapping("/{propertyId}/archive")
     @PreAuthorize("hasRole('OWNER')")
     public ResponseEntity<PropertyListingDTO> archiveProperty(

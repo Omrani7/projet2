@@ -55,6 +55,7 @@ export class UserProfileService {
       institute: profileData.institute,
       userType: profileData.userType,
       studentYear: profileData.studentYear,
+      educationLevel: profileData.educationLevel,
       favoritePropertyIds: profileData.favoritePropertyIds,
       userId: profileData.userId
       // Explicitly exclude owner-specific fields: contactNumber, isAgency, state, etc.

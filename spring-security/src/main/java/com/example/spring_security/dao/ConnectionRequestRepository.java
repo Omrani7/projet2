@@ -12,42 +12,25 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Repository interface for ConnectionRequest entity operations
- * Provides methods for managing student-to-student connection requests
- */
+
 @Repository
 public interface ConnectionRequestRepository extends JpaRepository<ConnectionRequest, Long> {
     
-    /**
-     * Find connection request by ID with sender and receiver details
-     * @param id the connection request ID
-     * @return optional connection request with details
-     */
+
     @Query("SELECT cr FROM ConnectionRequest cr " +
            "LEFT JOIN FETCH cr.sender " +
            "LEFT JOIN FETCH cr.receiver " +
            "WHERE cr.id = :id")
     Optional<ConnectionRequest> findByIdWithDetails(@Param("id") Long id);
     
-    /**
-     * Find all connection requests sent by a specific user
-     * @param senderId the ID of the sender
-     * @param pageable pagination information
-     * @return page of sent connection requests
-     */
+
     @Query("SELECT cr FROM ConnectionRequest cr " +
            "LEFT JOIN FETCH cr.receiver " +
            "WHERE cr.sender.id = :senderId " +
            "ORDER BY cr.createdAt DESC")
     Page<ConnectionRequest> findBySenderIdOrderByCreatedAtDesc(@Param("senderId") Integer senderId, Pageable pageable);
     
-    /**
-     * Find all connection requests received by a specific user
-     * @param receiverId the ID of the receiver
-     * @param pageable pagination information
-     * @return page of received connection requests
-     */
+
     @Query("SELECT cr FROM ConnectionRequest cr " +
            "LEFT JOIN FETCH cr.sender " +
            "WHERE cr.receiver.id = :receiverId " +

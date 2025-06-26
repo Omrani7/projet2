@@ -15,10 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * REST controller for managing user roommate preferences
- * Allows students to set and update their roommate preferences for ML matching
- */
+
 @RestController
 @RequestMapping("/api/v1/users/roommate-preferences")
 public class UserRoommatePreferencesController {
@@ -32,10 +29,7 @@ public class UserRoommatePreferencesController {
         this.preferencesService = preferencesService;
     }
     
-    /**
-     * Get current user's roommate preferences
-     * GET /api/v1/users/roommate-preferences
-     */
+
     @GetMapping
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<UserRoommatePreferencesDTO> getCurrentUserPreferences(
@@ -48,10 +42,7 @@ public class UserRoommatePreferencesController {
         return ResponseEntity.ok(preferences);
     }
     
-    /**
-     * Create or update current user's roommate preferences
-     * PUT /api/v1/users/roommate-preferences
-     */
+
     @PutMapping
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<UserRoommatePreferencesDTO> updateCurrentUserPreferences(
@@ -66,10 +57,7 @@ public class UserRoommatePreferencesController {
         return ResponseEntity.ok(updatedPreferences);
     }
     
-    /**
-     * Check if current user has preferences set
-     * GET /api/v1/users/roommate-preferences/status
-     */
+
     @GetMapping("/status")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<Map<String, Object>> getPreferencesStatus(
@@ -86,10 +74,7 @@ public class UserRoommatePreferencesController {
         return ResponseEntity.ok(status);
     }
     
-    /**
-     * Delete current user's roommate preferences
-     * DELETE /api/v1/users/roommate-preferences
-     */
+
     @DeleteMapping
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<Map<String, String>> deleteCurrentUserPreferences(

@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { UserProfileService } from '../../services/user-profile.service';
@@ -11,6 +11,29 @@ import { PropertyCardComponent } from '../../components/property-card/property-c
 import { OwnerPropertyCardComponent } from '../../components/owner-property-card/owner-property-card.component';
 import { PropertyListingDTO } from '../../models/property-listing.dto';
 import { InquiryService } from '../../services/inquiry.service';
+
+// Custom validator for date of birth
+function dateOfBirthValidator(control: AbstractControl): ValidationErrors | null {
+  if (!control.value) {
+    return null; // Let required validator handle empty values
+  }
+  
+  const selectedDate = new Date(control.value);
+  const minDate = new Date('1990-01-01');
+  const maxDate = new Date('2007-12-31');
+  
+  if (selectedDate < minDate || selectedDate > maxDate) {
+    return { 
+      dateRange: { 
+        message: 'Date of birth must be between 1990 and 2007 for student eligibility',
+        min: '1990-01-01',
+        max: '2007-12-31'
+      } 
+    };
+  }
+  
+  return null;
+}
 
 @Component({
   selector: 'app-profile',
@@ -105,6 +128,11 @@ export class ProfileComponent implements OnInit {
       if (this.isOwner) {
         this.loadOwnerProperties();
       }
+      
+      // If user is a student, load closed deals count
+      if (this.isStudent) {
+        this.loadClosedDealsCount();
+      }
     } else {
       this.isLoading = false;
       this.errorMessage = 'Could not identify user.';
@@ -129,7 +157,7 @@ export class ProfileComponent implements OnInit {
         fieldOfStudy: ['', [Validators.required, Validators.minLength(2)]],
         studentYear: ['', [Validators.required]],
         educationLevel: ['', [Validators.required]],
-        dateOfBirth: ['']
+        dateOfBirth: ['', [dateOfBirthValidator]] // Added custom date validator
       });
     }
   }
@@ -198,7 +226,6 @@ export class ProfileComponent implements OnInit {
     const formValues = this.profileForm.value;
     
     // Start with a base from currentUserProfile if it exists, or an empty object
-    // Then, add only the fields relevant to the current role and form
     let profileToSend: Partial<UserProfile> = { 
       ...(this.currentUserProfile || {}), // Spread existing profile fields
       id: this.currentUserId // Ensure ID is present
@@ -232,9 +259,7 @@ export class ProfileComponent implements OnInit {
       delete profileToSend.isAgency;
     }
     
-    // The service expects UserProfile, so we cast. 
-    // This assumes UserProfile model fields are mostly optional or correctly handled by backend if not all are sent.
-    // Or, ensure all *required* fields for UserProfile are present in profileToSend.
+    // The service expects UserProfile, so we cast.
     const apiCall = this.isOwner 
       ? this.userProfileService.updateOwnerProfile(this.currentUserId, profileToSend as UserProfile)
       : this.userProfileService.updateStudentProfile(this.currentUserId, profileToSend as UserProfile);
@@ -262,6 +287,11 @@ export class ProfileComponent implements OnInit {
         this.isLoading = false;
         this.isEditing = false;
         this.successMessage = 'Profile updated successfully!';
+        
+        // Auto-dismiss success message after 4 seconds
+        setTimeout(() => {
+          this.successMessage = null;
+        }, 4000);
       },
       error: (err) => {
         this.errorMessage = typeof err === 'string' ? err : 'Failed to update profile. ' + (err.message || '');
@@ -450,6 +480,23 @@ export class ProfileComponent implements OnInit {
       error: (error) => {
         console.error('Error loading closed deals:', error);
         this.loadingClosedDeals = false;
+      }
+    });
+  }
+
+  // Load closed deals count for student
+  loadClosedDealsCount(): void {
+    if (!this.isStudent) {
+      return;
+    }
+
+    this.inquiryService.getStudentClosedDeals(0, 1).subscribe({
+      next: (response: any) => {
+        this.closedDealsCount = response.totalElements || 0;
+      },
+      error: (error: any) => {
+        console.error('Error loading closed deals count:', error);
+        this.closedDealsCount = 0;
       }
     });
   }

@@ -27,7 +27,6 @@ public class OAuth2FailureHandler implements AuthenticationFailureHandler {
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, 
                                       AuthenticationException exception) throws IOException, ServletException {
         String errorMessage = exception.getMessage();
-        // Try to get a more specific error from request parameters if available (e.g., from Google's error response)
         String errorParam = request.getParameter("error");
         String errorDescriptionParam = request.getParameter("error_description");
 
@@ -40,10 +39,8 @@ public class OAuth2FailureHandler implements AuthenticationFailureHandler {
         System.err.println("OAuth2 Authentication Failed: " + errorMessage);
         exception.printStackTrace();
         
-        // Clear the failed OAuth2 authorization request state
         authorizationRequestRepository.removeAuthorizationRequest(request, response);
         
-        // Redirect the popup to the callback HTML page with error information
         String targetUrl = appConfig.getOAuth2PopupCallbackUrlWithError(errorMessage);
         response.sendRedirect(targetUrl);
     }

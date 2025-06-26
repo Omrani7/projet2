@@ -158,4 +158,19 @@ export class HeaderComponent implements OnDestroy {
     // Navigate to login page
     this.router.navigate(['/auth/login']);
   }
+
+  navigateToRoommateLogin(): void {
+    // Store that user wants to access roommates feature after login
+    console.log('Header: User clicked Find Roommates - redirecting to login');
+    
+    // Save the roommates page as destination after login
+    localStorage.setItem('original_page', '/roommates/browse');
+    
+    // Set flag indicating this is a user-initiated login for roommate feature
+    localStorage.setItem('user_initiated_login', 'true');
+    localStorage.setItem('roommate_feature_requested', 'true');
+    
+    // Navigate to login page
+    this.router.navigate(['/auth/login']);
+  }
 }

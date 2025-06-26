@@ -17,10 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * REST controller for ML-powered roommate recommendations
- * Implements recommendation endpoints as specified in the plan
- */
+
 @RestController
 @RequestMapping("/api/v1/recommendations")
 public class RecommendationController {
@@ -34,10 +31,7 @@ public class RecommendationController {
         this.recommendationService = recommendationService;
     }
     
-    /**
-     * Get personalized roommate recommendations for authenticated user
-     * GET /api/v1/recommendations/roommates
-     */
+
     @GetMapping("/roommates")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<List<AnnouncementWithScore>> getPersonalizedRecommendations(
@@ -57,10 +51,7 @@ public class RecommendationController {
         return ResponseEntity.ok(recommendations);
     }
     
-    /**
-     * Get high-quality matches (compatibility score >= 70%)
-     * GET /api/v1/recommendations/high-quality
-     */
+
     @GetMapping("/high-quality")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<List<AnnouncementWithScore>> getHighQualityMatches(
@@ -79,10 +70,7 @@ public class RecommendationController {
         return ResponseEntity.ok(highQualityMatches);
     }
     
-    /**
-     * Get compatible applicants for a specific announcement
-     * GET /api/v1/recommendations/announcements/{announcementId}/compatible-applicants
-     */
+
     @GetMapping("/announcements/{announcementId}/compatible-applicants")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<List<UserWithScore>> getCompatibleApplicants(
@@ -101,10 +89,7 @@ public class RecommendationController {
         return ResponseEntity.ok(compatibleApplicants);
     }
     
-    /**
-     * Get similar users for a specific announcement
-     * GET /api/v1/recommendations/announcements/{announcementId}/similar-users
-     */
+
     @GetMapping("/announcements/{announcementId}/similar-users")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<List<UserWithScore>> getSimilarUsers(
@@ -124,11 +109,7 @@ public class RecommendationController {
         return ResponseEntity.ok(similarUsers);
     }
     
-    /**
-     * NEW: Get compatible students based on user profile (general recommendations)
-     * Not tied to specific announcements - discover potential roommates
-     * GET /api/v1/recommendations/compatible-students
-     */
+
     @GetMapping("/compatible-students")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<List<UserWithScore>> getCompatibleStudents(
@@ -147,10 +128,7 @@ public class RecommendationController {
         return ResponseEntity.ok(compatibleStudents);
     }
     
-    /**
-     * Get recommendation statistics for authenticated user
-     * GET /api/v1/recommendations/stats
-     */
+
     @GetMapping("/stats")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<RecommendationStatsDTO> getRecommendationStats(
@@ -164,10 +142,7 @@ public class RecommendationController {
         return ResponseEntity.ok(stats);
     }
     
-    /**
-     * Mark a recommendation as viewed
-     * POST /api/v1/recommendations/{matchId}/view
-     */
+
     @PostMapping("/{matchId}/view")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<Map<String, String>> markRecommendationAsViewed(
@@ -185,10 +160,7 @@ public class RecommendationController {
         return ResponseEntity.ok(response);
     }
     
-    /**
-     * Mark a recommendation as clicked
-     * POST /api/v1/recommendations/{matchId}/click
-     */
+
     @PostMapping("/{matchId}/click")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<Map<String, String>> markRecommendationAsClicked(
@@ -206,18 +178,14 @@ public class RecommendationController {
         return ResponseEntity.ok(response);
     }
     
-    /**
-     * Get ML model performance metrics (for admin/analytics)
-     * GET /api/v1/recommendations/model-metrics
-     */
+
     @GetMapping("/model-metrics")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, Object>> getModelMetrics() {
         
         logger.info("Getting ML model performance metrics");
         
-        // This would typically fetch metrics from the ML service
-        // For now, return basic placeholder metrics
+
         Map<String, Object> metrics = new HashMap<>();
         metrics.put("recommendation_accuracy", 0.85);
         metrics.put("click_through_rate", 0.23);
@@ -228,10 +196,7 @@ public class RecommendationController {
         return ResponseEntity.ok(metrics);
     }
     
-    /**
-     * Health check for recommendation service
-     * GET /api/v1/recommendations/health
-     */
+
     @GetMapping("/health")
     public ResponseEntity<Map<String, String>> healthCheck() {
         
@@ -243,10 +208,7 @@ public class RecommendationController {
         return ResponseEntity.ok(health);
     }
     
-    /**
-     * Get recommendation algorithm weights (for debugging)
-     * GET /api/v1/recommendations/algorithm-info
-     */
+
     @GetMapping("/algorithm-info")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, Object>> getAlgorithmInfo() {
@@ -257,10 +219,10 @@ public class RecommendationController {
         algorithmInfo.put("algorithm_type", "Academic-Focused University-Based Scoring");
         algorithmInfo.put("description", "Prioritizes university → field of study → education level → age compatibility");
         algorithmInfo.put("factors", Map.of(
-                "university_weight", 0.40,      // PRIMARY: Same university students
-                "study_field_weight", 0.25,     // SECONDARY: Same field of study
-                "education_level_weight", 0.20, // TERTIARY: Same education level  
-                "age_weight", 0.15              // QUATERNARY: Similar age
+                "university_weight", 0.40,
+                "study_field_weight", 0.25,
+                "education_level_weight", 0.20,
+                "age_weight", 0.15
         ));
         algorithmInfo.put("priority_order", new String[]{"University", "Field of Study", "Education Level", "Age"});
         algorithmInfo.put("min_compatibility_threshold", 0.30);

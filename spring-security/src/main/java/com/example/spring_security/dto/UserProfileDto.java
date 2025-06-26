@@ -22,6 +22,7 @@ public class UserProfileDto {
     private String institute;
     private UserProfile.UserType userType;
     private String studentYear;
+    private UserProfile.EducationLevel educationLevel;
     private Set<Long> favoritePropertyIds;
     // We might also need userId for context in some scenarios, though UserProfile is tied to a User
     private int userId; 

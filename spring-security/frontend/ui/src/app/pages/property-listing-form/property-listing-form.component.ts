@@ -56,6 +56,10 @@ export class PropertyListingFormComponent implements OnInit {
   formSubmitError = '';
   formSubmitSuccess = '';
 
+  // Toast notification properties
+  showSuccessToast = false;
+  successToastMessage = '';
+
   // Edit mode
   isEditMode = false;
   propertyIdForEdit: number | null = null;
@@ -93,14 +97,13 @@ export class PropertyListingFormComponent implements OnInit {
       bathrooms: [1, [Validators.required, Validators.min(0)]],
       area: [null, [Validators.required, Validators.min(1)]],
       selectedAmenities: [[]],
-      hasBalcony: [false],
       floor: [0]
     });
 
     this.pricingForm = this.fb.group({
       price: [null, [Validators.required, Validators.min(1)]],
       securityDeposit: [null],
-      availableFrom: [this.formatDate(new Date()), Validators.required],
+      availableFrom: [this.formatDate(new Date()), [Validators.required, this.dateNotInPastValidator()]],
       availableTo: [''],
       paymentFrequency: ['monthly', Validators.required],
       minimumStayMonths: [1, [Validators.required, Validators.min(1)]],
@@ -149,7 +152,6 @@ export class PropertyListingFormComponent implements OnInit {
       bathrooms: [1, [Validators.required, Validators.min(0)]],
       area: [null, [Validators.required, Validators.min(1)]],
       selectedAmenities: [[]],
-      hasBalcony: [false],
       floor: [0]
     });
 
@@ -157,7 +159,7 @@ export class PropertyListingFormComponent implements OnInit {
     this.pricingForm = this.fb.group({
       price: [null, [Validators.required, Validators.min(1)]],
       securityDeposit: [null],
-      availableFrom: [this.formatDate(new Date()), Validators.required],
+      availableFrom: [this.formatDate(new Date()), [Validators.required, this.dateNotInPastValidator()]],
       availableTo: [''],
       paymentFrequency: ['monthly', Validators.required],
       minimumStayMonths: [1, [Validators.required, Validators.min(1)]],
@@ -188,7 +190,6 @@ export class PropertyListingFormComponent implements OnInit {
           bathrooms: property.bathrooms,
           area: property.area,
           selectedAmenities: property.amenities || [],
-          hasBalcony: property.hasBalcony,
           floor: property.floor
         });
         this.pricingForm.patchValue({
@@ -326,7 +327,6 @@ export class PropertyListingFormComponent implements OnInit {
       bathrooms: Number(this.detailsForm.get('bathrooms')?.value) || 0,
       area: Number(this.detailsForm.get('area')?.value) || 0,
       floor: Number(this.detailsForm.get('floor')?.value) ?? 0,
-      hasBalcony: this.detailsForm.get('hasBalcony')?.value || false,
       amenities: this.detailsForm.get('selectedAmenities')?.value || [],
       price: Number(this.pricingForm.get('price')?.value) || 0,
       securityDeposit: Number(this.pricingForm.get('securityDeposit')?.value) || null,
@@ -361,9 +361,16 @@ export class PropertyListingFormComponent implements OnInit {
       this.http.put(`${this.apiUrl}/owner/${this.propertyIdForEdit}`, formData, { headers: headers }).subscribe({
         next: (response) => {
           this.isSubmitting = false;
-          this.formSubmitSuccess = 'Property updated successfully!';
+          this.showSuccessToast = true;
+          this.successToastMessage = 'Property updated successfully!';
           this.selectedFiles = [];
           this.previewUrls = [];
+          
+          // Auto-hide toast and navigate
+          setTimeout(() => {
+            this.showSuccessToast = false;
+          }, 4000);
+          
           setTimeout(() => {
             this.router.navigate(['/owner/my-listings']);
           }, 2000);
@@ -387,10 +394,16 @@ export class PropertyListingFormComponent implements OnInit {
       this.http.post(this.apiUrl, formData, { headers: headers }).subscribe({
         next: (response) => {
           this.isSubmitting = false;
-          this.formSubmitSuccess = 'Property listing created successfully!';
+          this.showSuccessToast = true;
+          this.successToastMessage = 'Property listing created successfully!';
           this.selectedFiles = [];
           this.previewUrls = [];
-          // Reset forms or navigate
+          
+          // Auto-hide toast and navigate
+          setTimeout(() => {
+            this.showSuccessToast = false;
+          }, 4000);
+          
           setTimeout(() => {
             this.router.navigate(['/owner/my-listings']);
           }, 2000);
@@ -499,9 +512,38 @@ export class PropertyListingFormComponent implements OnInit {
   // Show success message
   showSuccessAndNavigate(message: string): void {
     this.formSubmitSuccess = message;
+    
+    // Clear any existing error message
+    this.formSubmitError = '';
+    
+    // Navigate to the owner dashboard after a short delay
     setTimeout(() => {
-      this.router.navigate(['/owner/my-listings']);
+      this.router.navigate(['/owner/dashboard']);
     }, 2000);
+  }
+
+  // Custom validator for date range
+  dateNotInPastValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (!control.value) {
+        return null; // Let required validator handle empty values
+      }
+      
+      const selectedDate = new Date(control.value);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Set to start of today
+      selectedDate.setHours(0, 0, 0, 0); // Set to start of selected date
+      
+      if (selectedDate < today) {
+        return { dateNotInPast: true };
+      }
+      return null;
+    };
+  }
+
+  // Get today's date in YYYY-MM-DD format for min attribute
+  get todaysDate(): string {
+    return this.formatDate(new Date());
   }
 }
 

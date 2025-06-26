@@ -39,8 +39,7 @@ public class AdminController {
     @Autowired
     private UserService userService;
 
-    // ==================== DASHBOARD STATS ====================
-    
+
     @GetMapping("/test")
     public ResponseEntity<String> testEndpoint() {
         return ResponseEntity.ok("Admin controller is working!");
@@ -83,7 +82,7 @@ public class AdminController {
         return ResponseEntity.ok(activity);
     }
 
-    // ==================== USER MANAGEMENT ====================
+
     
     @GetMapping("/users")
     public ResponseEntity<Page<AdminUserDto>> getAllUsers(
@@ -158,8 +157,7 @@ public class AdminController {
         }
     }
 
-    // ==================== PROPERTY MANAGEMENT ====================
-    
+
     @GetMapping("/properties")
     public ResponseEntity<Page<AdminPropertyDto>> getAllProperties(
             @RequestParam(defaultValue = "0") int page,
@@ -208,8 +206,7 @@ public class AdminController {
         }
     }
 
-    // ==================== ROOMMATE MANAGEMENT ====================
-    
+
     @GetMapping("/roommate-announcements")
     public ResponseEntity<Page<AdminRoommateAnnouncementDto>> getAllRoommateAnnouncements(
             @RequestParam(defaultValue = "0") int page,
@@ -273,8 +270,7 @@ public class AdminController {
         return ResponseEntity.ok(stats);
     }
 
-    // ==================== INQUIRY MANAGEMENT ====================
-    
+
     @GetMapping("/inquiries")
     public ResponseEntity<Page<Inquiry>> getAllInquiries(
             @RequestParam(defaultValue = "0") int page,
@@ -293,8 +289,7 @@ public class AdminController {
         return ResponseEntity.ok(inquiries);
     }
 
-    // ==================== SYSTEM ACTIONS ====================
-    
+
     @PostMapping("/system/clear-cache")
     public ResponseEntity<String> clearSystemCache() {
         logger.info("Admin requesting system cache clear");
@@ -308,8 +303,7 @@ public class AdminController {
         }
     }
     
-    // ==================== DATA EXPORT ENDPOINTS ====================
-    
+
     @PostMapping("/export/users")
     public ResponseEntity<String> exportUsersReport(@RequestBody Map<String, String> request) {
         String format = request.getOrDefault("format", "csv");

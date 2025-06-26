@@ -85,20 +85,17 @@ public class UserController {
     @GetMapping("/me")
     @PreAuthorize("isAuthenticated()") // Ensure user is logged in
     public ResponseEntity<UserInfoResponse> getCurrentUser(@AuthenticationPrincipal UserPrincipal principal) {
-        // The @AuthenticationPrincipal annotation injects the UserDetails object (our UserPrincipal)
         if (principal == null) {
-            // Should not happen if @PreAuthorize works, but good practice
-            return ResponseEntity.status(401).build(); 
+            return ResponseEntity.status(401).build();
         }
         
-        // Build the response DTO from the UserPrincipal
         UserInfoResponse userInfo = UserInfoResponse.builder()
-                .id(principal.getId()) // Assuming UserPrincipal has getId()
-                .email(principal.getEmail()) // Assuming UserPrincipal has getEmail()
-                .username(principal.getUsername()) // UserDetails standard method
-                .role(principal.getRole()) // Assuming UserPrincipal has getRole()
-                .authProvider(principal.getUser().getProvider()) // Need to access underlying User for this
-                .enabled(principal.isEnabled()) // UserDetails standard method
+                .id(principal.getId())
+                .email(principal.getEmail())
+                .username(principal.getUsername())
+                .role(principal.getRole())
+                .authProvider(principal.getUser().getProvider())
+                .enabled(principal.isEnabled())
                 .build();
                 
         return ResponseEntity.ok(userInfo);

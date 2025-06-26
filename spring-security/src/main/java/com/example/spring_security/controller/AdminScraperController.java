@@ -27,24 +27,17 @@ public class AdminScraperController {
     @Autowired
     private ScraperIntegrationService scraperIntegrationService;
 
-    /**
-     * Endpoint to manually trigger the Immobilier scraper.
-     * Requires ADMIN role.
-     * Checks scraper service status before triggering.
-     * @return ResponseEntity indicating success or failure of the trigger submission.
-     */
+
     @PostMapping("/trigger/immobilier")
-    @PreAuthorize("hasRole('ADMIN')") // Ensure only admins can call this
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> triggerImmobilier() {
         log.info("Admin request received to trigger Immobilier scraper.");
         
         try {
-            // Step 1: Check scraper service status
             log.debug("Checking scraper service status...");
-            String status = scraperIntegrationService.getScraperStatus(); // This will throw ScraperServiceUnavailableException if down
-            log.info("Scraper service status: {}", status); // Log status if successful
+            String status = scraperIntegrationService.getScraperStatus();
+            log.info("Scraper service status: {}", status);
 
-            // Step 2: If status check passed (no exception), trigger the scrape
             scrapingClientService.triggerImmobilierScrape();
             return ResponseEntity.ok("Immobilier scraper trigger request submitted successfully. Service status: " + status);
 
@@ -53,31 +46,22 @@ public class AdminScraperController {
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
                     .body("Scraping service is not available. Please ensure it is started. Details: " + e.getMessage());
         } catch (Exception e) {
-            // Catch other potential exceptions if the client service re-throws or other issues occur during trigger
             log.error("Error encountered while processing admin trigger for Immobilier scraper: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Failed to submit Immobilier scraper trigger request after status check. Error: " + e.getMessage());
         }
     }
 
-    /**
-     * Endpoint to manually trigger the Tayara scraper with a custom URL.
-     * Requires ADMIN role.
-     * Checks scraper service status before triggering.
-     * @param url The Tayara URL to scrape (optional)
-     * @return ResponseEntity indicating success or failure of the trigger submission.
-     */
+
     @PostMapping("/trigger/tayara")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> triggerTayara(@RequestParam(required = false) String url) {
         log.info("Admin request received to trigger Tayara scraper. URL: {}", url);
         try {
-            // Step 1: Check scraper service status
             log.debug("Checking scraper service status...");
             String status = scraperIntegrationService.getScraperStatus();
             log.info("Scraper service status: {}", status);
 
-            // Step 2: If status check passed (no exception), trigger the scrape
             scrapingClientService.triggerTayaraScrape(url);
             return ResponseEntity.ok("Tayara scraper trigger request submitted successfully");
 
@@ -92,11 +76,7 @@ public class AdminScraperController {
         }
     }
 
-    /**
-     * Endpoint to get scraper service status.
-     * Requires ADMIN role.
-     * @return ResponseEntity with scraper status information.
-     */
+
     @GetMapping("/status")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> getScraperStatus() {
@@ -115,5 +95,4 @@ public class AdminScraperController {
         }
     }
 
-    // TODO: Add endpoints for triggering other scrapers later
-} 
+}

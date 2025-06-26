@@ -18,9 +18,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * REST controller for managing roommate announcements and applications
- */
+
 @RestController
 @RequestMapping("/api/v1/roommates")
 public class RoommateController {
@@ -34,12 +32,7 @@ public class RoommateController {
         this.roommateService = roommateService;
     }
     
-    // ===== ROOMMATE ANNOUNCEMENT ENDPOINTS =====
-    
-    /**
-     * Create a new roommate announcement
-     * POST /api/v1/roommates/announcements
-     */
+
     @PostMapping("/announcements")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<RoommateAnnouncementDTO> createAnnouncement(
@@ -54,10 +47,7 @@ public class RoommateController {
         return ResponseEntity.created(location).body(createdAnnouncement);
     }
     
-    /**
-     * Get announcements for browsing (excluding current user's announcements)
-     * GET /api/v1/roommates/announcements
-     */
+
     @GetMapping("/announcements")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<Page<RoommateAnnouncementDTO>> getAnnouncementsForBrowsing(
@@ -71,10 +61,7 @@ public class RoommateController {
         return ResponseEntity.ok(announcements);
     }
     
-    /**
-     * Get announcements posted by the current user
-     * GET /api/v1/roommates/announcements/my
-     */
+
     @GetMapping("/announcements/my")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<Page<RoommateAnnouncementDTO>> getMyAnnouncements(
@@ -88,10 +75,7 @@ public class RoommateController {
         return ResponseEntity.ok(announcements);
     }
     
-    /**
-     * Get announcement by ID with details
-     * GET /api/v1/roommates/announcements/{id}
-     */
+
     @GetMapping("/announcements/{id}")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<RoommateAnnouncementDTO> getAnnouncementById(
@@ -105,12 +89,7 @@ public class RoommateController {
         return ResponseEntity.ok(announcement);
     }
     
-    // ===== ROOMMATE APPLICATION ENDPOINTS =====
-    
-    /**
-     * Apply to a roommate announcement
-     * POST /api/v1/roommates/applications
-     */
+
     @PostMapping("/applications")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<RoommateApplicationDTO> applyToAnnouncement(
@@ -125,10 +104,7 @@ public class RoommateController {
         return ResponseEntity.created(location).body(createdApplication);
     }
     
-    /**
-     * Get applications received for user's announcements
-     * GET /api/v1/roommates/applications/received
-     */
+
     @GetMapping("/applications/received")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<Page<RoommateApplicationDTO>> getReceivedApplications(
@@ -144,10 +120,7 @@ public class RoommateController {
         return ResponseEntity.ok(applications);
     }
     
-    /**
-     * Get applications sent by the current user
-     * GET /api/v1/roommates/applications/sent
-     */
+
     @GetMapping("/applications/sent")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<Page<RoommateApplicationDTO>> getSentApplications(
@@ -161,10 +134,7 @@ public class RoommateController {
         return ResponseEntity.ok(applications);
     }
     
-    /**
-     * Respond to an application (accept/reject)
-     * PUT /api/v1/roommates/applications/{id}/respond
-     */
+
     @PutMapping("/applications/{id}/respond")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<RoommateApplicationDTO> respondToApplication(
@@ -179,12 +149,7 @@ public class RoommateController {
         return ResponseEntity.ok(updatedApplication);
     }
     
-    // ===== CLOSED DEALS ENDPOINTS =====
-    
-    /**
-     * Get closed deals for student to create Type A announcements
-     * GET /api/v1/roommates/closed-deals
-     */
+
     @GetMapping("/closed-deals")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<Page<InquiryDTO>> getClosedDealsForStudent(
@@ -198,12 +163,7 @@ public class RoommateController {
         return ResponseEntity.ok(closedDeals);
     }
     
-    // ===== UTILITY ENDPOINTS =====
-    
-    /**
-     * Get application count for a specific announcement
-     * GET /api/v1/roommates/announcements/{id}/application-count
-     */
+
     @GetMapping("/announcements/{id}/application-count")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<Map<String, Long>> getApplicationCount(
@@ -212,7 +172,6 @@ public class RoommateController {
         
         logger.info("Fetching application count for announcement {} by user {}", id, currentUser.getId());
         
-        // This endpoint gets announcement details and extracts application count
         RoommateAnnouncementDTO announcement = roommateService.getAnnouncementById(id, currentUser);
         
         Map<String, Long> response = new HashMap<>();

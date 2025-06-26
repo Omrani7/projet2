@@ -7,6 +7,8 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,6 +17,7 @@ import java.util.Map;
 @RequestMapping("/auth/password")
 public class PasswordController {
     
+    private static final Logger logger = LoggerFactory.getLogger(PasswordController.class);
     private final UserService userService;
     
     public PasswordController(UserService userService) {
@@ -23,15 +26,19 @@ public class PasswordController {
     
     @PostMapping("/forgot")
     public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        logger.info("Received forgot password request for email: {}", request.getEmail());
+        
         try {
             userService.sendPasswordResetEmail(request.getEmail());
-            
+            logger.info("Password reset email process completed for: {}", request.getEmail());
 
             Map<String, String> response = new HashMap<>();
             response.put("message", "If an account exists with that email, we have sent password reset instructions.");
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {
+            logger.error("Error processing forgot password request for {}: {}", request.getEmail(), e.getMessage(), e);
+            
             Map<String, String> response = new HashMap<>();
             response.put("error", "Failed to process request: " + e.getMessage());
             

@@ -20,10 +20,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * REST Controller for managing connection requests between students
- * Provides endpoints for sending, receiving, and responding to connection requests
- */
+
 @RestController
 @RequestMapping("/api/v1/connections")
 public class ConnectionRequestController {
@@ -37,10 +34,7 @@ public class ConnectionRequestController {
         this.connectionRequestService = connectionRequestService;
     }
     
-    /**
-     * Send a connection request to another student
-     * POST /api/v1/connections/request
-     */
+
     @PostMapping("/request")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<ConnectionRequestDTO> sendConnectionRequest(
@@ -57,10 +51,7 @@ public class ConnectionRequestController {
         return ResponseEntity.created(location).body(connectionRequest);
     }
     
-    /**
-     * Get connection requests sent by the current user
-     * GET /api/v1/connections/sent
-     */
+
     @GetMapping("/sent")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<Page<ConnectionRequestDTO>> getSentRequests(
@@ -75,10 +66,7 @@ public class ConnectionRequestController {
         return ResponseEntity.ok(sentRequests);
     }
     
-    /**
-     * Get connection requests received by the current user
-     * GET /api/v1/connections/received
-     */
+
     @GetMapping("/received")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<Page<ConnectionRequestDTO>> getReceivedRequests(
@@ -93,10 +81,7 @@ public class ConnectionRequestController {
         return ResponseEntity.ok(receivedRequests);
     }
     
-    /**
-     * Get pending connection requests received by the current user
-     * GET /api/v1/connections/pending
-     */
+
     @GetMapping("/pending")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<Page<ConnectionRequestDTO>> getPendingReceivedRequests(
@@ -111,10 +96,7 @@ public class ConnectionRequestController {
         return ResponseEntity.ok(pendingRequests);
     }
     
-    /**
-     * Respond to a connection request (accept or reject)
-     * PUT /api/v1/connections/{id}/respond
-     */
+
     @PutMapping("/{id}/respond")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<ConnectionRequestDTO> respondToConnectionRequest(
@@ -131,10 +113,7 @@ public class ConnectionRequestController {
         return ResponseEntity.ok(updatedRequest);
     }
     
-    /**
-     * Get a specific connection request by ID
-     * GET /api/v1/connections/{id}
-     */
+
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<ConnectionRequestDTO> getConnectionRequestById(
@@ -149,10 +128,7 @@ public class ConnectionRequestController {
         return ResponseEntity.ok(connectionRequest);
     }
     
-    /**
-     * Get count of pending connection requests received by user
-     * GET /api/v1/connections/pending/count
-     */
+
     @GetMapping("/pending/count")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<Map<String, Long>> getPendingRequestsCount(
@@ -168,10 +144,7 @@ public class ConnectionRequestController {
         return ResponseEntity.ok(response);
     }
     
-    /**
-     * Check if a connection exists between current user and another user
-     * GET /api/v1/connections/exists/{userId}
-     */
+
     @GetMapping("/exists/{userId}")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<Map<String, Boolean>> checkConnectionExists(
@@ -189,10 +162,7 @@ public class ConnectionRequestController {
         return ResponseEntity.ok(response);
     }
     
-    /**
-     * Get accepted connections for a user (their network)
-     * GET /api/v1/connections/network
-     */
+
     @GetMapping("/network")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<Page<ConnectionRequestDTO>> getAcceptedConnections(

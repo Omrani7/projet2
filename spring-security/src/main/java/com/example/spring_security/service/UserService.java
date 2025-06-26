@@ -310,6 +310,7 @@ public class UserService {
         userProfile.setInstitute(userProfileDto.getInstitute());
         userProfile.setFieldOfStudy(userProfileDto.getFieldOfStudy()); // DTO's fieldOfStudy maps to entity's fieldOfStudy
         userProfile.setStudentYear(userProfileDto.getStudentYear());
+        userProfile.setEducationLevel(userProfileDto.getEducationLevel()); // Add missing education level field
         userProfile.setDateOfBirth(userProfileDto.getDateOfBirth()); // Assuming dateOfBirth is editable here
         
         // For collections like favorites, handle them carefully (e.g., clear and add, or more sophisticated merge)

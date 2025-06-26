@@ -274,6 +274,30 @@ export class FilterBarComponent implements OnDestroy, OnChanges, OnInit {
   }
 
   onFocusInstitute(): void {
+    // Close all other dropdowns when institutes dropdown is opened
+    if (this.showPriceFilter) {
+      this.showPriceFilter = false;
+      if (this.closePriceFilterUnlisten) {
+        this.closePriceFilterUnlisten();
+        this.closePriceFilterUnlisten = null;
+      }
+    }
+    
+    if (this.showSortDropdown) {
+      this.showSortDropdown = false;
+      document.removeEventListener('click', this.closeSortDropdown);
+    }
+    
+    if (this.showDistanceDropdown) {
+      this.showDistanceDropdown = false;
+      document.removeEventListener('click', this.closeDistanceDropdown);
+    }
+    
+    if (this.showBedroomsDropdown) {
+      this.showBedroomsDropdown = false;
+      document.removeEventListener('click', this.closeBedroomsDropdown);
+    }
+
     const query = this.searchForm.get('instituteQuery')!.value;
     this.showInstitutesDropdown = query && query.trim().length > 0;
   }
@@ -308,6 +332,7 @@ export class FilterBarComponent implements OnDestroy, OnChanges, OnInit {
   }
 
   clearInstituteSearch(): void {
+    this.closeAllDropdowns();
     this.searchForm.get('instituteQuery')!.setValue('', { emitEvent: true });
     this.showInstitutesDropdown = false;
     this.instituteSelected.emit(null);
@@ -316,8 +341,31 @@ export class FilterBarComponent implements OnDestroy, OnChanges, OnInit {
   togglePriceFilter(event: MouseEvent): void {
     event.stopPropagation();
 
+    // Close all other dropdowns first
     const wasOpen = this.showPriceFilter;
-    this.showPriceFilter = !this.showPriceFilter;
+    
+    // Close other dropdowns but not the price filter itself
+    if (this.showSortDropdown) {
+      this.showSortDropdown = false;
+      document.removeEventListener('click', this.closeSortDropdown);
+    }
+    
+    if (this.showDistanceDropdown) {
+      this.showDistanceDropdown = false;
+      document.removeEventListener('click', this.closeDistanceDropdown);
+    }
+    
+    if (this.showBedroomsDropdown) {
+      this.showBedroomsDropdown = false;
+      document.removeEventListener('click', this.closeBedroomsDropdown);
+    }
+    
+    if (this.showInstitutesDropdown) {
+      this.showInstitutesDropdown = false;
+    }
+
+    // Now toggle the price filter
+    this.showPriceFilter = !wasOpen;
 
     if (this.showPriceFilter) {
       setTimeout(() => {
@@ -357,16 +405,24 @@ export class FilterBarComponent implements OnDestroy, OnChanges, OnInit {
     }
   }
 
-  toggleFilterModal(): void { this.showFilterModal = !this.showFilterModal; }
+  toggleFilterModal(): void { 
+    this.closeAllDropdowns();
+    this.showFilterModal = !this.showFilterModal; 
+  }
+  
   closeFilterModal(): void { this.showFilterModal = false; }
+  
   selectSort(event: Event): void { 
     const selectElement = event.target as HTMLSelectElement;
     if (selectElement && selectElement.value) {
         this.sortChanged.emit(selectElement.value);
     }
   }
+  
   selectBedrooms(value: number | null): void { this.filterForm.get('bedrooms')!.setValue(value); }
+  
   applyFiltersAndCloseModal(): void { this.applyFilters(); this.closeFilterModal(); }
+  
   applyFilters(): void { 
     const criteria: PropertySearchCriteria = {};
     const formVal = this.filterForm.value;
@@ -377,7 +433,9 @@ export class FilterBarComponent implements OnDestroy, OnChanges, OnInit {
     
     this.filtersChanged.emit(criteria);
   }
+  
   clearAllFilters(): void { 
+    this.closeAllDropdowns();
     this.filterForm.reset({
         minPrice: '',
         maxPrice: '',
@@ -535,14 +593,43 @@ export class FilterBarComponent implements OnDestroy, OnChanges, OnInit {
     }
   }
 
+  // New method to close all dropdowns
+  closeAllDropdowns(): void {
+    // Close price filter
+    this.closePriceFilterIfOpen();
+    
+    // Close sort dropdown
+    if (this.showSortDropdown) {
+      this.showSortDropdown = false;
+      document.removeEventListener('click', this.closeSortDropdown);
+    }
+    
+    // Close distance dropdown
+    if (this.showDistanceDropdown) {
+      this.showDistanceDropdown = false;
+      document.removeEventListener('click', this.closeDistanceDropdown);
+    }
+    
+    // Close bedrooms dropdown
+    if (this.showBedroomsDropdown) {
+      this.showBedroomsDropdown = false;
+      document.removeEventListener('click', this.closeBedroomsDropdown);
+    }
+    
+    // Close institutes dropdown
+    if (this.showInstitutesDropdown) {
+      this.showInstitutesDropdown = false;
+    }
+  }
+
   // Toggle methods for custom dropdowns
   toggleSortDropdown(): void {
-    // Close other dropdowns first
-    this.closePriceFilterIfOpen();
-    this.showDistanceDropdown = false;
+    // Close all other dropdowns first
+    const wasOpen = this.showSortDropdown;
+    this.closeAllDropdowns();
     
-    // Toggle sort dropdown
-    this.showSortDropdown = !this.showSortDropdown;
+    // Toggle sort dropdown (only open if it wasn't already open)
+    this.showSortDropdown = !wasOpen;
     
     if (this.showSortDropdown) {
       // Add a document click listener to close the dropdown when clicking outside
@@ -553,12 +640,12 @@ export class FilterBarComponent implements OnDestroy, OnChanges, OnInit {
   }
   
   toggleDistanceDropdown(): void {
-    // Close other dropdowns first
-    this.closePriceFilterIfOpen();
-    this.showSortDropdown = false;
+    // Close all other dropdowns first
+    const wasOpen = this.showDistanceDropdown;
+    this.closeAllDropdowns();
     
-    // Toggle distance dropdown
-    this.showDistanceDropdown = !this.showDistanceDropdown;
+    // Toggle distance dropdown (only open if it wasn't already open)
+    this.showDistanceDropdown = !wasOpen;
     
     if (this.showDistanceDropdown) {
       // Add a document click listener to close the dropdown when clicking outside
@@ -630,13 +717,12 @@ export class FilterBarComponent implements OnDestroy, OnChanges, OnInit {
 
   // Toggle method for bedrooms dropdown
   toggleBedroomsDropdown(): void {
-    // Close other dropdowns first
-    this.closePriceFilterIfOpen();
-    this.showSortDropdown = false;
-    this.showDistanceDropdown = false;
+    // Close all other dropdowns first
+    const wasOpen = this.showBedroomsDropdown;
+    this.closeAllDropdowns();
     
-    // Toggle bedrooms dropdown
-    this.showBedroomsDropdown = !this.showBedroomsDropdown;
+    // Toggle bedrooms dropdown (only open if it wasn't already open)
+    this.showBedroomsDropdown = !wasOpen;
     
     if (this.showBedroomsDropdown) {
       // Add a document click listener to close the dropdown when clicking outside

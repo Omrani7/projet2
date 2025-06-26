@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
-import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule, FormsModule, AbstractControl, ValidatorFn } from '@angular/forms';
 import { RoommateService, RoommateAnnouncementCreateDTO } from '../../services/roommate.service';
 import { AuthService } from '../../auth/auth.service';
 
@@ -55,6 +55,10 @@ export class PostRoommateAnnouncementComponent implements OnInit {
   successMessage: string | null = null;
   showPreview = false;
 
+  // Toast notification properties
+  showSuccessToast = false;
+  successToastMessage = '';
+
   constructor(
     private fb: FormBuilder,
     private roommateService: RoommateService,
@@ -67,6 +71,33 @@ export class PostRoommateAnnouncementComponent implements OnInit {
   ngOnInit(): void {
     this.loadClosedDeals();
     this.setupFormWatchers();
+  }
+
+  /**
+   * Get today's date in YYYY-MM-DD format for date input min attribute
+   */
+  get todaysDate(): string {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+  }
+
+  /**
+   * Custom validator to ensure date is not in the past
+   */
+  private dateNotInPastValidator(): ValidatorFn {
+    return (control: AbstractControl): {[key: string]: any} | null => {
+      if (!control.value) return null;
+      
+      const selectedDate = new Date(control.value);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Set to beginning of today
+      
+      if (selectedDate < today) {
+        return { 'dateInPast': { value: control.value } };
+      }
+      
+      return null;
+    };
   }
 
   /**
@@ -102,7 +133,7 @@ export class PostRoommateAnnouncementComponent implements OnInit {
       
       // Posting details
       description: ['', [Validators.required, Validators.maxLength(1000)]],
-      moveInDate: ['', Validators.required],
+      moveInDate: ['', [Validators.required, this.dateNotInPastValidator()]],
       leaseDurationMonths: [12, [Validators.required, Validators.min(1), Validators.max(60)]]
     });
   }
@@ -333,9 +364,15 @@ export class PostRoommateAnnouncementComponent implements OnInit {
     this.roommateService.createAnnouncement(createDTO).subscribe({
       next: (createdAnnouncement) => {
         this.isSubmitting = false;
-        this.successMessage = 'Roommate announcement posted successfully!';
+        this.showSuccessToast = true;
+        this.successToastMessage = 'Roommate announcement posted successfully!';
         
         console.log('Announcement created:', createdAnnouncement);
+        
+        // Auto-hide toast after 4 seconds
+        setTimeout(() => {
+          this.showSuccessToast = false;
+        }, 4000);
         
         // Redirect to the announcement details or my announcements
         setTimeout(() => {
@@ -374,12 +411,23 @@ export class PostRoommateAnnouncementComponent implements OnInit {
    * Get field error message
    */
   getFieldError(fieldName: string): string {
-    const field = this.announcementForm.get(fieldName);
-    if (field && field.errors && field.touched) {
-      if (field.errors['required']) return `${fieldName} is required`;
-      if (field.errors['min']) return `${fieldName} must be at least ${field.errors['min'].min}`;
-      if (field.errors['max']) return `${fieldName} must be at most ${field.errors['max'].max}`;
-      if (field.errors['maxlength']) return `${fieldName} is too long`;
+    const control = this.announcementForm.get(fieldName);
+    if (control && control.errors && control.touched) {
+      if (control.errors['required']) {
+        return 'This field is required';
+      }
+      if (control.errors['min']) {
+        return `Minimum value is ${control.errors['min'].min}`;
+      }
+      if (control.errors['max']) {
+        return `Maximum value is ${control.errors['max'].max}`;
+      }
+      if (control.errors['maxlength']) {
+        return `Maximum length is ${control.errors['maxlength'].requiredLength} characters`;
+      }
+      if (control.errors['dateInPast']) {
+        return 'Move-in date cannot be in the past';
+      }
     }
     return '';
   }

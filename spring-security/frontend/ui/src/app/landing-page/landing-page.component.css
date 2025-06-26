@@ -1,1 +1,26 @@
 /* Styles for LandingPageComponent - please restore original content if any */
+
+/* Toast Animation */
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out;
+}
+
+/* Toast styling */
+.toast-notification {
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+}
+
+.toast-notification:hover {
+  transform: translateY(-2px);
+}

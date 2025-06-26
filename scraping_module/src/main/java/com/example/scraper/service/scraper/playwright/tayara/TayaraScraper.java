@@ -35,7 +35,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class TayaraScraper extends AbstractPlaywrightScraper<TayaraProperty> {
 
     private static final String BASE_URL = "https://www.tayara.tn";
-    private static final int MAX_PAGES_TO_SCRAPE = 2; // Changed from 100 to 10
+    private static final int MAX_PAGES_TO_SCRAPE = 2;
     private static final long DELAY_BETWEEN_PAGES_MS = 2000; // 2 seconds
     private static final int MAX_ANNOUNCEMENT_AGE_DAYS = 30; // Maximum age for an announcement to be considered recent
 

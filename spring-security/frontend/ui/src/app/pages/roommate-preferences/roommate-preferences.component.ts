@@ -18,6 +18,10 @@ export class RoommatePreferencesComponent implements OnInit {
   errorMessage = '';
   successMessage = '';
   
+  // Toast notification properties
+  showSuccessToast = false;
+  successToastMessage = '';
+  
   // Available options
   availableLifestyleTags: string[] = [];
   availableStudyHabits: string[] = [];
@@ -173,14 +177,15 @@ export class RoommatePreferencesComponent implements OnInit {
     this.preferencesService.updateUserPreferences(preferences).subscribe({
       next: (savedPreferences) => {
         this.isSaving = false;
-        this.successMessage = 'Preferences saved successfully!';
+        this.showSuccessToast = true;
+        this.successToastMessage = 'Roommate preferences saved successfully!';
         this.hasExistingPreferences = true;
         this.isPreferencesComplete = this.preferencesService.isPreferencesComplete(savedPreferences);
         
-        // Auto-hide success message after 3 seconds
+        // Auto-hide toast after 4 seconds
         setTimeout(() => {
-          this.successMessage = '';
-        }, 3000);
+          this.showSuccessToast = false;
+        }, 4000);
       },
       error: (error) => {
         console.error('Error saving preferences:', error);

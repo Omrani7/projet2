@@ -42,8 +42,7 @@ public class AuthController {
     
     @GetMapping("/login")
     public RedirectView handleLoginGet() {
-        // Redirect to frontend landing page when GET /auth/login is accessed directly
-        // This prevents 405 errors when browser navigation tries to access this URL
+
         return new RedirectView(frontendUrl);
     }
     

@@ -154,13 +154,6 @@
             </button>
           </div>
           
-          <!-- Standard status actions -->
-          <div class="standard-actions" *ngIf="inquiry.reply && inquiry.status !== 'CLOSED' && inquiry.status !== 'PROPERTY_NO_LONGER_AVAILABLE'">
-            <button class="status-btn" (click)="updateStatus(inquiry.id, 'CLOSED')">
-              Mark as Closed
-            </button>
-          </div>
-          
           <!-- Status info for unavailable properties -->
           <div class="unavailable-info" *ngIf="inquiry.status === 'PROPERTY_NO_LONGER_AVAILABLE'">
             <small class="unavailable-text">🚫 Deal closed with another student</small>

@@ -311,13 +311,32 @@ body {
   gap: 12px;
   padding: 16px 24px;
   border-radius: 16px;
-  margin: 20px;
+  margin: 20px auto;
   max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   animation: slideUp 0.5s ease-out;
+  position: relative;
+  z-index: 10;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+
+/* Success message as a fixed toast notification */
+.success-message {
+  position: fixed !important;
+  top: 20px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  z-index: 9999 !important;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.95) 0%, rgba(16, 185, 129, 0.95) 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(34, 197, 94, 0.6) !important;
+  box-shadow: 0 16px 48px 0 rgba(34, 197, 94, 0.4) !important;
+  backdrop-filter: blur(20px) !important;
+  animation: successToastSlideDown 0.6s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  margin: 0 !important;
+  min-width: 400px !important;
+  max-width: 500px !important;
 }
 
 .message-card svg {
@@ -329,6 +348,7 @@ body {
 .message-card p {
   margin: 0;
   font-weight: 500;
+  font-size: 16px;
 }
 
 .error-message {
@@ -341,14 +361,27 @@ body {
   color: #f87171;
 }
 
-.success-message {
-  background: rgba(34, 197, 94, 0.2);
-  color: #bbf7d0;
-  border-color: rgba(34, 197, 94, 0.3);
+.success-message svg {
+  color: #ffffff !important;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2)) !important;
 }
 
-.success-message svg {
-  color: #4ade80;
+.success-message p {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+  font-weight: 600 !important;
+  color: #ffffff !important;
+}
+
+/* Success toast animation */
+@keyframes successToastSlideDown {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-100px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 }
 
 /* Main Content Grid */
@@ -500,6 +533,25 @@ body {
   font-size: 16px;
   backdrop-filter: blur(10px);
   transition: all 0.3s ease;
+}
+
+/* Add specific styling for select options */
+.select-wrapper select option {
+  background: #2d3748 !important; /* Dark background for options */
+  color: white !important; /* White text */
+  padding: 10px !important;
+  border: none !important;
+}
+
+.select-wrapper select option:hover {
+  background: #4a5568 !important; /* Lighter background on hover */
+  color: white !important;
+}
+
+.select-wrapper select option:checked,
+.select-wrapper select option:selected {
+  background: #667eea !important; /* Primary color for selected option */
+  color: white !important;
 }
 
 .input-wrapper input::placeholder {
@@ -1139,6 +1191,20 @@ body {
   .overlay-grid {
     grid-template-columns: 1fr;
     padding: 20px;
+  }
+  
+  /* Mobile responsive success toast */
+  .success-message {
+    min-width: 90% !important;
+    max-width: 95% !important;
+    left: 50% !important;
+    right: auto !important;
+    margin: 0 !important;
+    padding: 14px 20px !important;
+  }
+  
+  .success-message p {
+    font-size: 14px !important;
   }
 }
 

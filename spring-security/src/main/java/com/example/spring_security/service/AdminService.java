@@ -57,8 +57,7 @@ public class AdminService {
     @Autowired(required = false)
     private CacheManager cacheManager;
 
-    // ==================== DASHBOARD STATISTICS ====================
-    
+
     public AdminStatsDto getOverviewStats() {
         logger.info("Generating admin overview statistics");
         
@@ -67,7 +66,6 @@ public class AdminService {
         LocalDateTime todayStart = now.toLocalDate().atStartOfDay();
         LocalDateTime weekStart = now.minusDays(7);
         
-            // User Statistics - with error handling
             long totalUsers = 0;
             long activeUsers = 0;
             long newUsersToday = 0;
@@ -113,7 +111,6 @@ public class AdminService {
                 logger.error("Error getting users by role: {}", e.getMessage());
             }
         
-            // Property Statistics - with error handling
             long totalProperties = 0;
             long activeProperties = 0;
             long pendingProperties = 0;
@@ -155,7 +152,6 @@ public class AdminService {
                 logger.error("Error getting properties listed this week: {}", e.getMessage());
             }
         
-            // Inquiry Statistics - with error handling
             long totalInquiries = 0;
             long pendingInquiries = 0;
             long acceptedInquiries = 0;
@@ -188,7 +184,6 @@ public class AdminService {
                 logger.error("Error getting inquiry counts by date: {}", e.getMessage());
             }
         
-            // Roommate Statistics - with error handling
             long totalAnnouncements = 0;
             long activeAnnouncements = 0;
             long announcementsToday = 0;
@@ -214,18 +209,15 @@ public class AdminService {
                 logger.error("Error getting announcements today: {}", e.getMessage());
             }
             
-        // Note: Applications will be added when RoommateApplicationRepository is available
         long totalApplications = 0;
         long successfulMatches = 0;
         long applicationsToday = 0;
         
-            // Calculate growth rates safely
         double userGrowthRate = calculateGrowthRate(newUsersThisWeek, totalUsers - newUsersThisWeek);
         double propertyGrowthRate = calculateGrowthRate(propertiesListedThisWeek, totalProperties - propertiesListedThisWeek);
         double inquiryGrowthRate = calculateGrowthRate(inquiriesThisWeek, totalInquiries - inquiriesThisWeek);
         double announcementGrowthRate = calculateGrowthRate(announcementsToday * 7, totalAnnouncements);
         
-        // System Statistics
         OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
         MemoryMXBean memoryBean = ManagementFactory.getMemoryMXBean();
         
@@ -234,7 +226,6 @@ public class AdminService {
         long uptimeMillis = ManagementFactory.getRuntimeMXBean().getUptime();
         String uptimeHours = String.format("%.1f", uptimeMillis / (1000.0 * 60 * 60));
         
-        // Create distribution maps
         Map<String, Long> usersByRole = Map.of(
             "STUDENT", studentUsers,
             "OWNER", ownerUsers,
@@ -299,19 +290,14 @@ public class AdminService {
     public SystemHealthDto getSystemHealth() {
         logger.info("Checking system health");
         
-        // Database Health
         SystemHealthDto.DatabaseHealth dbHealth = checkDatabaseHealth();
         
-        // Application Health
         SystemHealthDto.ApplicationHealth appHealth = checkApplicationHealth();
         
-        // External Services Health
         SystemHealthDto.ExternalServicesHealth extHealth = checkExternalServicesHealth();
         
-        // System Resources
         SystemHealthDto.SystemResources sysResources = checkSystemResources();
         
-        // Overall Status
         String overallStatus = determineOverallStatus(dbHealth, appHealth, extHealth);
         
         return SystemHealthDto.builder()
@@ -330,7 +316,6 @@ public class AdminService {
         
         Map<String, Object> growthData = new HashMap<>();
         
-        // Daily user registrations for the last 'days' days
         List<Map<String, Object>> dailyGrowth = new ArrayList<>();
         for (int i = days - 1; i >= 0; i--) {
             LocalDateTime dayStart = LocalDateTime.now().minusDays(i).toLocalDate().atStartOfDay();
@@ -356,13 +341,10 @@ public class AdminService {
         
         Map<String, Object> activityData = new HashMap<>();
         
-        // Properties listed
         long propertiesListed = propertyRepository.countByCreatedAtAfter(startDate);
         
-        // Inquiries made
         long inquiriesMade = inquiryRepository.countByTimestampAfter(startDate);
         
-        // Announcements posted
         long announcementsPosted = announcementRepository.countByCreatedAtAfter(startDate);
         
         activityData.put("propertiesListed", propertiesListed);
@@ -373,8 +355,7 @@ public class AdminService {
         return activityData;
     }
 
-    // ==================== USER MANAGEMENT ====================
-    
+
     public Page<AdminUserDto> getAllUsers(Pageable pageable, String search, String role) {
         logger.info("Fetching users with search: '{}', role: '{}'", search, role);
         
@@ -453,13 +434,11 @@ public class AdminService {
             throw new RuntimeException("User not found");
         }
         
-        // Note: Consider soft delete or cascade deletion based on business requirements
         userRepository.deleteById(userId);
         logger.info("Deleted user {}", userId);
     }
 
-    // ==================== PROPERTY MANAGEMENT ====================
-    
+
     public Page<AdminPropertyDto> getAllProperties(Pageable pageable, String search, String status) {
         Specification<PropertyListing> spec = (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -484,7 +463,6 @@ public class AdminService {
         
         Page<PropertyListing> propertyPage = propertyRepository.findAll(spec, pageable);
         
-        // Convert to DTOs to avoid lazy loading issues
         List<AdminPropertyDto> propertyDtos = propertyPage.getContent().stream()
             .map(this::convertToAdminPropertyDto)
             .collect(Collectors.toList());
@@ -508,7 +486,6 @@ public class AdminService {
             .updatedAt(property.getUpdatedAt())
             .images(property.getImageUrls());
         
-        // Safely handle the lazy-loaded User relationship
         if (property.getUser() != null) {
             try {
                 User user = property.getUser();
@@ -527,9 +504,8 @@ public class AdminService {
                    .ownerEmail("N/A");
         }
         
-        // Calculate activity metrics (you can implement these queries later)
-        builder.totalInquiries(0L)  // TODO: Implement inquiry count query
-               .viewCount(0L);      // TODO: Implement view count query
+        builder.totalInquiries(0L)
+               .viewCount(0L);
         
         return builder.build();
     }
@@ -552,8 +528,7 @@ public class AdminService {
         logger.info("Updated property {} status to {}", propertyId, status);
     }
 
-    // ==================== ROOMMATE MANAGEMENT ====================
-    
+
     public Page<AdminRoommateAnnouncementDto> getAllRoommateAnnouncements(Pageable pageable, String search, String status) {
         Specification<RoommateAnnouncement> spec = (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -577,7 +552,6 @@ public class AdminService {
         
         Page<RoommateAnnouncement> announcementPage = announcementRepository.findAll(spec, pageable);
         
-        // Convert to DTOs to avoid lazy loading issues
         List<AdminRoommateAnnouncementDto> announcementDtos = announcementPage.getContent().stream()
             .map(this::convertToAdminRoommateAnnouncementDto)
             .collect(Collectors.toList());
@@ -620,7 +594,6 @@ public class AdminService {
             .isTypeA(announcement.getPropertyListing() != null)
             .propertyListingId(announcement.getPropertyListing() != null ? announcement.getPropertyListing().getId() : null);
         
-        // Safely handle the lazy-loaded User relationship
         if (announcement.getPoster() != null) {
             try {
                 User poster = announcement.getPoster();
@@ -642,11 +615,10 @@ public class AdminService {
                    .posterRole("N/A");
         }
         
-        // Calculate activity metrics (implement these queries later if needed)
-        builder.totalApplications(0L)  // TODO: Implement application count query
-               .pendingApplications(0L) // TODO: Implement pending application count query
-               .acceptedApplications(0L) // TODO: Implement accepted application count query
-               .viewCount(0L);      // TODO: Implement view count query
+        builder.totalApplications(0L)
+               .pendingApplications(0L)
+               .acceptedApplications(0L)
+               .viewCount(0L);
         
         return builder.build();
     }
@@ -689,7 +661,6 @@ public class AdminService {
             long expiredAnnouncements = announcementRepository.countByStatus("EXPIRED");
             long filledAnnouncements = announcementRepository.countByStatus("FILLED");
             
-            // Calculate announcements by type
             long typeACount = announcementRepository.countByPropertyListingIsNotNull();
             long typeBCount = announcementRepository.countByPropertyListingIsNull();
             
@@ -700,7 +671,6 @@ public class AdminService {
             stats.put("typeACount", typeACount);
             stats.put("typeBCount", typeBCount);
             
-            // Calculate recent activity
             LocalDateTime last7Days = LocalDateTime.now().minusDays(7);
             long recentAnnouncements = announcementRepository.countByCreatedAtAfter(last7Days);
             stats.put("recentAnnouncements", recentAnnouncements);
@@ -713,8 +683,7 @@ public class AdminService {
         return stats;
     }
 
-    // ==================== INQUIRY MANAGEMENT ====================
-    
+
     public Page<Inquiry> getAllInquiries(Pageable pageable, String search, String status) {
         Specification<Inquiry> spec = (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -742,8 +711,6 @@ public class AdminService {
         return inquiryRepository.findAll(spec, pageable);
     }
 
-    // ==================== SYSTEM OPERATIONS ====================
-    
     public void clearSystemCache() {
         if (cacheManager != null) {
             cacheManager.getCacheNames().forEach(cacheName -> {
@@ -755,23 +722,19 @@ public class AdminService {
     }
     
     public String backupDatabase() {
-        // Implementation depends on your database setup
-        // This is a placeholder implementation
+
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
         String backupFileName = "backup_" + timestamp + ".sql";
         
         logger.info("Database backup initiated: {}", backupFileName);
         
-        // Here you would implement actual backup logic
-        // For PostgreSQL: pg_dump command
-        // For MySQL: mysqldump command
+
         
         return backupFileName;
     }
     
     public List<String> getRecentLogs(int lines) {
-        // This is a simplified implementation
-        // In a real application, you would read from actual log files
+
         List<String> logs = new ArrayList<>();
         
         logs.add(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " INFO  - System running normally");
@@ -781,7 +744,7 @@ public class AdminService {
         return logs.stream().limit(lines).collect(Collectors.toList());
     }
 
-    // ==================== DATA EXPORT SERVICES ====================
+
     
     public String exportUsersReport(String format) {
         try {
@@ -898,16 +861,13 @@ public class AdminService {
         }
     }
     
-    // ==================== CSV GENERATION METHODS ====================
-    
+
     private String generateUsersCSV(List<User> users, String fileName) {
         try {
             StringBuilder csv = new StringBuilder();
             
-            // CSV Header
             csv.append("ID,Username,Email,Role,Provider,Enabled,Updated At,Study Field,Age,Institute,Profile Status\n");
             
-            // CSV Data
             for (User user : users) {
                 csv.append(sanitizeCSVField(String.valueOf(user.getId()))).append(",");
                 csv.append(sanitizeCSVField(user.getUsername())).append(",");
@@ -923,7 +883,6 @@ public class AdminService {
                 csv.append("\n");
             }
             
-            // Save to file
             saveReportToFile(csv.toString(), fileName);
             logger.info("Generated CSV report with {} users, saved as {}", users.size(), fileName);
             return fileName;
@@ -938,10 +897,8 @@ public class AdminService {
         try {
             StringBuilder csv = new StringBuilder();
             
-            // CSV Header
             csv.append("ID,Title,Location,Price,Rooms,Bathrooms,Area,Property Type,Active,Created At,Owner Email\n");
             
-            // CSV Data
             for (PropertyListing property : properties) {
                 csv.append(sanitizeCSVField(String.valueOf(property.getId()))).append(",");
                 csv.append(sanitizeCSVField(property.getTitle())).append(",");
@@ -957,7 +914,7 @@ public class AdminService {
                 csv.append("\n");
             }
             
-            // Save to file
+
             saveReportToFile(csv.toString(), fileName);
             logger.info("Generated CSV report with {} properties, saved as {}", properties.size(), fileName);
             return fileName;
@@ -972,10 +929,9 @@ public class AdminService {
         try {
             StringBuilder csv = new StringBuilder();
             
-            // CSV Header
+
             csv.append("ID,Student Email,Property Title,Message,Status,Created At,Reply\n");
-            
-            // CSV Data
+
             for (Inquiry inquiry : inquiries) {
                 csv.append(sanitizeCSVField(String.valueOf(inquiry.getId()))).append(",");
                 csv.append(sanitizeCSVField(inquiry.getStudent() != null ? inquiry.getStudent().getEmail() : "")).append(",");
@@ -987,7 +943,6 @@ public class AdminService {
                 csv.append("\n");
             }
             
-            // Save to file
             saveReportToFile(csv.toString(), fileName);
             logger.info("Generated CSV report with {} inquiries, saved as {}", inquiries.size(), fileName);
             return fileName;
@@ -1002,10 +957,8 @@ public class AdminService {
         try {
             StringBuilder csv = new StringBuilder();
             
-            // CSV Header
             csv.append("ID,Poster Email,Property Title,Property Address,Rent Per Person,Max Roommates,Status,Created At,Move In Date\n");
             
-            // CSV Data
             for (RoommateAnnouncement announcement : announcements) {
                 csv.append(sanitizeCSVField(String.valueOf(announcement.getId()))).append(",");
                 csv.append(sanitizeCSVField(announcement.getPoster() != null ? announcement.getPoster().getEmail() : "")).append(",");
@@ -1019,7 +972,6 @@ public class AdminService {
                 csv.append("\n");
             }
             
-            // Save to file
             saveReportToFile(csv.toString(), fileName);
             logger.info("Generated CSV report with {} announcements, saved as {}", announcements.size(), fileName);
             return fileName;
@@ -1034,36 +986,29 @@ public class AdminService {
         try {
             StringBuilder csv = new StringBuilder();
             
-            // CSV Header
             csv.append("Metric,Value,Category\n");
             
-            // User Statistics
             csv.append("Total Users,").append(stats.getTotalUsers()).append(",Users\n");
             csv.append("Active Users,").append(stats.getActiveUsers()).append(",Users\n");
             csv.append("Student Users,").append(stats.getStudentUsers()).append(",Users\n");
             csv.append("Owner Users,").append(stats.getOwnerUsers()).append(",Users\n");
             csv.append("Admin Users,").append(stats.getAdminUsers()).append(",Users\n");
             
-            // Property Statistics
             csv.append("Total Properties,").append(stats.getTotalProperties()).append(",Properties\n");
             csv.append("Active Properties,").append(stats.getActiveProperties()).append(",Properties\n");
             csv.append("Pending Properties,").append(stats.getPendingProperties()).append(",Properties\n");
             
-            // Inquiry Statistics
             csv.append("Total Inquiries,").append(stats.getTotalInquiries()).append(",Inquiries\n");
             csv.append("Pending Inquiries,").append(stats.getPendingInquiries()).append(",Inquiries\n");
             csv.append("Accepted Inquiries,").append(stats.getAcceptedInquiries()).append(",Inquiries\n");
             
-            // Announcement Statistics
             csv.append("Total Announcements,").append(stats.getTotalAnnouncements()).append(",Announcements\n");
             csv.append("Active Announcements,").append(stats.getActiveAnnouncements()).append(",Announcements\n");
             
-            // Growth Rates
             csv.append("User Growth Rate,").append(String.format("%.2f%%", stats.getUserGrowthRate())).append(",Growth\n");
             csv.append("Property Growth Rate,").append(String.format("%.2f%%", stats.getPropertyGrowthRate())).append(",Growth\n");
             csv.append("Inquiry Growth Rate,").append(String.format("%.2f%%", stats.getInquiryGrowthRate())).append(",Growth\n");
             
-            // Save to file
             saveReportToFile(csv.toString(), fileName);
             logger.info("Generated analytics CSV report, saved as {}", fileName);
             return fileName;
@@ -1074,11 +1019,9 @@ public class AdminService {
         }
     }
     
-    // ==================== EXCEL GENERATION METHODS (Placeholder) ====================
-    
+
     private String generateUsersExcel(List<User> users, String fileName) {
-        // For now, return CSV format with .xlsx extension
-        // In a real implementation, you'd use Apache POI to generate actual Excel files
+
         logger.info("Excel export not yet implemented, generating CSV format");
         return generateUsersCSV(users, fileName.replace(".xlsx", ".csv"));
     }
@@ -1103,17 +1046,14 @@ public class AdminService {
         return generateAnalyticsCSV(stats, fileName.replace(".xlsx", ".csv"));
     }
     
-    // ==================== UTILITY METHODS ====================
-    
+
     private void saveReportToFile(String content, String fileName) throws IOException {
-        // Create reports directory if it doesn't exist
         Path reportsDir = Paths.get("reports");
         if (!Files.exists(reportsDir)) {
             Files.createDirectories(reportsDir);
             logger.info("Created reports directory: {}", reportsDir.toAbsolutePath());
         }
         
-        // Save file to reports directory
         Path filePath = reportsDir.resolve(fileName);
         try (FileWriter writer = new FileWriter(filePath.toFile())) {
             writer.write(content);
@@ -1127,7 +1067,6 @@ public class AdminService {
             return "";
         }
         
-        // Escape quotes and wrap in quotes if contains comma, quote, or newline
         String sanitized = field.replace("\"", "\"\"");
         if (sanitized.contains(",") || sanitized.contains("\"") || sanitized.contains("\n") || sanitized.contains("\r")) {
             sanitized = "\"" + sanitized + "\"";
@@ -1136,8 +1075,7 @@ public class AdminService {
         return sanitized;
     }
 
-    // ==================== HELPER METHODS ====================
-    
+
     private double calculateGrowthRate(long newCount, long previousCount) {
         if (previousCount == 0) return newCount > 0 ? 100.0 : 0.0;
         return ((double) newCount / previousCount) * 100.0;
@@ -1200,20 +1138,18 @@ public class AdminService {
     
     private SystemHealthDto.DatabaseHealth checkDatabaseHealth() {
         try {
-            // Actually test database connectivity
             long startTime = System.currentTimeMillis();
             long totalUsers = userRepository.count(); // Simple DB check
             long responseTime = System.currentTimeMillis() - startTime;
             
-            // More realistic connection pool info (these are still estimates)
             return SystemHealthDto.DatabaseHealth.builder()
                     .status("UP")
-                    .connectionPoolSize(20) // Typical HikariCP default
-                    .activeConnections(Math.min(5, (int)(totalUsers % 10) + 1)) // Simulated based on usage
-                    .idleConnections(15) // Estimated
+                    .connectionPoolSize(20)
+                    .activeConnections(Math.min(5, (int)(totalUsers % 10) + 1))
+                    .idleConnections(15)
                     .averageResponseTime((double)responseTime)
-                    .totalQueries(totalUsers * 10) // Estimate queries based on users
-                    .slowQueries(0) // Start with 0, can be enhanced later
+                    .totalQueries(totalUsers * 10)
+                    .slowQueries(0)
                     .lastBackup(LocalDateTime.now().minusHours(6).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
                     .build();
         } catch (Exception e) {
@@ -1237,11 +1173,9 @@ public class AdminService {
         Runtime runtime = Runtime.getRuntime();
             long uptimeMillis = ManagementFactory.getRuntimeMXBean().getUptime();
             
-            // Get actual CPU usage for the JVM process
             OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
             double cpuUsage = osBean.getSystemLoadAverage();
             if (cpuUsage < 0) {
-                // Windows fallback - estimate based on memory usage
                 long usedMemory = memoryBean.getHeapMemoryUsage().getUsed();
                 long maxMemory = memoryBean.getHeapMemoryUsage().getMax();
                 cpuUsage = maxMemory > 0 ? (double) usedMemory / maxMemory * 2.0 : 0.5; // Rough estimate
@@ -1250,7 +1184,7 @@ public class AdminService {
         return SystemHealthDto.ApplicationHealth.builder()
                 .status("UP")
                 .version("1.0.0")
-                    .buildDate("2024-12-01") // Update to current date
+                    .buildDate("2024-12-01")
                     .uptime(uptimeMillis)
                 .heapMemoryUsed(memoryBean.getHeapMemoryUsage().getUsed())
                 .heapMemoryMax(memoryBean.getHeapMemoryUsage().getMax())
@@ -1281,17 +1215,16 @@ public class AdminService {
     private SystemHealthDto.ExternalServicesHealth checkExternalServicesHealth() {
         Map<String, String> services = new HashMap<>();
         
-        // Actually check if services are reachable/configured
+
         try {
-            // Check if we have OAuth configurations
-            services.put("Google OAuth", "UP"); // Could check if client ID is configured
-            services.put("GitHub OAuth", "UP"); // Could check if client ID is configured
+            services.put("Google OAuth", "UP");
+            services.put("GitHub OAuth", "UP");
             
         return SystemHealthDto.ExternalServicesHealth.builder()
-                    .emailServiceStatus("UP") // Could ping email server
-                    .scraperServiceStatus("UP") // Could check if scraper endpoints respond
-                    .websocketServiceStatus("UP") // Could check if WebSocket is configured
-                    .fileStorageStatus("UP") // Could check if upload directory exists
+                    .emailServiceStatus("UP")
+                    .scraperServiceStatus("UP")
+                    .websocketServiceStatus("UP")
+                    .fileStorageStatus("UP")
                     .thirdPartyServices(services)
                     .build();
         } catch (Exception e) {
@@ -1312,25 +1245,20 @@ public class AdminService {
         Runtime runtime = Runtime.getRuntime();
             OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
             
-            // JVM Memory (more accurate than total system memory)
-            long maxMemory = runtime.maxMemory(); // Max heap size
-            long totalMemory = runtime.totalMemory(); // Current heap size
-            long freeMemory = runtime.freeMemory(); // Free memory in current heap
+            long maxMemory = runtime.maxMemory();
+            long totalMemory = runtime.totalMemory();
+            long freeMemory = runtime.freeMemory();
         long usedMemory = totalMemory - freeMemory;
             
-            // Get CPU load (handle Windows properly)
             double cpuUsage = osBean.getSystemLoadAverage();
             if (cpuUsage < 0) {
-                // On Windows, getSystemLoadAverage returns -1, try alternative
                 try {
-                    // Use available processors as a fallback indicator
                     cpuUsage = osBean.getAvailableProcessors() * 0.3; // Assume 30% usage as placeholder
                 } catch (Exception e) {
                     cpuUsage = 0.0;
                 }
             }
             
-            // Get file system info for the current directory
             java.io.File currentDir = new java.io.File(".");
             long totalDiskSpace = currentDir.getTotalSpace();
             long freeDiskSpace = currentDir.getFreeSpace();
@@ -1338,25 +1266,24 @@ public class AdminService {
         
         return SystemHealthDto.SystemResources.builder()
                 .memoryUsed(usedMemory)
-                    .memoryTotal(maxMemory) // Use max heap instead of total system RAM
+                    .memoryTotal(maxMemory)
                     .memoryPercent(maxMemory > 0 ? (double) usedMemory / maxMemory * 100 : 0)
                     .diskSpaceUsed(usedDiskSpace)
                     .diskSpaceTotal(totalDiskSpace)
                     .diskSpacePercent(totalDiskSpace > 0 ? (double) usedDiskSpace / totalDiskSpace * 100 : 0)
-                    .networkIn(0.0) // Placeholder - network metrics are complex to get
-                    .networkOut(0.0) // Placeholder - network metrics are complex to get  
+                    .networkIn(0.0)
+                    .networkOut(0.0)
                     .processCount(Thread.activeCount())
                     .build();
                     
         } catch (Exception e) {
             logger.error("Error getting system resources: {}", e.getMessage());
-            // Return safe defaults if anything fails
             return SystemHealthDto.SystemResources.builder()
-                    .memoryUsed(256 * 1024 * 1024L) // 256MB
-                    .memoryTotal(1024 * 1024 * 1024L) // 1GB  
+                    .memoryUsed(256 * 1024 * 1024L)
+                    .memoryTotal(1024 * 1024 * 1024L)
                     .memoryPercent(25.0)
-                    .diskSpaceUsed(5L * 1024 * 1024 * 1024) // 5GB
-                    .diskSpaceTotal(100L * 1024 * 1024 * 1024) // 100GB
+                    .diskSpaceUsed(5L * 1024 * 1024 * 1024)
+                    .diskSpaceTotal(100L * 1024 * 1024 * 1024)
                     .diskSpacePercent(5.0)
                 .networkIn(0.0)
                 .networkOut(0.0)

@@ -1210,16 +1210,6 @@ select.styled-select option:active {
     gap: 0.25rem;
   }
   
-  .badge-count {
-    position: absolute;
-    top: -2px;
-    right: -2px;
-    height: 1rem;
-    min-width: 1rem;
-    font-size: 0.65rem;
-    padding: 0 0.25rem;
-  }
-  
   .nav-link-with-icon {
     position: relative;
     padding: 0.5rem;
@@ -1227,7 +1217,7 @@ select.styled-select option:active {
   }
 }
 
-/* Badge count for shortlist */
+/* Badge count for notifications */
 .badge-count {
   display: inline-flex;
   align-items: center;
@@ -1314,20 +1304,6 @@ select.styled-select option:active {
   background-color: #eaeaea;
   border: none;
   margin: 0.25rem 0;
-}
-
-/* Shortlist link specific styling */
-.shortlist-link {
-  position: relative;
-  padding-right: 0.75rem;
-}
-
-@media (max-width: 767px) {
-  .shortlist-link .badge-count {
-    position: absolute;
-    top: 0;
-    right: 0;
-  }
 }
 
 /* Login link styling */

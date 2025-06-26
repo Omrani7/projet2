@@ -110,7 +110,7 @@ public class SecurityConfig {
                 exceptions.authenticationEntryPoint((request, response, authException) -> {
                     String requestURI = request.getRequestURI();
                     if (requestURI.startsWith("/api/")) {
-                        // For API requests, return 401 instead of redirecting
+                        //  return 401 instead of redirecting
                         response.setStatus(jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED);
                         response.setContentType("application/json");
                         response.getWriter().write("{\"error\":\"Unauthorized\",\"message\":\"Authentication required\"}");

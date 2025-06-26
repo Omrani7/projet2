@@ -87,12 +87,6 @@
               </svg>
               <span>Support</span>
             </a>
-            <a href="#" class="nav-link-with-icon shortlist-link">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-              </svg>
-              <span>Shortlist</span>
-            </a>
           </ng-container>
 
           <!-- Auth Section -->
@@ -155,7 +149,7 @@
       <div class="filter-chip-group custom-dropdown-wrapper" [formGroup]="searchForm">
         <div class="filter-chip custom-dropdown-trigger" 
              [class.active]="!!searchForm.get('sortBy')?.value" 
-             (click)="toggleSortDropdown(); closePriceFilterIfOpen()">
+             (click)="toggleSortDropdown()">
           <span class="dropdown-label">{{ getSortLabel() }}</span>
           <svg class="dropdown-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="6 9 12 15 18 9"></polyline>
@@ -175,7 +169,7 @@
       <div *ngIf="currentSelectedInstitute" class="filter-chip-group">
         <div class="filter-chip active">
           {{ currentSelectedInstitute.name }}
-          <button class="chip-close-btn" (click)="clearInstituteSearch(); closePriceFilterIfOpen()">×</button>
+          <button class="chip-close-btn" (click)="clearInstituteSearch()">×</button>
         </div>
       </div>
 
@@ -183,7 +177,7 @@
       <div class="filter-chip-group custom-dropdown-wrapper" [formGroup]="filterForm">
         <div class="filter-chip custom-dropdown-trigger" 
              [class.active]="!!filterForm.get('radiusKm')?.value"
-             (click)="toggleDistanceDropdown(); closePriceFilterIfOpen()">
+             (click)="toggleDistanceDropdown()">
           <span class="dropdown-label">{{ getDistanceLabel() }}</span>
           <svg class="dropdown-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="6 9 12 15 18 9"></polyline>
@@ -258,7 +252,7 @@
       <div class="filter-chip-group custom-dropdown-wrapper" [formGroup]="filterForm">
         <div class="filter-chip custom-dropdown-trigger" 
              [class.active]="!!filterForm.get('bedrooms')?.value"
-             (click)="toggleBedroomsDropdown(); closePriceFilterIfOpen()">
+             (click)="toggleBedroomsDropdown()">
           <span class="dropdown-label">{{ getBedroomsLabel() }}</span>
           <svg class="dropdown-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="6 9 12 15 18 9"></polyline>
@@ -295,13 +289,13 @@
 
       <!-- Filter and Clear All buttons next to other filters -->
       <div class="filter-chip-group">
-        <button class="filter-btn" (click)="toggleFilterModal(); closePriceFilterIfOpen()">
+        <button class="filter-btn" (click)="toggleFilterModal()">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
             <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
           </svg>
           Filter
         </button>
-                          <button class="clear-all-btn" (click)="clearAllFilters(); closePriceFilterIfOpen()">
+        <button class="clear-all-btn" (click)="clearAllFilters()">
           Clear All
         </button>
       </div>
@@ -382,7 +376,7 @@
       </div>
     </div>
     <div class="filter-modal-footer">
-                    <button class="clear-btn" (click)="clearAllFilters()">Clear All</button>
+      <button class="clear-btn" (click)="clearAllFilters()">Clear All</button>
       <button class="apply-btn" (click)="applyFiltersAndCloseModal()">Apply Filters</button>
     </div>
   </div>

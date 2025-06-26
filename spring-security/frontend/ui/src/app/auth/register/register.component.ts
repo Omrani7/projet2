@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -13,6 +13,8 @@ import { HttpErrorResponse } from '@angular/common/http';
   styleUrl: './register.component.css'
 })
 export class RegisterComponent {
+  @Output() closeModalEvent = new EventEmitter<void>();
+
   email: string = '';
   username: string = '';
   password: string = '';
@@ -127,8 +129,26 @@ export class RegisterComponent {
   }
 
   closeModal() {
-    // Navigate back to previous page or home
-    this.router.navigate(['/']);
+    // Check if this component is being used as a modal (has observers) or as a routed page
+    if (this.closeModalEvent.observers.length > 0) {
+      // Used as modal - emit event to parent component to close the modal
+      this.closeModalEvent.emit();
+    } else {
+      // Used as routed page - navigate back or to home
+      const originalPage = localStorage.getItem('original_page');
+      
+      if (originalPage && originalPage !== '/auth/register') {
+        // Navigate back to the original page
+        localStorage.removeItem('original_page');
+        this.router.navigate([originalPage]);
+      } else if (window.history.length > 1) {
+        // Go back in browser history
+        window.history.back();
+      } else {
+        // Fallback to home page
+        this.router.navigate(['/']);
+      }
+    }
   }
 
   goToLogin() {

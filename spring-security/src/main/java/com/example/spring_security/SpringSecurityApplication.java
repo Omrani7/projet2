@@ -27,6 +27,5 @@ public class SpringSecurityApplication {
 		logger.info("1. Make sure your Gmail account has 'Less secure app access' enabled or you're using an App Password");
 		logger.info("2. Verify your email and password are correct in application-dev.properties");
 		logger.info("3. Check that your Gmail account doesn't have captcha or 2FA preventing programmatic access");
-		logger.info("4. For development, password reset links will be logged to console if email sending fails");
 	}
 }

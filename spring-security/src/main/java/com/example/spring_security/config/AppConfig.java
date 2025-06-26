@@ -75,27 +75,27 @@ public class AppConfig {
     public RestTemplate restTemplate(RestTemplateBuilder builder) {
         return builder
                 .setConnectTimeout(Duration.ofSeconds(10))
-                .setReadTimeout(Duration.ofSeconds(60)) // Increased from default 30s
+                .setReadTimeout(Duration.ofSeconds(60)) // 60 S
                 .build();
     }
 
     /**
-     * RestTemplate specifically configured for long-running scraper operations
+     rest mtaa el scraper ki ytawell fel khedma
      */
     @Bean("scraperRestTemplate")
     public RestTemplate scraperRestTemplate(RestTemplateBuilder builder) {
         return builder
                 .setConnectTimeout(Duration.ofSeconds(15))
-                .setReadTimeout(Duration.ofMinutes(10)) // 10 minutes for scraping operations
+                .setReadTimeout(Duration.ofMinutes(10)) // 10 min
                 .build();
     }
 
     @Bean
     public SimpleClientHttpRequestFactory clientHttpRequestFactory() {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-        factory.setConnectTimeout(10000); // 10 seconds
-        factory.setReadTimeout(30000);    // 30 seconds
-        factory.setBufferRequestBody(false); // For large responses like images
+        factory.setConnectTimeout(10000); // 10 s
+        factory.setReadTimeout(30000);    // 30 s
+        factory.setBufferRequestBody(false); // for images
         return factory;
     }
 } 

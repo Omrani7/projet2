@@ -52,10 +52,10 @@
         </div>
       </div>
 
-      <!-- Image Gallery Section -->
-      <div class="relative mb-8 rounded-lg overflow-hidden shadow-lg">
-        <!-- Main Image Display -->
-        <div class="relative aspect-video bg-gray-100 overflow-hidden">
+      <!-- Image Gallery Section - Made smaller in both height and width -->
+      <div class="relative mb-8 rounded-lg overflow-hidden shadow-lg max-w-6xl mx-auto">
+        <!-- Main Image Display - Made smaller -->
+        <div class="relative h-80 bg-gray-100 overflow-hidden">
           <img 
             [src]="property.images?.[activeImageIndex] || property.imageUrl" 
             [alt]="property.title" 
@@ -86,11 +86,11 @@
         </div>
         
         <!-- Thumbnail Gallery -->
-        <div *ngIf="property.images && property.images.length > 1" class="flex mt-2 space-x-2 overflow-x-auto scrollbar-hide">
+        <div *ngIf="property.images && property.images.length > 1" class="flex mt-2 space-x-2 overflow-x-auto scrollbar-hide justify-center">
           <button 
             *ngFor="let image of property.images; let i = index" 
             (click)="setActiveImage(i)" 
-            class="relative h-16 w-16 md:h-20 md:w-20 flex-none rounded-md overflow-hidden focus:outline-none"
+            class="relative h-12 w-12 md:h-16 md:w-16 flex-none rounded-md overflow-hidden focus:outline-none"
             [class.ring-2]="activeImageIndex === i"
             [class.ring-blue-500]="activeImageIndex === i"
           >
@@ -103,7 +103,7 @@
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Property Details Column -->
         <div class="lg:col-span-2">
-          <!-- Price and Highlighted Info Section -->
+          <!-- Price Section -->
           <div class="bg-white p-6 rounded-lg shadow-xl mb-6 border-l-4 border-pink-600">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
               <div>
@@ -117,23 +117,56 @@
                   </p>
                 </ng-container>
               </div>
-              <!-- Action Buttons (Moved up for prominence on mobile) -->
-              <div class="flex flex-col sm:flex-row gap-3 mt-4 sm:mt-0 w-full sm:w-auto">
-                <button 
-                  (click)="contactProperty()" 
-                  class="flex-1 sm:flex-initial px-6 py-3 bg-pink-600 text-white font-medium rounded-md hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 transition shadow-sm"
-                >
-                  Contact Owner
-                </button>
-                <button 
-                  (click)="bookViewingOrApply()" 
-                  class="flex-1 sm:flex-initial px-6 py-3 border border-pink-600 text-pink-600 font-medium rounded-md hover:bg-pink-50 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 transition"
-                >
-                  Book a Viewing
-                </button>
-              </div>
             </div>
 
+            <!-- Contact Information -->
+            <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+              <h2 class="text-xl font-semibold text-gray-800 mb-4">Contact Information</h2>
+              <div class="space-y-4">
+                <div *ngIf="getContactPhone()" class="flex items-center p-3 bg-pink-50 rounded-lg border border-pink-100">
+                  <div class="bg-pink-100 rounded-full p-2 mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-pink-600" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p class="text-sm text-gray-500">Phone Number</p>
+                    <p class="text-base font-semibold text-gray-800">{{ getContactPhone() }}</p>
+                  </div>
+                </div>
+                
+                <div *ngIf="getContactName()" class="flex items-center p-3 bg-pink-50 rounded-lg border border-pink-100">
+                  <div class="bg-pink-100 rounded-full p-2 mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-pink-600" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 005 10a6 6 0 0012 0c0-.35-.035-.691-.1-1.02A5 5 0 0010 11z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p class="text-sm text-gray-500">Owner Name</p>
+                    <p class="text-base font-semibold text-gray-800">{{ getContactName() }}</p>
+                  </div>
+                </div>
+                
+                <div *ngIf="getContactEmail()" class="flex items-center p-3 bg-pink-50 rounded-lg border border-pink-100">
+                  <div class="bg-pink-100 rounded-full p-2 mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-pink-600" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                      <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p class="text-sm text-gray-500">Email Address</p>
+                    <p class="text-base font-semibold text-gray-800 break-all">{{ getContactEmail() }}</p>
+                  </div>
+                </div>
+                
+                <!-- Fallback if no contact info is available -->
+                <div *ngIf="!getContactPhone() && !getContactName() && !getContactEmail()" class="text-center p-4 bg-gray-50 rounded-lg">
+                  <p class="text-gray-500">Contact information not available</p>
+                </div>
+              </div>
+            </div>
+            
             <!-- Surface Area - Only if available with a value -->
             <div *ngIf="property.area && property.area > 0" class="mt-6 pt-4 border-t border-gray-200">
               <div class="inline-block bg-pink-50 rounded-lg border border-pink-100 px-4 py-2">
@@ -175,19 +208,6 @@
                     <p class="text-base font-semibold text-gray-800">{{ property.baths }} {{ property.baths === 1 ? 'Bath' : 'Baths' }}</p>
                   </div>
                 </div>
-                
-                <!-- Phone -->
-                <div *ngIf="getContactPhone()" class="flex items-center bg-pink-50 p-3 rounded-lg border border-pink-100">
-                  <div class="bg-pink-100 rounded-full p-2 mr-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-pink-600" viewBox="0 0 20 20" fill="currentColor">
-                      <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p class="text-sm text-gray-500">Contact</p>
-                    <p class="text-base font-semibold text-gray-800 break-all">{{ getContactPhone() }}</p>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -214,40 +234,6 @@
                 </svg>
                 <span class="text-gray-700">{{ amenity }}</span>
               </div>
-            </div>
-          </div>
-          
-          <!-- Location Map -->
-          <div class="bg-white p-6 rounded-lg shadow-md mb-6">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4">Location</h2>
-            <p class="text-gray-700 mb-4">{{ property.address }}</p>
-            
-            <!-- Map Container -->
-            <div class="h-[300px] bg-gray-100 rounded-lg overflow-hidden">
-              <!-- Integrate with your existing map component if possible -->
-              <app-map-display 
-                *ngIf="property.location"
-                [properties]="[property]"
-                [selectedPropertyId]="property.id ? +property.id : null"
-              ></app-map-display>
-            </div>
-            
-            <!-- Nearby Places -->
-            <div *ngIf="property.nearbyPlaces && property.nearbyPlaces.length > 0" class="mt-4">
-              <h3 class="text-lg font-medium text-gray-800 mb-2">Nearby</h3>
-              <ul class="space-y-2">
-                <li *ngFor="let place of property.nearbyPlaces" class="flex items-center text-gray-700">
-                  <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
-                    </svg>
-                  </div>
-                  <div>
-                    <span class="font-medium">{{ place.name }}</span>
-                    <span class="text-sm text-gray-500 ml-2">{{ place.distance }} - {{ place.type }}</span>
-                  </div>
-                </li>
-              </ul>
             </div>
           </div>
           
@@ -290,32 +276,6 @@
       
         <!-- Sidebar Column -->
         <div class="lg:col-span-1">
-          <!-- Contact Information (Original placement, now mostly for email/name if needed) -->
-          <div *ngIf="property.contactInfo && (property.contactInfo.name || property.contactInfo.email)" class="bg-white p-6 rounded-lg shadow-md mb-6">
-            <h3 class="text-lg font-medium text-gray-800 mb-4">Agent Information</h3>
-            <div class="space-y-3">
-              <div *ngIf="property.contactInfo?.name" class="flex items-start">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 mr-3 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 005 10a6 6 0 0012 0c0-.35-.035-.691-.1-1.02A5 5 0 0010 11z" clip-rule="evenodd" />
-                </svg>
-                <span class="text-gray-700">{{ getContactName() }}</span>
-              </div>
-              <div *ngIf="property.contactInfo?.phone" class="flex items-start">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 mr-3 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-                </svg>
-                <span class="text-gray-700">{{ getContactPhone() }}</span> 
-              </div>
-              <div *ngIf="property.contactInfo?.email" class="flex items-start">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 mr-3 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                  <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                </svg>
-                <span class="text-gray-700 break-all">{{ getContactEmail() }}</span>
-              </div>
-            </div>
-          </div>
-          
           <!-- Similar Properties -->
           <div *ngIf="similarProperties.length > 0" class="bg-white p-6 rounded-lg shadow-md">
             <h3 class="text-lg font-medium text-gray-800 mb-4">Similar Properties</h3>

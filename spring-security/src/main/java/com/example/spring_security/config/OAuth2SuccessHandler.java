@@ -55,12 +55,11 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             System.out.println("OAuth2 Attributes: " + attributes);
             
             String email = (String) attributes.get("email");
-            String providerId = oAuth2User.getName(); // Standard way to get unique ID for provider
+            String providerId = oAuth2User.getName();
             String name = (String) attributes.get("name");
             
-            // Fallbacks for Google specific attributes if standard ones are missing
             if (email == null && provider == User.AuthProvider.GOOGLE) {
-                email = (String) attributes.get("email"); // Retrying, as it should be present
+                email = (String) attributes.get("email");
             }
             if (name == null && provider == User.AuthProvider.GOOGLE) {
                 name = (String) attributes.getOrDefault("given_name", "") + " " + 
@@ -82,7 +81,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             User user = userService.createOrUpdateOAuth2User(email, name, providerId, provider);
             String jwtToken = tokenService.generateToken(user);
             
-            // Redirect the popup to the HTML page that will postMessage the token
             String targetUrl = appConfig.getOAuth2PopupCallbackUrlWithToken(jwtToken);
             logger.info("OAuth2 success, redirecting popup to: " + targetUrl);
             getRedirectStrategy().sendRedirect(request, response, targetUrl);

@@ -34,8 +34,7 @@ public class SchedulingConfig {
     }
 
     /**
-     * Scheduled task to trigger the Immobilier scraper once a week.
-     * This task only runs if the property 'scraper.scheduling.enabled' is set to 'true'.
+     Scheduling for mobilier scraper
      */
     @Scheduled(cron = "0 0 2 ? * SUN")
     @ConditionalOnProperty(name = "scraper.scheduling.enabled", havingValue = "true", matchIfMissing = false)
@@ -49,5 +48,4 @@ public class SchedulingConfig {
         }
     }
 
-    // TODO: Add scheduled methods for other scrapers later, also conditionalized
-} 
+}
