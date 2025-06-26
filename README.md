@@ -1,9 +1,5 @@
 # UniNest - PFE Final Year Project 🏠🎓
 
-**Faculty of Sciences of Monastir - Software Engineering & Information Systems**
-
-![UniNest Logo](./assets/logo-placeholder.png)
-*[Add UniNest Logo Here]*
 
 ## 📖 Introduction
 
